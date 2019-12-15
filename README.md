@@ -9,3 +9,7 @@ The data collected from this app can be used as open privacy protected data with
 
 ## System Architecture
 ![Image of Saral Lekha App](/assets/FinancialApp-System.png)
+
+## Sample Output (Insights)
+![Image of Expense](/assets/expense.png)
+![Image of Loan Amount](/assets/loanAmount.png)

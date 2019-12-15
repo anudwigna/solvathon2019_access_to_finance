@@ -20,7 +20,7 @@
     },
     {
       "id": 103,
-      "en": "",
+      "en": "Tools",
       "np": "औजार / मेसिन",
       "iconName": "home"
     },
@@ -71,6 +71,12 @@
       "en": "Miscellaneous",
       "np": "मसलन्द",
       "iconName": "table-tennis"
+    },
+    {
+      "id": 112,
+      "en": "Insurance Expense",
+      "np": "बिमा खर्च",
+      "iconName": "table-tennis"
     }
   ],
   "income": [
@@ -79,6 +85,12 @@
       "en": "Sales",
       "np": "बिक्री",
       "iconName": "hand-holding-usd"
+    },
+    {
+      "id": 112,
+      "en": "Insurance Income",
+      "np": "बिमा आय",
+      "iconName": "table-tennis"
     }
   ]
 }
