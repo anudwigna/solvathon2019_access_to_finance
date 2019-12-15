@@ -1,0 +1,67 @@
+//English letter should e in lower case
+const Map<String, String> ResourceMap = {
+  'nepali language': 'नेपाली भाषा',
+  'sampatti': 'सम्पत्ति',
+  'categories': 'श्रेणीहरू',
+  'income': 'आमदानी',
+  'expense': 'खर्च',
+  'add': 'थप्नुहोस',
+  'accounts': 'खाताहरू',
+  'current balance': 'हालको मौज्दात',
+  'npr': 'रू',
+  'person': 'व्यक्ति',
+  'other': 'अन्य',
+  'bank': 'बैंक',
+  'cash': 'नगद',
+  'account type': 'खाताको किसिम',
+  'update': 'हेरफेर गर्नुहोस',
+  'delete': 'मेटाउनुहोस ',
+  'are you sure to delete this account?':
+      'के तपाई यो खाता मेटाउन निश्चित हुनुहुन्छ?',
+  'budget': 'बजेट',
+  'monthly budget': 'मासिक बजेट',
+  'click to set budget': 'बजेट तय गर्न क्लिक गर्नुहोस',
+  'set budget': 'बजेट तय गर्नुहोस',
+  'update budget': 'बजेट संशोधन गर्नुहोस',
+  'clear budget': 'बजेट खाली गर्नुहोस',
+  'dashboard': 'गृहपृष्ठ',
+  'add income': 'आमदानी राख्नुहोस',
+  'add expense': 'खर्च राख्नुहोस',
+  'sorry, income for current month can only be added!':
+      'माफ गर्नुहोस, चालु महिनाको मात्र आम्दानी रकम राख्न सकिन्छ!',
+  'sorry, expense for current month can only be added!':
+      'माफ गर्नुहोस, चालु महिनाको मात्र खर्च रकम राख्न सकिन्छ!',
+  'select category': 'श्रेणी चुन्नुहोस',
+  'select account': 'खाता चुन्नुहोस',
+  'choose date': 'मिति रोज्नुहोस',
+  'submit': 'स्वीकार गर्नुहोस',
+  'please select category.': 'कृपया श्रेणी चुन्नुहोस',
+  'please select account.': 'कृपया खाता चुन्नुहोस',
+  'no transactions': 'कारोबार भएको छैन',
+  'login as guest': 'दर्ता नगरी चलाउनुहोस',
+  'register': 'दर्ता गर्नुहोस',
+  'select your country': 'देश चयन गर्नुहोस',
+  'warning': 'चेतावनी',
+  'okay': 'ठिक छ',
+  'cancel': 'रद्द गर्नुहोस',
+  'the data will be lost if you remove the app while using it as guest.':
+      'दर्ता नगरी चलाउनुहुदा, यो एप्प हटाउनुभएको खण्डमा सबै डेटाहरु हराउन सक्छन।',
+  'cannot delete! this account is linked with some transactions.':
+      'हटाउन सकिएन! यो खाता कुनै कारोबारसँग सम्बन्धित छ।',
+  'budget is not enough for the transaction. do you really want to add the transaction?':
+      'यो कारोबारको लागी बजेट रकम अपुग भएको छ। के तपाई साचै यो कारोबार राख्न चाहनुहुन्छ ?',
+  'Budget cannot be cleared as it in use.':
+      'बजेट प्रयोग भैराखेको हुनाले , खाली  गर्न सकिएन।',
+  'budget amount is not enough.': 'बजेट रकम पुगेन।',
+  'transaction detail': 'कारोबारको विवरण',
+  'date: ': 'मिति: ',
+  'detail: ': 'विवरण: ',
+  'amount: ': 'रकम: ',
+  'more categories': 'थप श्रेणीहरू',
+  'are you sure you want to delete this category? deleting the category will also clear all the records related to it.':
+      ' के तपाई साचै यो श्रेणी हटाउन चाहनुहुन्छ ? हटाउनु भएको खण्डमा यो श्रेणीसँग सम्बन्धित सबै कारोबारहरूपनि मेटिने छन।',
+  'update income': 'आमदानी हेरफेर गर्नुहोस',
+  'update expense': 'खर्च हेरफेर गर्नुहोस',
+  'are you sure you want to delete this category?':
+      'के तपाई साचै यो कारोबार हटाउन चाहनुहुन्छ ?',
+};

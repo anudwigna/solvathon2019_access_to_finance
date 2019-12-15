@@ -1,0 +1,119 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sampatti/globals.dart' as globals;
+import 'package:sampatti/providers/preference_provider.dart';
+import 'package:sampatti/services/preference_service.dart';
+
+import '../configuration.dart';
+import 'adaptive_text.dart';
+
+class MyDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var preferenceProvider = Provider.of<PreferenceProvider>(context);
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.8,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: Configuration().gradientColors,
+          begin: FractionalOffset.bottomRight,
+          end: FractionalOffset.topLeft,
+        ),
+      ),
+      child: ListView(
+        physics: BouncingScrollPhysics(),
+        children: <Widget>[
+          UserAccountsDrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+            ),
+            accountName: Text("Welcome Guest User!"),
+            accountEmail: Text("guestuser@gmail.com"),
+          ),
+          Configuration().drawerItemDivider,
+          ListTile(
+            leading: Icon(Icons.category),
+            title: AdaptiveText(
+              'Dashboard',
+              style: Configuration().whiteText,
+            ),
+            onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/home',
+                  ModalRoute.withName('/home'),
+                ),
+          ),
+          Configuration().drawerItemDivider,
+          ListTile(
+            leading: Icon(Icons.category),
+            title: AdaptiveText(
+              'Categories',
+              style: Configuration().whiteText,
+            ),
+            onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/category',
+                  ModalRoute.withName('/home'),
+                ),
+          ),
+          // ListTile(
+          //   leading: Icon(Icons.category),
+          //   title: Text('Test Page'),
+          //   onTap: () => Navigator.pushNamedAndRemoveUntil(
+          //         context,
+          //         '/test',
+          //         ModalRoute.withName('/test'),
+          //       ),
+          // ),
+          ListTile(
+            leading: Icon(Icons.card_travel),
+            title: AdaptiveText(
+              'Budget',
+              style: Configuration().whiteText,
+            ),
+            onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/budget',
+                  ModalRoute.withName('/home'),
+                ),
+          ),
+          ListTile(
+            leading: Icon(Icons.account_balance),
+            title: AdaptiveText(
+              'Accounts',
+              style: Configuration().whiteText,
+            ),
+            onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/account',
+                  ModalRoute.withName('/home'),
+                ),
+          ),
+          Configuration().drawerItemDivider,
+          ListTile(
+            leading: Icon(Icons.language),
+            title: AdaptiveText(
+              'Nepali Language',
+              style: Configuration().whiteText,
+            ),
+            trailing: Switch(
+              value: preferenceProvider.language == Lang.NP ? true : false,
+              activeColor: Colors.white,
+              onChanged: (nepaliSelected) {
+                if (nepaliSelected) {
+                  PreferenceService.instance.setLanguage('np');
+                  globals.language = 'np';
+                  preferenceProvider.language = Lang.NP;
+                } else {
+                  PreferenceService.instance.setLanguage('en');
+                  globals.language = 'en';
+                  preferenceProvider.language = Lang.EN;
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
