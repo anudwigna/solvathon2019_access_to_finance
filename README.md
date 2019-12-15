@@ -1,2 +1,2 @@
-# solvathon2019_access_to_finance
-This is one of the project of Access to Finance.
+#Access to Finance
+This is the app related to data collection for Access to Finance.
