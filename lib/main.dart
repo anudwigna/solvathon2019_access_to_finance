@@ -18,7 +18,7 @@ void main() async {
   //WidgetFlutterBinding.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();
   globals.language = (await PreferenceService.instance.getLanguage()) ?? 'en';
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(Sampatti());
 }
 
