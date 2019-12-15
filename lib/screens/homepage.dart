@@ -159,7 +159,7 @@ class _HomePageState extends State<HomePage>
                                         100 -
                                             _getIncomeFraction(snapshot.data[0],
                                                 snapshot.data[1]),
-                                        Configuration().redColor,
+                                        Colors.red,
                                       ),
                                     ],
                                   ),

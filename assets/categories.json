@@ -2,251 +2,83 @@
   "expense": [
     {
       "id": 100,
-      "en": "Food",
-      "np": "खानपीन",
+      "en": "Foundation Seed",
+      "np": "मूल बिउ",
       "iconName": "utensils"
     },
     {
       "id": 101,
-      "en": "Bills",
-      "np": "बिल",
+      "en": "Fertilizers",
+      "np": "मल",
       "iconName": "file-invoice-dollar"
     },
     {
       "id": 102,
-      "en": "Transportation",
-      "np": "यातायात",
+      "en": "Insecticide",
+      "np": "बिषादी",
       "iconName": "bus"
     },
     {
       "id": 103,
-      "en": "Home",
-      "np": "घर",
+      "en": "",
+      "np": "औजार / मेसिन",
       "iconName": "home"
     },
     {
       "id": 104,
-      "en": "Car",
-      "np": "गाडी",
+      "en": "Transportation",
+      "np": "यातायात",
       "iconName": "car"
     },
     {
       "id": 105,
-      "en": "Entertainment",
-      "np": "मनोरञ्जन",
+      "en": "Water",
+      "np": "पानी",
       "iconName": "gamepad"
     },
     {
       "id": 106,
-      "en": "Shopping",
-      "np": "किनमेल",
+      "en": "Electricity / Fuel",
+      "np": "बिजुली / इन्धन",
       "iconName": "shopping-bag"
     },
     {
       "id": 107,
-      "en": "Clothing",
-      "np": "लुगाफाटा",
+      "en": "Labour Wage",
+      "np": "श्रमिक ज्याला",
       "iconName": "tshirt"
     },
     {
       "id": 108,
-      "en": "Insurance",
-      "np": "बीमा",
+      "en": "Rent",
+      "np": "भाडा",
       "iconName": "user-shield"
     },
     {
       "id": 109,
-      "en": "Tax",
-      "np": "कर",
+      "en": "Transportation Fare",
+      "np": "ढुवानी",
       "iconName": "file-invoice"
     },
     {
       "id": 110,
-      "en": "Telephone",
-      "np": "टेलिफोन",
-      "iconName": "phone"
-    },
-    {
-      "id": 111,
-      "en": "Cigarette",
-      "np": "चुरोट",
-      "iconName": "smoking"
-    },
-    {
-      "id": 112,
-      "en": "Health",
-      "np": "स्वास्थ्य",
+      "en": "Food",
+      "np": "खाजा खाना",
       "iconName": "heartbeat"
     },
     {
-      "id": 113,
-      "en": "Sport",
-      "np": "खेल",
+      "id": 111,
+      "en": "Miscellaneous",
+      "np": "मसलन्द",
       "iconName": "table-tennis"
-    },
-    {
-      "id": 114,
-      "en": "Baby",
-      "np": "बच्चा",
-      "iconName": "baby"
-    },
-    {
-      "id": 115,
-      "en": "Pet",
-      "np": "पशूपंक्षी",
-      "iconName": "dog"
-    },
-    {
-      "id": 116,
-      "en": "Beauty",
-      "np": "सौन्दर्य",
-      "iconName": "highlighter"
-    },
-    {
-      "id": 117,
-      "en": "Electronics",
-      "np": "विद्युतीय उपकरण",
-      "iconName": "plug"
-    },
-    {
-      "id": 118,
-      "en": "Hamburger",
-      "np": "हैम्बर्गर",
-      "iconName": "hamburger"
-    },
-    {
-      "id": 119,
-      "en": "Wine",
-      "np": "मदिरा",
-      "iconName": "wine-glass-alt"
-    },
-    {
-      "id": 120,
-      "en": "Vegetables",
-      "np": "तरकारी ",
-      "iconName": "pepper-hot"
-    },
-    {
-      "id": 121,
-      "en": "Snacks",
-      "np": "खाजा",
-      "iconName": "cookie"
-    },
-    {
-      "id": 122,
-      "en": "Gift",
-      "np": "उपहार",
-      "iconName": "gift"
-    },
-    {
-      "id": 123,
-      "en": "Social",
-      "np": "सामाजिक",
-      "iconName": "users"
-    },
-    {
-      "id": 124,
-      "en": "Travel",
-      "np": "यात्रा",
-      "iconName": "globe-europe"
-    },
-    {
-      "id": 125,
-      "en": "Education",
-      "np": "शिक्षा",
-      "iconName": "graduation-cap"
-    },
-    {
-      "id": 126,
-      "en": "Fruits",
-      "np": "फलफूल ",
-      "iconName": "apple-alt"
-    },
-    {
-      "id": 127,
-      "en": "Book",
-      "np": "किताब",
-      "iconName": "book"
-    },
-    {
-      "id": 128,
-      "en": "Office",
-      "np": "कार्यालय",
-      "iconName": "briefcase"
-    },
-    {
-      "id": 129,
-      "en": "Religious",
-      "np": "धार्मिक",
-      "iconName": "om"
-    },
-    {
-      "id": 130,
-      "en": "Others",
-      "np": "अन्य",
-      "iconName": "hornbill"
     }
   ],
   "income": [
     {
       "id": 1,
-      "en": "Salary",
-      "np": "तलब",
-      "iconName": "hand-holding-usd"
-    },
-    {
-      "id": 2,
-      "en": "Awards",
-      "np": "पुरस्कार",
-      "iconName": "award"
-    },
-    {
-      "id": 3,
-      "en": "Grants",
-      "np": "अनुदान",
-      "iconName": "donate"
-    },
-    {
-      "id": 4,
-      "en": "Sale",
+      "en": "Sales",
       "np": "बिक्री",
-      "iconName": "tag"
-    },
-    {
-      "id": 5,
-      "en": "Rental",
-      "np": "भाडा",
-      "iconName": "money-bill-alt"
-    },
-    {
-      "id": 6,
-      "en": "Refunds",
-      "np": "फिर्ता",
-      "iconName": "history"
-    },
-    {
-      "id": 7,
-      "en": "Lottery",
-      "np": "चिट्ठा",
-      "iconName": "money-bill-wave"
-    },
-    {
-      "id": 8,
-      "en": "Dividends",
-      "np": "लाभांश",
-      "iconName": "chart-line"
-    },
-    {
-      "id": 9,
-      "en": "Investments",
-      "np": "लगानी",
-      "iconName": "piggy-bank"
-    },
-    {
-      "id": 10,
-      "en": "Others",
-      "np": "अन्य",
-      "iconName": "hornbill"
+      "iconName": "hand-holding-usd"
     }
   ]
 }
