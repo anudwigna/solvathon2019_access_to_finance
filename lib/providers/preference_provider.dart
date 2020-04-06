@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:sampatti/globals.dart' as globals;
+import 'package:saral_lekha/globals.dart' as globals;
 
 enum Lang { EN, NP }
 

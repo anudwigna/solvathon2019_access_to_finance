@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/components/adaptive_text.dart';
-import 'package:sampatti/components/drawer.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/icons/vector_icons.dart';
-import 'package:sampatti/models/category/category.dart';
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/category_service.dart';
-import 'package:sampatti/components/reorderable_list.dart' as Component;
+import 'package:saral_lekha/components/adaptive_text.dart';
+import 'package:saral_lekha/components/drawer.dart';
+import 'package:saral_lekha/globals.dart' as globals;
+import 'package:saral_lekha/icons/vector_icons.dart';
+import 'package:saral_lekha/models/category/category.dart';
+import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:saral_lekha/services/category_service.dart';
+import 'package:saral_lekha/components/reorderable_list.dart' as Component;
 
 import '../configuration.dart';
 

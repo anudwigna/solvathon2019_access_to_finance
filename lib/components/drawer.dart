@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/preference_service.dart';
+import 'package:saral_lekha/globals.dart' as globals;
+import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:saral_lekha/services/preference_service.dart';
 
 import '../configuration.dart';
 import 'adaptive_text.dart';

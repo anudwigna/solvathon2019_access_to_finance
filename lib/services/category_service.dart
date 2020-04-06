@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/models/category/category.dart';
-import 'package:sampatti/models/database_and_store.dart';
-import 'package:sampatti/services/budget_service.dart';
-import 'package:sampatti/services/preference_service.dart';
-import 'package:sampatti/services/transaction_service.dart';
+import 'package:saral_lekha/globals.dart' as globals;
+import 'package:saral_lekha/models/category/category.dart';
+import 'package:saral_lekha/models/database_and_store.dart';
+import 'package:saral_lekha/services/budget_service.dart';
+import 'package:saral_lekha/services/preference_service.dart';
+import 'package:saral_lekha/services/transaction_service.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 

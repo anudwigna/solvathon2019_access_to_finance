@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/screens/account_page.dart';
-import 'package:sampatti/screens/budget_page.dart';
-import 'package:sampatti/screens/category_page.dart';
-import 'package:sampatti/screens/homepage.dart';
-import 'package:sampatti/screens/language_selection_page.dart';
-import 'package:sampatti/screens/login_page.dart';
-import 'package:sampatti/screens/splashscreen.dart';
-import 'package:sampatti/screens/test_screen.dart';
-import 'package:sampatti/services/preference_service.dart';
+import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:saral_lekha/screens/account_page.dart';
+import 'package:saral_lekha/screens/budget_page.dart';
+import 'package:saral_lekha/screens/category_page.dart';
+import 'package:saral_lekha/screens/homepage.dart';
+import 'package:saral_lekha/screens/language_selection_page.dart';
+import 'package:saral_lekha/screens/login_page.dart';
+import 'package:saral_lekha/screens/splashscreen.dart';
+import 'package:saral_lekha/services/preference_service.dart';
 
 import 'globals.dart' as globals;
 
@@ -19,10 +18,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   globals.language = (await PreferenceService.instance.getLanguage()) ?? 'en';
   //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(Sampatti());
+  runApp(Sarallekha());
 }
 
-class Sampatti extends StatelessWidget {
+class Sarallekha extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PreferenceProvider>(

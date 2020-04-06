@@ -1,8 +1,8 @@
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/components/adaptive_text.dart';
-import 'package:sampatti/providers/preference_provider.dart';
+import 'package:saral_lekha/components/adaptive_text.dart';
+import 'package:saral_lekha/providers/preference_provider.dart';
 
 import '../configuration.dart';
 import 'package:country_pickers/country_pickers.dart';
@@ -48,13 +48,13 @@ class _LoginPageState extends State<LoginPage> {
           children: <Widget>[
             _spacing(2),
             Image.asset(
-              'assets/sampatti_logo.png',
+              'assets/saral_lekha_logo.png',
               width: 150,
               height: 150,
             ),
             SizedBox(height: 10.0),
             Text(
-              'SAMPATTI',
+              'saral_lekha',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,

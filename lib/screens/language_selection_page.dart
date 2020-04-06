@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/preference_service.dart';
+import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:saral_lekha/services/preference_service.dart';
 
 import '../configuration.dart';
 
@@ -16,13 +16,13 @@ class LanguageSelectionPage extends StatelessWidget {
           children: <Widget>[
             Flexible(flex: 3, child: Container()),
             Image.asset(
-              'assets/sampatti_logo.png',
+              'assets/saral_lekha_logo.png',
               height: 150.0,
               width: 150.0,
             ),
             SizedBox(height: 10.0),
             Text(
-              'SAMPATTI',
+              'Saral Lekha',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,

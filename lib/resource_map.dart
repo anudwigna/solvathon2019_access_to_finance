@@ -1,7 +1,7 @@
 //English letter should e in lower case
 const Map<String, String> ResourceMap = {
   'nepali language': 'नेपाली भाषा',
-  'sampatti': 'सम्पत्ति',
+  'saral_lekha': 'सम्पत्ति',
   'categories': 'श्रेणीहरू',
   'income': 'आमदानी',
   'expense': 'खर्च',

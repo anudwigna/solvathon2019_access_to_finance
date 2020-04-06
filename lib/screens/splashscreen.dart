@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/models/account/account.dart';
-import 'package:sampatti/services/account_service.dart';
-import 'package:sampatti/services/category_service.dart';
-import 'package:sampatti/services/preference_service.dart';
+import 'package:saral_lekha/globals.dart' as globals;
+import 'package:saral_lekha/models/account/account.dart';
+import 'package:saral_lekha/services/account_service.dart';
+import 'package:saral_lekha/services/category_service.dart';
+import 'package:saral_lekha/services/preference_service.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

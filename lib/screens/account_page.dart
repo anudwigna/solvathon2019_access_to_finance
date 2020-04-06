@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nepali_utils/nepali_utils.dart' as nu;
 import 'package:provider/provider.dart';
-import 'package:sampatti/components/adaptive_text.dart';
-import 'package:sampatti/components/drawer.dart';
-import 'package:sampatti/models/account/account.dart';
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/account_service.dart';
+import 'package:saral_lekha/components/adaptive_text.dart';
+import 'package:saral_lekha/components/drawer.dart';
+import 'package:saral_lekha/models/account/account.dart';
+import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:saral_lekha/services/account_service.dart';
 
 import '../configuration.dart';
 

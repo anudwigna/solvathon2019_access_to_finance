@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/components/adaptive_text.dart';
-import 'package:sampatti/components/drawer.dart';
-import 'package:sampatti/icons/vector_icons.dart';
-import 'package:sampatti/models/budget/budget.dart';
-import 'package:sampatti/models/category/category.dart';
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/budget_service.dart';
-import 'package:sampatti/services/category_service.dart';
-import 'package:sampatti/services/transaction_service.dart';
+import 'package:saral_lekha/components/adaptive_text.dart';
+import 'package:saral_lekha/components/drawer.dart';
+import 'package:saral_lekha/icons/vector_icons.dart';
+import 'package:saral_lekha/models/budget/budget.dart';
+import 'package:saral_lekha/models/category/category.dart';
+import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:saral_lekha/services/budget_service.dart';
+import 'package:saral_lekha/services/category_service.dart';
+import 'package:saral_lekha/services/transaction_service.dart';
 
 import '../configuration.dart';
 
