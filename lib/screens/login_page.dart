@@ -7,6 +7,9 @@ import 'package:saral_lekha/providers/preference_provider.dart';
 import '../configuration.dart';
 import 'package:country_pickers/country_pickers.dart';
 
+import '../globals.dart';
+import '../providers/preference_provider.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -54,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 10.0),
             Text(
-              'saral_lekha',
+              (language == Lang.EN) ? 'Saral Lekha' : 'सारल लेखा',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,
@@ -203,53 +206,53 @@ class _LoginPageState extends State<LoginPage> {
   void _openCountryPickerDialog() => showDialog(
         context: context,
         builder: (context) => Theme(
-              data: Theme.of(context).copyWith(
-                canvasColor: Colors.white,
-                cardColor: Colors.white,
-                brightness: Brightness.light,
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors.white,
+            cardColor: Colors.white,
+            brightness: Brightness.light,
+          ),
+          child: CountryPickerDialog(
+            titlePadding: EdgeInsets.all(8.0),
+            searchCursorColor: Colors.pinkAccent,
+            searchInputDecoration: InputDecoration(
+              hintText: 'Search...',
+              hintStyle: TextStyle(
+                color: Colors.grey,
               ),
-              child: CountryPickerDialog(
-                titlePadding: EdgeInsets.all(8.0),
-                searchCursorColor: Colors.pinkAccent,
-                searchInputDecoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
-                isSearchable: true,
-                title: AdaptiveText('Select your country'),
-                onValuePicked: (country) => setState(
-                      () => _selectedCountry = country,
-                    ),
-                itemBuilder: (country) => Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        CountryPickerUtils.getDefaultFlagImage(country),
-                        SizedBox(width: 12.0),
-                        Expanded(
-                          child: RichText(
-                            text: TextSpan(
-                              text: country.name,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w300,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: ' (+${country.phoneCode})',
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ],
-                            ),
+            ),
+            isSearchable: true,
+            title: AdaptiveText('Select your country'),
+            onValuePicked: (country) => setState(
+              () => _selectedCountry = country,
+            ),
+            itemBuilder: (country) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CountryPickerUtils.getDefaultFlagImage(country),
+                SizedBox(width: 12.0),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      text: country.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: ' (+${country.phoneCode})',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w300,
                           ),
                         ),
                       ],
                     ),
-              ),
+                  ),
+                ),
+              ],
             ),
+          ),
+        ),
       );
 
   _warnUser() => showDialog(
