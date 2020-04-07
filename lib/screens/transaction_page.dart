@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:saral_lekha/components/adaptive_text.dart';
 import 'package:saral_lekha/icons/vector_icons.dart';
 import 'package:saral_lekha/models/account/account.dart';
+import 'package:saral_lekha/globals.dart' as globals;
 import 'package:saral_lekha/models/budget/budget.dart';
 import 'package:saral_lekha/models/category/category.dart';
 import 'package:saral_lekha/models/transaction/transaction.dart';
@@ -30,22 +31,21 @@ class TransactionPage extends StatefulWidget {
 }
 
 class _TransactionPageState extends State<TransactionPage> {
+  TextEditingController _categoryName = TextEditingController();
   Lang language;
   double fontsize = 15.0;
   BoxDecoration _decoration = BoxDecoration(
     color: Colors.white,
-    borderRadius: BorderRadius.all(Radius.circular(15.0)),
   );
-
   var _formKey = GlobalKey<FormState>();
+  var _formKey1 = GlobalKey<FormState>();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  var _dropdownKey = GlobalKey();
   var _amountController = TextEditingController();
   var _descriptionController = TextEditingController();
   int _selectedCategoryId;
   Account _selectedAccount;
   NepaliDateTime _selectedDateTime = NepaliDateTime.now();
-
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
@@ -77,44 +77,46 @@ class _TransactionPageState extends State<TransactionPage> {
               SizedBox(height: 20.0),
               Row(
                 children: <Widget>[
-                  Text(
-                      (language == Lang.EN)
-                          ? (widget.transactionType == 1)
-                              ? 'Expense Amount'
-                              : 'Business Income'
-                          : (widget.transactionType == 1)
-                              ? 'खर्च रकम'
-                              : 'व्यापार आय',
-                      style: TextStyle(fontSize: fontsize)),
+                  Expanded(
+                    child: Text(
+                        (language == Lang.EN)
+                            ? (widget.transactionType == 1)
+                                ? 'Expense Amount'
+                                : 'Business Income'
+                            : (widget.transactionType == 1)
+                                ? 'खर्च रकम'
+                                : 'व्यापार आय',
+                        style: TextStyle(fontSize: fontsize)),
+                  ),
                   SizedBox(
                     width: 5,
                   ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(left: 12.0),
-                      decoration: _decoration,
-                      child: Form(
-                        key: _formKey,
-                        child: TextFormField(
-                          validator: (value) => value.length == 0
-                              ? language == Lang.EN ? 'Required' : 'अनिवार्य'
-                              : null,
-                          autofocus: true,
-                          controller: _amountController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly
-                          ],
-                          style: TextStyle(
-                              color: Colors.grey[800], fontSize: fontsize),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: language == Lang.EN
-                                ? 'Enter amount'
-                                : 'रकम लेख्नुहोस',
-                            hintStyle: TextStyle(
-                                color: Colors.grey, fontSize: fontsize),
-                          ),
+                  Container(
+                    key: new GlobalKey(),
+                    width: (MediaQuery.of(context).size.width / 100) * 60,
+                    padding: EdgeInsets.only(left: 12.0),
+                    decoration: _decoration,
+                    child: Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        validator: (value) => value.length == 0
+                            ? language == Lang.EN ? 'Required' : 'अनिवार्य'
+                            : null,
+                        autofocus: true,
+                        controller: _amountController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly
+                        ],
+                        style: TextStyle(
+                            color: Colors.grey[800], fontSize: fontsize),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: language == Lang.EN
+                              ? 'Enter amount'
+                              : 'रकम लेख्नुहोस',
+                          hintStyle:
+                              TextStyle(color: Colors.grey, fontSize: fontsize),
                         ),
                       ),
                     ),
@@ -126,90 +128,117 @@ class _TransactionPageState extends State<TransactionPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                        (language == Lang.EN)
-                            ? (widget.transactionType == 1)
-                                ? 'Expense Category'
-                                : 'Source of Income'
-                            : (widget.transactionType == 1)
-                                ? 'खर्च को वर्गीकरण'
-                                : 'आय को स्रोत',
-                        style: TextStyle(fontSize: fontsize)),
+                    Expanded(
+                      child: Text(
+                          (language == Lang.EN)
+                              ? (widget.transactionType == 1)
+                                  ? 'Expense Category'
+                                  : 'Source of Income'
+                              : (widget.transactionType == 1)
+                                  ? 'खर्च को वर्गीकरण'
+                                  : 'आय को स्रोत',
+                          style: TextStyle(fontSize: fontsize)),
+                    ),
                     SizedBox(
                       width: 5,
                     ),
-                    Expanded(
-                      child: Container(
-                        decoration: _decoration,
-                        child: FutureBuilder<List<Category>>(
-                          future: CategoryService().getCategories(
-                            widget.transactionType == 0
-                                ? CategoryType.INCOME
-                                : CategoryType.EXPENSE,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 5.0),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<int>(
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
+                    Container(
+                      width: (MediaQuery.of(context).size.width / 100) * 60,
+                      decoration: _decoration,
+                      child: FutureBuilder<List<Category>>(
+                        future: CategoryService().getCategories(
+                          widget.transactionType == 0
+                              ? CategoryType.INCOME
+                              : CategoryType.EXPENSE,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              child: DropdownButtonHideUnderline(
+                                key: _dropdownKey,
+                                child: DropdownButton<int>(
+                                  icon: Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.grey[700],
+                                  ),
+                                  hint: AdaptiveText(
+                                    (language == Lang.EN)
+                                        ? 'Select Category'
+                                        : 'वर्गीकरण गर्नुहोस्',
+                                    style: TextStyle(
                                       color: Colors.grey[700],
                                     ),
-                                    hint: AdaptiveText(
-                                      (language == Lang.EN)
-                                          ? 'Select Category'
-                                          : 'वर्गीकरण गर्नुहोस्',
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                    value: _selectedCategoryId,
-                                    items: [
-                                      for (int i = 0;
-                                          i < snapshot.data.length;
-                                          i++)
-                                        DropdownMenuItem<int>(
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Icon(
-                                                VectorIcons.fromName(
-                                                  snapshot.data[i].iconName,
-                                                  provider:
-                                                      IconProvider.FontAwesome5,
-                                                ),
-                                                color: Colors.grey,
-                                                size: fontsize,
+                                  ),
+                                  value: _selectedCategoryId,
+                                  items: [
+                                    for (int i = 0;
+                                        i < snapshot.data.length;
+                                        i++)
+                                      DropdownMenuItem<int>(
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Icon(
+                                              VectorIcons.fromName(
+                                                snapshot.data[i].iconName,
+                                                provider:
+                                                    IconProvider.FontAwesome5,
                                               ),
-                                              SizedBox(width: 5.0),
-                                              AdaptiveText(
-                                                '',
-                                                category: snapshot.data[i],
-                                                style: TextStyle(
-                                                  color: Colors.grey[700],
-                                                ),
+                                              color: Colors.grey,
+                                              size: fontsize,
+                                            ),
+                                            SizedBox(width: 5.0),
+                                            AdaptiveText(
+                                              '',
+                                              category: snapshot.data[i],
+                                              style: TextStyle(
+                                                color: Colors.grey[700],
                                               ),
-                                            ],
-                                          ),
-                                          value: snapshot.data[i].id,
+                                            ),
+                                          ],
                                         ),
-                                    ],
-                                    onChanged: (value) {
+                                        value: snapshot.data[i].id,
+                                      ),
+                                    DropdownMenuItem<int>(
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.create,
+                                            color: Colors.grey,
+                                            size: fontsize,
+                                          ),
+                                          SizedBox(width: 5.0),
+                                          AdaptiveText(
+                                            'Add new Category',
+                                            style: TextStyle(
+                                              color: Colors.grey[700],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      value: 'Add new Category'.hashCode,
+                                    ),
+                                  ],
+                                  onChanged: (value) {
+                                    if (value == 'Add new Category'.hashCode) {
+                                      _showAddCategoryBottomSheet();
+
+                                    } else {
                                       setState(() {
                                         _selectedCategoryId = value;
                                       });
-                                    },
-                                  ),
+                                    }
+                                  },
                                 ),
-                              );
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          },
-                        ),
+                              ),
+                            );
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -219,74 +248,75 @@ class _TransactionPageState extends State<TransactionPage> {
                 Row(
                   children: <Widget>[
                     if (language == Lang.EN)
-                      Text(
-                        widget.transactionType == 0
-                            ? 'Deposited to:  '
-                            : 'Pay from:  ',
-                        style: TextStyle(fontSize: fontsize),
+                      Expanded(
+                        child: Text(
+                          widget.transactionType == 0
+                              ? 'Deposited to:  '
+                              : 'Pay from:  ',
+                          style: TextStyle(fontSize: fontsize),
+                        ),
                       ),
-                    Expanded(
-                      child: Container(
-                        decoration: _decoration,
-                        child: FutureBuilder<List<Account>>(
-                          future: AccountService().getAccounts(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<Account>(
-                                    icon: Icon(
-                                      Icons.arrow_drop_down,
+                    Container(
+                      width: (MediaQuery.of(context).size.width / 100) * 60,
+                      decoration: _decoration,
+                      child: FutureBuilder<List<Account>>(
+                        future: AccountService().getAccounts(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<Account>(
+                                  icon: Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.grey[700],
+                                  ),
+                                  hint: AdaptiveText(
+                                    'Select Account',
+                                    style: TextStyle(
                                       color: Colors.grey[700],
                                     ),
-                                    hint: AdaptiveText(
-                                      'Select Account',
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                    value: _selectedAccount,
-                                    items: [
-                                      for (int i = 0;
-                                          i < snapshot.data.length;
-                                          i++)
-                                        DropdownMenuItem<Account>(
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Icon(
-                                                _accountTypeIcon(
-                                                    snapshot.data[i].type),
-                                                color: Colors.grey,
-                                                size: fontsize,
-                                              ),
-                                              SizedBox(width: 5.0),
-                                              AdaptiveText(
-                                                '${snapshot.data[i].name}',
-                                                style: TextStyle(
-                                                  color: Colors.grey[700],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          value: snapshot.data[i],
-                                        ),
-                                    ],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedAccount = value;
-                                      });
-                                    },
                                   ),
+                                  value: _selectedAccount,
+                                  items: [
+                                    for (int i = 0;
+                                        i < snapshot.data.length;
+                                        i++)
+                                      DropdownMenuItem<Account>(
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Icon(
+                                              _accountTypeIcon(
+                                                  snapshot.data[i].type),
+                                              color: Colors.grey,
+                                              size: fontsize,
+                                            ),
+                                            SizedBox(width: 5.0),
+                                            AdaptiveText(
+                                              '${snapshot.data[i].name}',
+                                              style: TextStyle(
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        value: snapshot.data[i],
+                                      ),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedAccount = value;
+                                    });
+                                  },
                                 ),
-                              );
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          },
-                        ),
+                              ),
+                            );
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        },
                       ),
                     ),
                     if (language == Lang.NP)
@@ -648,5 +678,137 @@ class _TransactionPageState extends State<TransactionPage> {
   _showMessage(String message) {
     _scaffoldKey.currentState
         .showSnackBar(SnackBar(content: AdaptiveText(message)));
+  }
+
+  Future<bool> _showAddCategoryBottomSheet() async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return AnimatedPadding(
+          padding: MediaQuery.of(context).viewInsets,
+          duration: Duration(milliseconds: 100),
+          curve: Curves.decelerate,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0))),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20.0),
+                          ),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            VectorIcons.fromName('hornbill',
+                                provider: IconProvider.FontAwesome5),
+                            color: Colors.black,
+                          ),
+                          onPressed: () {},
+                        ),
+                      ),
+                      SizedBox(width: 10.0),
+                      Expanded(
+                        child: Form(
+                          key: _formKey1,
+                          child: TextFormField(
+                            validator: validator,
+                            controller: _categoryName,
+                            style: TextStyle(
+                                color: Colors.grey[800], fontSize: 20.0),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: language == Lang.EN
+                                  ? 'Enter new category'
+                                  : 'नयाँ श्रेणी लेख्नुहोस',
+                              hintStyle:
+                                  TextStyle(color: Colors.grey, fontSize: 20.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      gradient: LinearGradient(
+                        colors: Configuration().gradientColors,
+                        begin: FractionalOffset.centerLeft,
+                        end: FractionalOffset.centerRight,
+                      ),
+                    ),
+                    child: Material(
+                      child: InkWell(
+                        onTap: () async {
+                          if (_formKey1.currentState.validate()) {
+                            await CategoryService().addCategory(
+                              Category(
+                                en: _categoryName.text,
+                                np: _categoryName.text,
+                                iconName: 'hornbill',
+                                id: _categoryName.text.hashCode,
+                              ),
+                              type: widget.transactionType == 0
+                                  ? CategoryType.INCOME
+                                  : CategoryType.EXPENSE,
+                            );
+                            Navigator.pop(context);
+                          }
+                          _categoryName.clear();
+                        },
+                        borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          child: AdaptiveText(
+                            'ADD',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    setState(() {});
+  }
+
+  String validator(String value) {
+    var _value = value.toLowerCase();
+    var categories = widget.transactionType == 0
+        ? globals.expenseCategories
+        : globals.incomeCategories;
+    if (value.isEmpty) {
+      return language == Lang.EN ? 'Category is empty' : 'श्रेणी खाली छ';
+    } else if (categories.any((category) =>
+        category.en.toLowerCase() == _value ||
+        category.np.toLowerCase() == _value)) {
+      return language == Lang.EN
+          ? 'Category already exists!'
+          : 'श्रेणी पहिल्यै छ';
+    }
+    return null;
   }
 }

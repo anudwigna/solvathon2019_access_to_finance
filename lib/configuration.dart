@@ -6,10 +6,12 @@ class Configuration {
       );
 
   //Color get yellowColor => Color(0xeef8aa2c);
-  Color get yellowColor => Colors.blue;
+  Color get yellowColor => Color(0xff263547);
 
   //Color get redColor => Color(0xeee62844);
-  Color get redColor => Colors.blue;
+  Color get redColor => Color(0xff263547);
+  Color get expenseColor => Colors.red;
+  Color get incomeColor => Color(0xff263547);
 
   Widget get drawerItemDivider => Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.0),

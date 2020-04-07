@@ -28,7 +28,7 @@ class Sarallekha extends StatelessWidget {
       builder: (context) => PreferenceProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Finance Manager APP',
+        title: 'Saral Lekha',
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: MaterialColor(0xffffffff, {}),
@@ -41,8 +41,8 @@ class Sarallekha extends StatelessWidget {
         ),
         routes: {
           '/': (context) => SplashScreen(),
-          '/language': (context) => LanguageSelectionPage(),
-          '/login': (context) => LoginPage(),
+        //  '/language': (context) => LanguageSelectionPage(),
+        //  '/login': (context) => LoginPage(),
           '/home': (context) => HomePage(),
           '/category': (context) => CategoryPage(),
           '/budget': (context) => BudgetPage(),

@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:saral_lekha/globals.dart' as globals;
 import 'package:saral_lekha/models/account/account.dart';
+import 'package:saral_lekha/providers/preference_provider.dart';
 import 'package:saral_lekha/services/account_service.dart';
 import 'package:saral_lekha/services/category_service.dart';
 import 'package:saral_lekha/services/preference_service.dart';
@@ -21,7 +23,10 @@ class _SplashScreenState extends State<SplashScreen> {
       (isFirstStart) async {
         if (isFirstStart) {
           await _loadCategories();
-          Navigator.pushReplacementNamed(context, '/language');
+          await PreferenceService.instance.setLanguage('en');
+          Provider.of<PreferenceProvider>(context).language = Lang.EN;
+          PreferenceService.instance.setIsFirstStart(false);
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
           globals.incomeCategories =
               await CategoryService().getCategories(CategoryType.INCOME);
@@ -92,7 +97,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: Color(0xff263547),
+      child: Center(
+          child: Image.asset("assets/saral_lekha_logo.png", fit: BoxFit.cover)),
     );
   }
 }

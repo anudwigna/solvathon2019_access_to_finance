@@ -8,7 +8,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Finance Manager App"
+        android:label="Saral Lekha"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

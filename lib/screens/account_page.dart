@@ -176,15 +176,6 @@ class _AccountPageState extends State<AccountPage> {
                                   if ((await showDialog(
                                         context: context,
                                         builder: (context) =>
-                                            _updateDialog(_accounts[_index]),
-                                      )) ??
-                                      false) {
-                                    _refreshBalance();
-                                  }
-                                } else {
-                                  if ((await showDialog(
-                                        context: context,
-                                        builder: (context) =>
                                             _deleteDialog(_accounts[_index]),
                                       )) ??
                                       false) {
@@ -193,23 +184,14 @@ class _AccountPageState extends State<AccountPage> {
                                 }
                               },
                               itemBuilder: (context) => [
-                                    PopupMenuItem(
-                                      value: 1,
-                                      child: AdaptiveText(
-                                        'Update',
-                                        style:
-                                            TextStyle(color: Colors.grey[700]),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 2,
-                                      child: AdaptiveText(
-                                        'Delete',
-                                        style:
-                                            TextStyle(color: Colors.grey[700]),
-                                      ),
-                                    ),
-                                  ],
+                                PopupMenuItem(
+                                  value: 1,
+                                  child: AdaptiveText(
+                                    'Delete',
+                                    style: TextStyle(color: Colors.grey[700]),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],

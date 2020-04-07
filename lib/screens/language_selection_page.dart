@@ -123,6 +123,6 @@ class LanguageSelectionPage extends StatelessWidget {
     );
   }
 
-  _navigateToHome(BuildContext context) =>
-      Navigator.pushReplacementNamed(context, '/login');
+   _navigateToHome(BuildContext context) =>
+       Navigator.pushReplacementNamed(context, '/home');
 }

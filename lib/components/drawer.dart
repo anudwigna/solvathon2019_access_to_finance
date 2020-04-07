@@ -23,25 +23,23 @@ class MyDrawer extends StatelessWidget {
       child: ListView(
         physics: BouncingScrollPhysics(),
         children: <Widget>[
-          UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-            ),
-            accountName: Text("Welcome Guest User!"),
-            accountEmail: Text("guestuser@gmail.com"),
+          Image.asset(
+            "assets/saral_lekha_logo.png",
+            fit: BoxFit.cover,
+            height: 200,
           ),
           Configuration().drawerItemDivider,
           ListTile(
-            leading: Icon(Icons.category),
+            leading: Icon(Icons.dashboard),
             title: AdaptiveText(
               'Dashboard',
               style: Configuration().whiteText,
             ),
             onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/home',
-                  ModalRoute.withName('/home'),
-                ),
+              context,
+              '/home',
+              ModalRoute.withName('/home'),
+            ),
           ),
           Configuration().drawerItemDivider,
           ListTile(
@@ -51,10 +49,10 @@ class MyDrawer extends StatelessWidget {
               style: Configuration().whiteText,
             ),
             onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/category',
-                  ModalRoute.withName('/home'),
-                ),
+              context,
+              '/category',
+              ModalRoute.withName('/home'),
+            ),
           ),
           // ListTile(
           //   leading: Icon(Icons.category),
@@ -72,10 +70,10 @@ class MyDrawer extends StatelessWidget {
               style: Configuration().whiteText,
             ),
             onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/budget',
-                  ModalRoute.withName('/home'),
-                ),
+              context,
+              '/budget',
+              ModalRoute.withName('/home'),
+            ),
           ),
           ListTile(
             leading: Icon(Icons.account_balance),
@@ -84,10 +82,10 @@ class MyDrawer extends StatelessWidget {
               style: Configuration().whiteText,
             ),
             onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/account',
-                  ModalRoute.withName('/home'),
-                ),
+              context,
+              '/account',
+              ModalRoute.withName('/home'),
+            ),
           ),
           Configuration().drawerItemDivider,
           ListTile(

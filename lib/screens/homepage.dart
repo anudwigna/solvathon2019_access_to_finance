@@ -74,7 +74,9 @@ class _HomePageState extends State<HomePage>
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: AdaptiveText("Finance Manager"),
+          title: AdaptiveText(
+            "Saral Lekha",
+          ),
           bottom: TabBar(
             controller: _tabController,
             isScrollable: true,
@@ -190,11 +192,13 @@ class _HomePageState extends State<HomePage>
                             ),
                             child: InkWell(
                               onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TransactionPage(0),
-                                    ),
-                                  ),
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TransactionPage(0),
+                                ),
+                              ).then((onValue) {
+                                setState(() {});
+                              }),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(25.0),
                               ),
@@ -227,7 +231,7 @@ class _HomePageState extends State<HomePage>
                           ),
                           SizedBox(height: 20.0),
                           Material(
-                            color: Configuration().redColor,
+                            color: Colors.red,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(25.0),
@@ -235,11 +239,13 @@ class _HomePageState extends State<HomePage>
                             ),
                             child: InkWell(
                               onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TransactionPage(1),
-                                    ),
-                                  ),
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TransactionPage(1),
+                                ),
+                              ).then((onValue) {
+                                setState(() {});
+                              }),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(25.0),
                               ),
@@ -488,18 +494,20 @@ class _TransactionListState extends State<TransactionList> {
                                             color: dailyTransactions[index]
                                                         .transactionType ==
                                                     0
-                                                ? Configuration().yellowColor
-                                                : Configuration().redColor,
+                                                ? Configuration().incomeColor
+                                                : Configuration().expenseColor,
                                             shape: BoxShape.circle,
                                           ),
-                                          child: Icon(
-                                            VectorIcons.fromName(
-                                              snapshot.data.iconName,
-                                              provider:
-                                                  IconProvider.FontAwesome5,
+                                          child: Center(
+                                            child: Icon(
+                                              VectorIcons.fromName(
+                                                snapshot.data.iconName,
+                                                provider:
+                                                    IconProvider.FontAwesome5,
+                                              ),
+                                              color: Colors.white,
+                                              size: 16.0,
                                             ),
-                                            color: Colors.white,
-                                            size: 16.0,
                                           ),
                                         ),
                                         SizedBox(width: 10.0),
@@ -532,9 +540,9 @@ class _TransactionListState extends State<TransactionList> {
                   );
                 },
                 separatorBuilder: (context, _) => Divider(
-                      height: 1.0,
-                      color: Colors.grey[300],
-                    ),
+                  height: 1.0,
+                  color: Colors.grey[300],
+                ),
               ),
             ),
           ],
@@ -619,21 +627,21 @@ class _TransactionListState extends State<TransactionList> {
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: Material(
-                      color: Configuration().yellowColor,
-                      child: InkWell(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.0),
-                          child: AdaptiveText(
-                            'UPDATE',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        onTap: () => _updateTransaction(transaction),
-                      ),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: Material(
+                  //     color: Configuration().yellowColor,
+                  //     child: InkWell(
+                  //       child: Padding(
+                  //         padding: EdgeInsets.symmetric(vertical: 10.0),
+                  //         child: AdaptiveText(
+                  //           'UPDATE',
+                  //           textAlign: TextAlign.center,
+                  //         ),
+                  //       ),
+                  //       onTap: () => _updateTransaction(transaction),
+                  //     ),
+                  //   ),
+                  // ),
                   Expanded(
                     child: Material(
                       color: Colors.green,
@@ -688,8 +696,8 @@ class _TransactionListState extends State<TransactionList> {
 
   TextStyle getTextStyle(Transaction transaction) => TextStyle(
         color: transaction.transactionType == 0
-            ? Configuration().yellowColor
-            : Configuration().redColor,
+            ? Configuration().incomeColor
+            : Configuration().expenseColor,
       );
 
   Map<int, List<Transaction>> _buildTransactionMap(
@@ -708,18 +716,18 @@ class _TransactionListState extends State<TransactionList> {
     return map;
   }
 
-  void _updateTransaction(Transaction transaction) {
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TransactionPage(
-              transaction.id,
-              transaction: transaction,
-            ),
-      ),
-    );
-  }
+  // void _updateTransaction(Transaction transaction) {
+  //   Navigator.pop(context);
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => TransactionPage(
+  //         transaction.id,
+  //         transaction: transaction,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   void _deleteTransaction(Transaction transaction) {
     showDialog(

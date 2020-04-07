@@ -370,7 +370,7 @@ class _CategoryPageState extends State<CategoryPage>
                                 en: _categoryName.text,
                                 np: _categoryName.text,
                                 iconName: 'hornbill',
-                                id: 300,
+                                id: _categoryName.text.hashCode,
                               ),
                               type: _tabController.index == 0
                                   ? CategoryType.EXPENSE

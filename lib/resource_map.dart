@@ -2,6 +2,7 @@
 const Map<String, String> ResourceMap = {
   'nepali language': 'नेपाली भाषा',
   'saral_lekha': 'सारल लेखा',
+  'saral lekha': 'सारल लेखा',
   'categories': 'श्रेणीहरू',
   'income': 'आमदानी',
   'expense': 'खर्च',
@@ -57,7 +58,7 @@ const Map<String, String> ResourceMap = {
   'date: ': 'मिति: ',
   'detail: ': 'विवरण: ',
   'amount: ': 'रकम: ',
-  'transportation fare':'ढुवानी',
+  'transportation fare': 'ढुवानी',
   'more categories': 'थप श्रेणीहरू',
   'are you sure you want to delete this category? deleting the category will also clear all the records related to it.':
       ' के तपाई साचै यो श्रेणी हटाउन चाहनुहुन्छ ? हटाउनु भएको खण्डमा यो श्रेणीसँग सम्बन्धित सबै कारोबारहरूपनि मेटिने छन।',
