@@ -25,10 +25,11 @@ class _HomePageState extends State<HomePage>
   TabController _tabController;
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
-
+  List<GlobalKey<AnimatedCircularChartState>> _chartKey =
+      new List<GlobalKey<AnimatedCircularChartState>>();
   var _dateResolver = <NepaliDateTime>[];
-
   var _scaffoldKey = GlobalKey<ScaffoldState>();
+  final int _initialIndex = 9;
 
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage>
     _tabController = TabController(
       length: 12,
       vsync: this,
-      initialIndex: 9,
+      initialIndex: _initialIndex,
     );
   }
 
@@ -119,7 +120,12 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  initChartController(NepaliDateTime date) {
+    _chartKey.add(GlobalKey<AnimatedCircularChartState>());
+  }
+
   Widget _buildBody(NepaliDateTime date) {
+    initChartController(date);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -145,6 +151,7 @@ class _HomePageState extends State<HomePage>
                           return Stack(
                             children: <Widget>[
                               AnimatedCircularChart(
+                                key: _chartKey[date.month - 1],
                                 size: Size(
                                     MediaQuery.of(context).size.width / 2,
                                     MediaQuery.of(context).size.width / 2),
@@ -197,7 +204,9 @@ class _HomePageState extends State<HomePage>
                                   builder: (context) => TransactionPage(0),
                                 ),
                               ).then((onValue) {
-                                setState(() {});
+                                if (onValue ?? false) {
+                                  _updateChartData(date);
+                                }
                               }),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(25.0),
@@ -244,7 +253,9 @@ class _HomePageState extends State<HomePage>
                                   builder: (context) => TransactionPage(1),
                                 ),
                               ).then((onValue) {
-                                setState(() {});
+                                if (onValue ?? false) {
+                                  _updateChartData(date);
+                                }
                               }),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(25.0),
@@ -368,6 +379,28 @@ class _HomePageState extends State<HomePage>
       },
     );
   }
+
+  Future _updateChartData(NepaliDateTime date) async {
+    List<int> snapshot =
+        await TransactionService().getTotalIncomeExpense(date.year, date.month);
+    double chartData = _getIncomeFraction(snapshot[0], snapshot[1]);
+    _chartKey[date.month - 1].currentState.updateData(
+      [
+        CircularStackEntry(
+          [
+            CircularSegmentEntry(
+              chartData,
+              Configuration().yellowColor,
+            ),
+            CircularSegmentEntry(
+              100 -chartData,
+              Colors.red,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }
 
 class TransactionList extends StatefulWidget {
@@ -382,7 +415,7 @@ class TransactionList extends StatefulWidget {
 
 class _TransactionListState extends State<TransactionList> {
   var _transactionMap = <int, List<Transaction>>{};
-  var _updatedAmountController = TextEditingController();
+  //var _updatedAmountController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -627,21 +660,6 @@ class _TransactionListState extends State<TransactionList> {
                       ),
                     ),
                   ),
-                  // Expanded(
-                  //   child: Material(
-                  //     color: Configuration().yellowColor,
-                  //     child: InkWell(
-                  //       child: Padding(
-                  //         padding: EdgeInsets.symmetric(vertical: 10.0),
-                  //         child: AdaptiveText(
-                  //           'UPDATE',
-                  //           textAlign: TextAlign.center,
-                  //         ),
-                  //       ),
-                  //       onTap: () => _updateTransaction(transaction),
-                  //     ),
-                  //   ),
-                  // ),
                   Expanded(
                     child: Material(
                       color: Colors.green,
@@ -715,20 +733,6 @@ class _TransactionListState extends State<TransactionList> {
     );
     return map;
   }
-
-  // void _updateTransaction(Transaction transaction) {
-  //   Navigator.pop(context);
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => TransactionPage(
-  //         transaction.id,
-  //         transaction: transaction,
-  //       ),
-  //     ),
-  //   );
-  // }
-
   void _deleteTransaction(Transaction transaction) {
     showDialog(
       context: context,

@@ -6,8 +6,6 @@ import 'package:saral_lekha/screens/account_page.dart';
 import 'package:saral_lekha/screens/budget_page.dart';
 import 'package:saral_lekha/screens/category_page.dart';
 import 'package:saral_lekha/screens/homepage.dart';
-import 'package:saral_lekha/screens/language_selection_page.dart';
-import 'package:saral_lekha/screens/login_page.dart';
 import 'package:saral_lekha/screens/splashscreen.dart';
 import 'package:saral_lekha/services/preference_service.dart';
 

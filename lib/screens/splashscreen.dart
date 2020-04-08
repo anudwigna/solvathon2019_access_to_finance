@@ -72,7 +72,6 @@ class _SplashScreenState extends State<SplashScreen> {
       },
     );
 
-    print("Loaded categories from assets");
     Future.delayed(Duration(seconds: 1), () async {
       globals.incomeCategories =
           await CategoryService().getCategories(CategoryType.INCOME);

@@ -289,6 +289,7 @@ class _CategoryPageState extends State<CategoryPage>
 
   Future _showAddCategoryBottomSheet() async {
     await showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (context) {
         return AnimatedPadding(

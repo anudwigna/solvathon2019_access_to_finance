@@ -4,7 +4,7 @@ const Map<String, String> ResourceMap = {
   'saral_lekha': 'सारल लेखा',
   'saral lekha': 'सारल लेखा',
   'categories': 'श्रेणीहरू',
-  'income': 'आमदानी',
+  'income': 'आम्दानी ',
   'expense': 'खर्च',
   'add': 'थप्नुहोस',
   'accounts': 'खाताहरू',
@@ -26,16 +26,24 @@ const Map<String, String> ResourceMap = {
   'update budget': 'बजेट संशोधन गर्नुहोस',
   'clear budget': 'बजेट खाली गर्नुहोस',
   'dashboard': 'गृहपृष्ठ',
-  'add income': 'आमदानी राख्नुहोस',
+  'expense amount': 'खर्च भएको रकम',
+  'business income': 'ब्यबसायबाट भएको आय',
+  'enter amount': 'रकम लेख्नुहोस',
+  'source of income':'आयको शिर्षक',
+  'expense category': 'खर्चको शिर्षक',
+  'select category': 'छान्नुहोस ',
+  'date of expense': 'खर्च भएको मिति',
+  'date of income': 'आय भएको मिति',
+  'add income': 'आम्दानी राख्नुहोस',
   'add expense': 'खर्च राख्नुहोस',
   'sorry, income for current month can only be added!':
       'माफ गर्नुहोस, चालु महिनाको मात्र आम्दानी रकम राख्न सकिन्छ!',
   'sorry, expense for current month can only be added!':
       'माफ गर्नुहोस, चालु महिनाको मात्र खर्च रकम राख्न सकिन्छ!',
-  'select category': 'श्रेणी चुन्नुहोस',
   'select account': 'खाता चुन्नुहोस',
   'choose date': 'मिति रोज्नुहोस',
   'submit': 'स्वीकार गर्नुहोस',
+  'description (optional)': 'विवरण (ऐच्छिक)',
   'please select category.': 'कृपया श्रेणी चुन्नुहोस',
   'please select account.': 'कृपया खाता चुन्नुहोस',
   'no transactions': 'कारोबार भएको छैन',
@@ -45,6 +53,7 @@ const Map<String, String> ResourceMap = {
   'warning': 'चेतावनी',
   'okay': 'ठिक छ',
   'cancel': 'रद्द गर्नुहोस',
+  'add new category':'नयाँ शिर्षक राख्नुहोस',
   'the data will be lost if you remove the app while using it as guest.':
       'दर्ता नगरी चलाउनुहुदा, यो एप्प हटाउनुभएको खण्डमा सबै डेटाहरु हराउन सक्छन।',
   'cannot delete! this account is linked with some transactions.':
@@ -62,7 +71,7 @@ const Map<String, String> ResourceMap = {
   'more categories': 'थप श्रेणीहरू',
   'are you sure you want to delete this category? deleting the category will also clear all the records related to it.':
       ' के तपाई साचै यो श्रेणी हटाउन चाहनुहुन्छ ? हटाउनु भएको खण्डमा यो श्रेणीसँग सम्बन्धित सबै कारोबारहरूपनि मेटिने छन।',
-  'update income': 'आमदानी हेरफेर गर्नुहोस',
+  'update income': 'आम्दानी  हेरफेर गर्नुहोस',
   'update expense': 'खर्च हेरफेर गर्नुहोस',
   'are you sure you want to delete this category?':
       'के तपाई साचै यो कारोबार हटाउन चाहनुहुन्छ ?',

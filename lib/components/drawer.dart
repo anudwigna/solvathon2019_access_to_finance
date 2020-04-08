@@ -25,7 +25,7 @@ class MyDrawer extends StatelessWidget {
         children: <Widget>[
           Image.asset(
             "assets/saral_lekha_logo.png",
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             height: 200,
           ),
           Configuration().drawerItemDivider,

@@ -19,7 +19,7 @@ class _AccountPageState extends State<AccountPage> {
   int _currentBalance = 0;
   Lang language;
   var _accounts = <Account>[];
-  var _updatedBalanceController = TextEditingController();
+  // var _updatedBalanceController = TextEditingController();
 
   var _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -245,80 +245,80 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  Widget _updateDialog(Account account) {
-    return Theme(
-      data: Theme.of(context).copyWith(canvasColor: Colors.white),
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(32.0))),
-        backgroundColor: Colors.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-              child: TextFormField(
-                controller: _updatedBalanceController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-                style: TextStyle(color: Colors.grey[800], fontSize: 20.0),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: language == Lang.EN
-                      ? 'Enter new balance'
-                      : 'नयाँ रकम लेख्नुहोस',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 20.0),
-                  prefixIcon: Icon(
-                    Icons.dialpad,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                  gradient: LinearGradient(
-                    colors: Configuration().gradientColors,
-                    begin: FractionalOffset.centerLeft,
-                    end: FractionalOffset.centerRight,
-                  ),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () async {
-                      await AccountService().updateAccount(
-                        Account(
-                          name: account.name,
-                          balance: _updatedBalanceController.text,
-                          type: account.type,
-                        ),
-                      );
-                      Navigator.pop(context, true);
-                    },
-                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: AdaptiveText(
-                        'UPDATE',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 20.0),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _updateDialog(Account account) {
+  //   return Theme(
+  //     data: Theme.of(context).copyWith(canvasColor: Colors.white),
+  //     child: Dialog(
+  //       shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.all(Radius.circular(32.0))),
+  //       backgroundColor: Colors.white,
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.stretch,
+  //         children: <Widget>[
+  //           Padding(
+  //             padding: EdgeInsets.only(
+  //                 top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
+  //             child: TextFormField(
+  //               controller: _updatedBalanceController,
+  //               keyboardType: TextInputType.number,
+  //               inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+  //               style: TextStyle(color: Colors.grey[800], fontSize: 20.0),
+  //               decoration: InputDecoration(
+  //                 border: InputBorder.none,
+  //                 hintText: language == Lang.EN
+  //                     ? 'Enter new balance'
+  //                     : 'नयाँ रकम लेख्नुहोस',
+  //                 hintStyle: TextStyle(color: Colors.grey, fontSize: 20.0),
+  //                 prefixIcon: Icon(
+  //                   Icons.dialpad,
+  //                   color: Colors.grey,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: EdgeInsets.all(20.0),
+  //             child: Container(
+  //               decoration: BoxDecoration(
+  //                 borderRadius: BorderRadius.all(Radius.circular(30.0)),
+  //                 gradient: LinearGradient(
+  //                   colors: Configuration().gradientColors,
+  //                   begin: FractionalOffset.centerLeft,
+  //                   end: FractionalOffset.centerRight,
+  //                 ),
+  //               ),
+  //               child: Material(
+  //                 color: Colors.transparent,
+  //                 child: InkWell(
+  //                   onTap: () async {
+  //                     await AccountService().updateAccount(
+  //                       Account(
+  //                         name: account.name,
+  //                         balance: _updatedBalanceController.text,
+  //                         type: account.type,
+  //                       ),
+  //                     );
+  //                     Navigator.pop(context, true);
+  //                   },
+  //                   borderRadius: BorderRadius.all(Radius.circular(30.0)),
+  //                   child: Padding(
+  //                     padding: EdgeInsets.symmetric(vertical: 16.0),
+  //                     child: AdaptiveText(
+  //                       'UPDATE',
+  //                       textAlign: TextAlign.center,
+  //                       style: TextStyle(fontSize: 20.0),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _deleteDialog(Account account) {
     return Theme(

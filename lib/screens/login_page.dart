@@ -1,13 +1,11 @@
-import 'package:country_pickers/country.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:saral_lekha/components/adaptive_text.dart';
 import 'package:saral_lekha/providers/preference_provider.dart';
 
 import '../configuration.dart';
-import 'package:country_pickers/country_pickers.dart';
 
-import '../globals.dart';
 import '../providers/preference_provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,12 +15,12 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   var _formKey = GlobalKey<FormState>();
-  Country _selectedCountry = Country(
-    isoCode: "NP",
-    phoneCode: "977",
-    name: "Nepal",
-    iso3Code: "NPL",
-  );
+  // Country _selectedCountry = Country(
+  //   isoCode: "NP",
+  //   phoneCode: "977",
+  //   name: "Nepal",
+  //   iso3Code: "NPL",
+  // );
 
   @override
   Widget build(BuildContext context) {
@@ -203,57 +201,57 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _spacing(int fraction) => Flexible(flex: fraction, child: Container());
 
-  void _openCountryPickerDialog() => showDialog(
-        context: context,
-        builder: (context) => Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Colors.white,
-            cardColor: Colors.white,
-            brightness: Brightness.light,
-          ),
-          child: CountryPickerDialog(
-            titlePadding: EdgeInsets.all(8.0),
-            searchCursorColor: Colors.pinkAccent,
-            searchInputDecoration: InputDecoration(
-              hintText: 'Search...',
-              hintStyle: TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-            isSearchable: true,
-            title: AdaptiveText('Select your country'),
-            onValuePicked: (country) => setState(
-              () => _selectedCountry = country,
-            ),
-            itemBuilder: (country) => Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                CountryPickerUtils.getDefaultFlagImage(country),
-                SizedBox(width: 12.0),
-                Expanded(
-                  child: RichText(
-                    text: TextSpan(
-                      text: country.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w300,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: ' (+${country.phoneCode})',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w300,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+  // void _openCountryPickerDialog() => showDialog(
+  //       context: context,
+  //       builder: (context) => Theme(
+  //         data: Theme.of(context).copyWith(
+  //           canvasColor: Colors.white,
+  //           cardColor: Colors.white,
+  //           brightness: Brightness.light,
+  //         ),
+  //         child: CountryPickerDialog(
+  //           titlePadding: EdgeInsets.all(8.0),
+  //           searchCursorColor: Colors.pinkAccent,
+  //           searchInputDecoration: InputDecoration(
+  //             hintText: 'Search...',
+  //             hintStyle: TextStyle(
+  //               color: Colors.grey,
+  //             ),
+  //           ),
+  //           isSearchable: true,
+  //           title: AdaptiveText('Select your country'),
+  //           onValuePicked: (country) => setState(
+  //             () => _selectedCountry = country,
+  //           ),
+  //           itemBuilder: (country) => Row(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: <Widget>[
+  //               CountryPickerUtils.getDefaultFlagImage(country),
+  //               SizedBox(width: 12.0),
+  //               Expanded(
+  //                 child: RichText(
+  //                   text: TextSpan(
+  //                     text: country.name,
+  //                     style: TextStyle(
+  //                       fontWeight: FontWeight.w300,
+  //                     ),
+  //                     children: [
+  //                       TextSpan(
+  //                         text: ' (+${country.phoneCode})',
+  //                         style: TextStyle(
+  //                           color: Colors.grey,
+  //                           fontWeight: FontWeight.w300,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     );
 
   _warnUser() => showDialog(
         context: context,

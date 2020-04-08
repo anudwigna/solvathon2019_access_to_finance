@@ -78,14 +78,10 @@ class _TransactionPageState extends State<TransactionPage> {
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text(
-                        (language == Lang.EN)
-                            ? (widget.transactionType == 1)
-                                ? 'Expense Amount'
-                                : 'Business Income'
-                            : (widget.transactionType == 1)
-                                ? 'खर्च रकम'
-                                : 'व्यापार आय',
+                    child: AdaptiveText(
+                        (widget.transactionType == 1)
+                            ? 'Expense Amount'
+                            : 'Business Income',
                         style: TextStyle(fontSize: fontsize)),
                   ),
                   SizedBox(
@@ -129,14 +125,10 @@ class _TransactionPageState extends State<TransactionPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Expanded(
-                      child: Text(
-                          (language == Lang.EN)
-                              ? (widget.transactionType == 1)
-                                  ? 'Expense Category'
-                                  : 'Source of Income'
-                              : (widget.transactionType == 1)
-                                  ? 'खर्च को वर्गीकरण'
-                                  : 'आय को स्रोत',
+                      child: AdaptiveText(
+                          (widget.transactionType == 1)
+                              ? 'Expense Category'
+                              : 'Source of Income',
                           style: TextStyle(fontSize: fontsize)),
                     ),
                     SizedBox(
@@ -164,9 +156,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                     color: Colors.grey[700],
                                   ),
                                   hint: AdaptiveText(
-                                    (language == Lang.EN)
-                                        ? 'Select Category'
-                                        : 'वर्गीकरण गर्नुहोस्',
+                                    'Select Category',
                                     style: TextStyle(
                                       color: Colors.grey[700],
                                     ),
@@ -201,31 +191,33 @@ class _TransactionPageState extends State<TransactionPage> {
                                         ),
                                         value: snapshot.data[i].id,
                                       ),
-                                    DropdownMenuItem<int>(
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Icon(
-                                            Icons.create,
-                                            color: Colors.grey,
-                                            size: fontsize,
-                                          ),
-                                          SizedBox(width: 5.0),
-                                          AdaptiveText(
-                                            'Add new Category',
-                                            style: TextStyle(
-                                              color: Colors.grey[700],
+                                    (widget.transaction == null)
+                                        ? DropdownMenuItem<int>(
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                Icon(
+                                                  Icons.create,
+                                                  color: Colors.grey,
+                                                  size: fontsize,
+                                                ),
+                                                SizedBox(width: 5.0),
+                                                AdaptiveText(
+                                                  'Add new Category',
+                                                  style: TextStyle(
+                                                    color: Colors.grey[700],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      value: 'Add new Category'.hashCode,
-                                    ),
+                                            value: 'Add new Category'.hashCode,
+                                          )
+                                        : DropdownMenuItem<int>(
+                                            child: Container())
                                   ],
                                   onChanged: (value) {
                                     if (value == 'Add new Category'.hashCode) {
                                       _showAddCategoryBottomSheet();
-
                                     } else {
                                       setState(() {
                                         _selectedCategoryId = value;
@@ -252,7 +244,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         child: Text(
                           widget.transactionType == 0
                               ? 'Deposited to:  '
-                              : 'Pay from:  ',
+                              : 'Paid from:  ',
                           style: TextStyle(fontSize: fontsize),
                         ),
                       ),
@@ -322,16 +314,18 @@ class _TransactionPageState extends State<TransactionPage> {
                     if (language == Lang.NP)
                       Text(
                         widget.transactionType == 0
-                            ? '  मा जम्मा गर्नुहोस'
-                            : '  बाट तिर्नुहोस',
+                            ? '  मा जम्मा गरियो '
+                            : '  बाट तिरिएको',
                         style: TextStyle(fontSize: fontsize),
                       ),
                   ],
                 ),
               SizedBox(height: 20.0),
-              Text((widget.transactionType == 1)
-                  ? (language == Lang.EN) ? 'Date of Expense' : 'खर्चको मिति'
-                  : (language == Lang.EN) ? 'Date of Income' : 'आयको मिति'),
+              AdaptiveText(
+                  (widget.transactionType == 1)
+                      ? 'Date of Expense'
+                      : 'Date of Income',
+                  style: TextStyle(fontSize: fontsize)),
               SizedBox(height: 5.0),
               Padding(
                 padding: EdgeInsets.only(left: 20, right: 20),
@@ -398,11 +392,8 @@ class _TransactionPageState extends State<TransactionPage> {
                 ),
               ),
               SizedBox(height: 20.0),
-              Text(
-                  language == Lang.EN
-                      ? 'Description (optional)'
-                      : 'विवरण (इच्छाधीन)',
-                  style: TextStyle(fontSize: 15)),
+              AdaptiveText('Description (Optional)',
+                  style: TextStyle(fontSize: fontsize)),
               SizedBox(height: 5.0),
               Container(
                 decoration: _decoration,
@@ -414,9 +405,13 @@ class _TransactionPageState extends State<TransactionPage> {
                         TextStyle(color: Colors.grey[800], fontSize: fontsize),
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: language == Lang.EN
-                          ? 'Enter description'
-                          : 'विवरण लेख्नुहोस',
+                      hintText: (widget.transactionType == 1)
+                          ? language == Lang.EN
+                              ? 'Enter expense description'
+                              : 'खर्च सम्बन्धि थप विवरण भए लेखुहोस्'
+                          : language == Lang.EN
+                              ? 'Enter income description'
+                              : 'खर्च सम्बन्धि थप विवरण भए लेखुहोस्',
                       hintStyle: TextStyle(color: Colors.grey, fontSize: 15.0),
                       counterStyle: TextStyle(color: Colors.grey),
                     ),
@@ -431,11 +426,6 @@ class _TransactionPageState extends State<TransactionPage> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      // gradient: LinearGradient(
-                      //   colors: Configuration().gradientColors,
-                      //   begin: FractionalOffset.centerLeft,
-                      //   end: FractionalOffset.centerRight,
-                      // ),
                       color: Colors.white),
                   child: Material(
                     color: Colors.transparent,
@@ -510,7 +500,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 ),
               );
               await _updateTransactionAndAccount(widget.transaction != null);
-              Navigator.pop(context);
+              Navigator.pop(context,true);
             }
             return;
           } else {
@@ -527,7 +517,7 @@ class _TransactionPageState extends State<TransactionPage> {
         } else {
           await _updateTransactionAndAccount(widget.transaction != null);
         }
-        Navigator.pop(context);
+          Navigator.pop(context,true);
       }
     }
   }
@@ -680,8 +670,9 @@ class _TransactionPageState extends State<TransactionPage> {
         .showSnackBar(SnackBar(content: AdaptiveText(message)));
   }
 
-  Future<bool> _showAddCategoryBottomSheet() async {
+  Future _showAddCategoryBottomSheet() async {
     await showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (context) {
         return AnimatedPadding(
