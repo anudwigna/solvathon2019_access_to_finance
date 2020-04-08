@@ -140,17 +140,31 @@ class TransactionService {
     Account _associatedAccount =
         await AccountService().getAccountForTransaction(transaction);
     _associatedAccount.transactionIds.remove(transaction.id);
-    int newBalance =
-        int.parse(_associatedAccount.balance) + int.parse(transaction.amount);
-    print(newBalance);
-    await AccountService().updateAccount(
-      Account(
-        name: _associatedAccount.name,
-        type: _associatedAccount.type,
-        transactionIds: _associatedAccount.transactionIds,
-        balance: '$newBalance',
-      ),
-    );
+    if (transaction.transactionType == 0) {
+      int newBalance =
+          int.parse(_associatedAccount.balance) - int.parse(transaction.amount);
+      print(newBalance);
+      await AccountService().updateAccount(
+        Account(
+          name: _associatedAccount.name,
+          type: _associatedAccount.type,
+          transactionIds: _associatedAccount.transactionIds,
+          balance: '$newBalance',
+        ),
+      );
+    } else {
+      int newBalance =
+          int.parse(_associatedAccount.balance) + int.parse(transaction.amount);
+      print(newBalance);
+      await AccountService().updateAccount(
+        Account(
+          name: _associatedAccount.name,
+          type: _associatedAccount.type,
+          transactionIds: _associatedAccount.transactionIds,
+          balance: '$newBalance',
+        ),
+      );
+    }
     if (transaction.transactionType == 1) {
       Budget budget = await BudgetService()
           .getBudget(transaction.categoryId, transaction.month);

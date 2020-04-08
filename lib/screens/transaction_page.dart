@@ -489,20 +489,15 @@ class _TransactionPageState extends State<TransactionPage> {
           _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
           _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
           if (_spent > _total) {
-            bool forcedUpdate = await _warnUser();
-            if (forcedUpdate) {
-              await BudgetService().updateBudget(
-                Budget(
-                  categoryId: _selectedCategoryId,
-                  month: _selectedDateTime.month,
-                  spent: '$_spent',
-                  total: oldBudget.total,
-                ),
-              );
-              await _updateTransactionAndAccount(widget.transaction != null);
-              Navigator.pop(context,true);
-            }
-            return;
+            await BudgetService().updateBudget(
+              Budget(
+                categoryId: _selectedCategoryId,
+                month: _selectedDateTime.month,
+                spent: '$_spent',
+                total: oldBudget.total,
+              ),
+            );
+            await _updateTransactionAndAccount(widget.transaction != null);
           } else {
             await BudgetService().updateBudget(
               Budget(
@@ -517,7 +512,7 @@ class _TransactionPageState extends State<TransactionPage> {
         } else {
           await _updateTransactionAndAccount(widget.transaction != null);
         }
-          Navigator.pop(context,true);
+        Navigator.pop(context, true);
       }
     }
   }
@@ -534,20 +529,15 @@ class _TransactionPageState extends State<TransactionPage> {
         _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
         _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
         if (_spent > _total) {
-          bool forcedUpdate = await _warnUser();
-          if (forcedUpdate) {
-            await BudgetService().updateBudget(
-              Budget(
-                categoryId: widget.transaction.categoryId,
-                month: _selectedDateTime.month,
-                spent: '$_spent',
-                total: oldBudget.total,
-              ),
-            );
-            await _updateTransactionAndAccount(widget.transaction != null);
-            Navigator.pop(context);
-          }
-          return;
+          await BudgetService().updateBudget(
+            Budget(
+              categoryId: widget.transaction.categoryId,
+              month: _selectedDateTime.month,
+              spent: '$_spent',
+              total: oldBudget.total,
+            ),
+          );
+          await _updateTransactionAndAccount(widget.transaction != null);
         } else {
           await BudgetService().updateBudget(
             Budget(
@@ -594,76 +584,76 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 
-  Future<bool> _warnUser() async => await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                AdaptiveText(
-                  'Warning',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-                Expanded(
-                  child: Container(),
-                ),
-                IconButton(
-                  icon: Transform.rotate(
-                    angle: 40.0,
-                    child: Icon(
-                      Icons.add_circle_outline,
-                      size: 30.0,
-                      color: Colors.red,
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context, false),
-                ),
-              ],
-            ),
-            content: AdaptiveText(
-              'Budget is not enough for the transaction. Do you really want to add the transaction?',
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            ),
-            actions: <Widget>[
-              SimpleDialogOption(
-                child: AdaptiveText(
-                  'UPDATE BUDGET',
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pop(context, false);
-                  Navigator.pushNamed(
-                    context,
-                    '/budget',
-                  );
-                },
-              ),
-              SimpleDialogOption(
-                child: AdaptiveText(
-                  'OKAY',
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-                onPressed: () => Navigator.pop(context, true),
-              ),
-            ],
-          );
-        },
-      );
+  // Future<bool> _warnUser() async => await showDialog(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           backgroundColor: Colors.white,
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(20.0),
+  //           ),
+  //           title: Row(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: <Widget>[
+  //               AdaptiveText(
+  //                 'Warning',
+  //                 textAlign: TextAlign.center,
+  //                 style: TextStyle(
+  //                   color: Colors.red,
+  //                 ),
+  //               ),
+  //               Expanded(
+  //                 child: Container(),
+  //               ),
+  //               IconButton(
+  //                 icon: Transform.rotate(
+  //                   angle: 40.0,
+  //                   child: Icon(
+  //                     Icons.add_circle_outline,
+  //                     size: 30.0,
+  //                     color: Colors.red,
+  //                   ),
+  //                 ),
+  //                 onPressed: () => Navigator.pop(context, false),
+  //               ),
+  //             ],
+  //           ),
+  //           content: AdaptiveText(
+  //             'Budget is not enough for the transaction. Do you really want to add the transaction?',
+  //             style: TextStyle(
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //           actions: <Widget>[
+  //             SimpleDialogOption(
+  //               child: AdaptiveText(
+  //                 'UPDATE BUDGET',
+  //                 style: TextStyle(
+  //                   color: Colors.black,
+  //                 ),
+  //               ),
+  //               onPressed: () {
+  //                 Navigator.pop(context, false);
+  //                 Navigator.pushNamed(
+  //                   context,
+  //                   '/budget',
+  //                 );
+  //               },
+  //             ),
+  //             SimpleDialogOption(
+  //               child: AdaptiveText(
+  //                 'OKAY',
+  //                 style: TextStyle(
+  //                   color: Colors.black,
+  //                 ),
+  //               ),
+  //               onPressed: () => Navigator.pop(context, true),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
 
   _showMessage(String message) {
     _scaffoldKey.currentState
