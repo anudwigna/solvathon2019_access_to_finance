@@ -26,12 +26,14 @@ class _SplashScreenState extends State<SplashScreen> {
           await PreferenceService.instance.setLanguage('en');
           Provider.of<PreferenceProvider>(context).language = Lang.EN;
           PreferenceService.instance.setIsFirstStart(false);
+          await Future.delayed(Duration(seconds: 2));
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           globals.incomeCategories =
               await CategoryService().getCategories(CategoryType.INCOME);
           globals.expenseCategories =
               await CategoryService().getCategories(CategoryType.EXPENSE);
+          await Future.delayed(Duration(seconds: 2));
           Navigator.pushReplacementNamed(context, '/home');
         }
       },

@@ -35,11 +35,10 @@ class _AccountPageState extends State<AccountPage> {
             _currentBalance = 0;
             accounts.forEach(
               (account) {
-                setState(() {
-                  _currentBalance += int.tryParse(account.balance) ?? 0;
-                });
+                _currentBalance += int.tryParse(account.balance) ?? 0;
               },
             );
+            setState(() {});
           }
         },
       );
@@ -136,6 +135,9 @@ class _AccountPageState extends State<AccountPage> {
             future: AccountService().getAccounts(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                if (snapshot.data.length < 0) {
+                  return Container();
+                }
                 _accounts = snapshot.data;
                 return ListView.builder(
                   shrinkWrap: true,

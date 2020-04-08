@@ -310,10 +310,7 @@ class _HomePageState extends State<HomePage>
           ),
         ),
         Expanded(
-          child: TransactionList(
-            date: date,
-            language: language,
-          ),
+          child: TransactionList(date: date, language: language, parent: this),
         ),
       ],
     );
@@ -393,21 +390,23 @@ class _HomePageState extends State<HomePage>
               Configuration().yellowColor,
             ),
             CircularSegmentEntry(
-              100 -chartData,
+              100 - chartData,
               Colors.red,
             ),
           ],
         ),
       ],
     );
+    setState(() {});
   }
 }
 
 class TransactionList extends StatefulWidget {
   final NepaliDateTime date;
   final Lang language;
+  final _HomePageState parent;
 
-  TransactionList({this.date, this.language});
+  TransactionList({this.date, this.language, this.parent});
 
   @override
   _TransactionListState createState() => _TransactionListState();
@@ -733,6 +732,7 @@ class _TransactionListState extends State<TransactionList> {
     );
     return map;
   }
+
   void _deleteTransaction(Transaction transaction) {
     showDialog(
       context: context,
@@ -777,6 +777,7 @@ class _TransactionListState extends State<TransactionList> {
                               .deleteTransaction(transaction);
                           Navigator.pop(context, true);
                           Navigator.pop(context, true);
+                          await widget.parent._updateChartData(widget.date);
                           setState(() {});
                         },
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),
