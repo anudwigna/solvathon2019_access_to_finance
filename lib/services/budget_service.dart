@@ -10,10 +10,11 @@ class BudgetService {
 
   factory BudgetService() => BudgetService._();
 
-  Future<DatabaseAndStore> getDatabaseAndStore() async {
+  Future<DatabaseAndStore> getDatabaseAndStore(String subSector) async {
     DatabaseFactory dbFactory = databaseFactoryIo;
     return DatabaseAndStore(
-      database: await dbFactory.openDatabase(await _getDbPath('budget.db')),
+      database: await dbFactory
+          .openDatabase(await _getDbPath('${subSector.toLowerCase()}budget.db')),
       store: intMapStoreFactory.store('budget'),
     );
   }
@@ -23,8 +24,8 @@ class BudgetService {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future<Budget> getBudget(int categoryId, int month) async {
-    var dbStore = await getDatabaseAndStore();
+  Future<Budget> getBudget(String subSector, int categoryId, int month) async {
+    var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
         Filter.equals('month', month),
@@ -41,10 +42,10 @@ class BudgetService {
   /// Updates the budget
   ///
   /// Adds new budget record if record doesn't exist.
-  Future updateBudget(Budget budget) async {
+  Future updateBudget(String subSector, Budget budget) async {
     print('Budget ${budget.toJson()}');
     if (budget.month != null && budget.categoryId != null) {
-      var dbStore = await getDatabaseAndStore();
+      var dbStore = await getDatabaseAndStore(subSector);
       Filter checkRecord = Filter.and([
         Filter.equals(
           'month',
@@ -75,8 +76,8 @@ class BudgetService {
     }
   }
 
-  Future clearBudget(Budget budget) async {
-    var dbStore = await getDatabaseAndStore();
+  Future clearBudget(String subSector, Budget budget) async {
+    var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
         Filter.equals(
@@ -92,8 +93,8 @@ class BudgetService {
     await dbStore.store.delete(dbStore.database, finder: finder);
   }
 
-  Future deleteBudgetsForCategory(int categoryId) async {
-    var dbStore = await getDatabaseAndStore();
+  Future deleteBudgetsForCategory(String subSector, int categoryId) async {
+    var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.equals(
         'categoryId',

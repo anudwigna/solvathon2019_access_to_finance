@@ -1,0 +1,72 @@
+{
+  "expense": [  
+    {
+      "id": 100,
+      "en": "Kid",
+      "np": "मूल बिउ",
+      "iconName": "utensils"
+    },
+    {
+      "id": 101,
+      "en": "Medicine",
+      "np": "औषधी",
+      "iconName": "file-invoice-dollar"
+    },
+    {
+      "id": 102,
+      "en": "Fodder/Water",
+      "np": "चारा/पानी",
+      "iconName": "bus"
+    },
+    {
+      "id": 103,
+      "en": "Shed Construction",
+      "np": "शेड निर्माण",
+      "iconName": "home"
+    },
+      {
+      "id": 104,
+      "en": "Labour Cost",
+      "np": "श्रमिक मूल्य",
+      "iconName": "gamepad"
+    },
+    {
+      "id": 105,
+      "en": "Transportation",
+      "np": "यातायात",
+      "iconName": "car"
+    },
+      {
+      "id": 106,
+      "en": "Bank Installment",
+      "np": " बैंक किस्त",
+      "iconName": "tshirt"
+    }
+  ], 
+  "income": [
+    {
+      "id": 111,
+      "en": "Goat Sales",
+      "np": "बाख्रा बिक्री",
+      "iconName": "hand-holding-usd"
+    },
+    {
+      "id": 112,
+      "en": "Fertilizer Sales",
+      "np": "मल बिक्री",
+      "iconName": "table-tennis"
+    },
+     {
+      "id": 113,
+      "en": " Bank Borrowing",
+      "np": "बैंक उधारो",
+      "iconName": "table-tennis"
+    },
+     {
+      "id": 114,
+      "en": "Self Financing",
+      "np": "आत्म वित्तीय ",
+      "iconName": "table-tennis"
+    }
+  ]
+}

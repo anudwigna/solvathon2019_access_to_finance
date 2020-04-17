@@ -6,6 +6,7 @@ import 'package:saral_lekha/screens/account_page.dart';
 import 'package:saral_lekha/screens/budget_page.dart';
 import 'package:saral_lekha/screens/category_page.dart';
 import 'package:saral_lekha/screens/homepage.dart';
+import 'package:saral_lekha/screens/setting.dart';
 import 'package:saral_lekha/screens/splashscreen.dart';
 import 'package:saral_lekha/services/preference_service.dart';
 
@@ -39,13 +40,43 @@ class Sarallekha extends StatelessWidget {
         ),
         routes: {
           '/': (context) => SplashScreen(),
-        //  '/language': (context) => LanguageSelectionPage(),
-        //  '/login': (context) => LoginPage(),
+          '/wrapper': (context) => WrapperPage(),
+        },
+      ),
+    );
+  }
+}
+
+class WrapperPage extends StatefulWidget {
+  @override
+  _WrapperPageState createState() => _WrapperPageState();
+}
+
+class _WrapperPageState extends State<WrapperPage> {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<SubSectorProvider>(
+      builder: (context) => SubSectorProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Saral Lekha',
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          primarySwatch: MaterialColor(0xffffffff, {}),
+          appBarTheme: Theme.of(context).appBarTheme.copyWith(
+                color: Colors.transparent,
+                elevation: 0,
+              ),
+          scaffoldBackgroundColor: Colors.transparent,
+          canvasColor: Colors.transparent,
+        ),
+        routes: {
+          '/': (context) => HomePage(),
           '/home': (context) => HomePage(),
           '/category': (context) => CategoryPage(),
           '/budget': (context) => BudgetPage(),
           '/account': (context) => AccountPage(),
-          //'/test': (context) => TestScreen()
+          '/wrapper': (context) => WrapperPage(),
         },
       ),
     );

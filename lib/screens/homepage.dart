@@ -4,6 +4,7 @@ import 'package:nepali_utils/nepali_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:saral_lekha/components/adaptive_text.dart';
 import 'package:saral_lekha/components/drawer.dart';
+import 'package:saral_lekha/globals.dart';
 import 'package:saral_lekha/icons/vector_icons.dart';
 import 'package:saral_lekha/models/category/category.dart';
 import 'package:saral_lekha/models/transaction/transaction.dart';
@@ -16,12 +17,13 @@ import '../configuration.dart';
 
 class HomePage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
+class HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   Lang language;
+  String selectedSubSector;
   TabController _tabController;
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
@@ -70,14 +72,16 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
+    selectedSubSector =
+        Provider.of<SubSectorProvider>(context).selectedSubSector;
     return Container(
       decoration: Configuration().gradientDecoration,
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: AdaptiveText(
-            "Saral Lekha",
-          ),
+          title: (language == Lang.EN)
+              ? Text('Saral Lekha (' + (selectedSubSector) + ')')
+              : Text('सारल लेखा(' + (selectedSubSector) + ')'),
           bottom: TabBar(
             controller: _tabController,
             isScrollable: true,
@@ -108,7 +112,7 @@ class _HomePageState extends State<HomePage>
             ],
           ),
         ),
-        drawer: MyDrawer(),
+        drawer: MyDrawer(homePageState:this),
         body: TabBarView(
           controller: _tabController,
           children: [
@@ -144,8 +148,8 @@ class _HomePageState extends State<HomePage>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     FutureBuilder<List<int>>(
-                      future: TransactionService()
-                          .getTotalIncomeExpense(date.year, date.month),
+                      future: TransactionService().getTotalIncomeExpense(
+                          selectedSubSector, date.year, date.month),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return Stack(
@@ -205,7 +209,7 @@ class _HomePageState extends State<HomePage>
                                 ),
                               ).then((onValue) {
                                 if (onValue ?? false) {
-                                  _updateChartData(date);
+                                  updateChartData(date);
                                 }
                               }),
                               borderRadius: BorderRadius.all(
@@ -254,7 +258,7 @@ class _HomePageState extends State<HomePage>
                                 ),
                               ).then((onValue) {
                                 if (onValue ?? false) {
-                                  _updateChartData(date);
+                                  updateChartData(date);
                                 }
                               }),
                               borderRadius: BorderRadius.all(
@@ -330,7 +334,8 @@ class _HomePageState extends State<HomePage>
 
   Widget _centerWidget(NepaliDateTime date) {
     return FutureBuilder<List<int>>(
-      future: TransactionService().getTotalIncomeExpense(date.year, date.month),
+      future: TransactionService()
+          .getTotalIncomeExpense(selectedSubSector, date.year, date.month),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Column(
@@ -377,9 +382,9 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Future _updateChartData(NepaliDateTime date) async {
-    List<int> snapshot =
-        await TransactionService().getTotalIncomeExpense(date.year, date.month);
+  Future updateChartData(NepaliDateTime date) async {
+    List<int> snapshot = await TransactionService()
+        .getTotalIncomeExpense(selectedSubSector, date.year, date.month);
     double chartData = _getIncomeFraction(snapshot[0], snapshot[1]);
     _chartKey[date.month - 1].currentState.updateData(
       [
@@ -404,7 +409,7 @@ class _HomePageState extends State<HomePage>
 class TransactionList extends StatefulWidget {
   final NepaliDateTime date;
   final Lang language;
-  final _HomePageState parent;
+  final HomePageState parent;
 
   TransactionList({this.date, this.language, this.parent});
 
@@ -419,8 +424,8 @@ class _TransactionListState extends State<TransactionList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Transaction>>(
-      future: TransactionService()
-          .getTransactions(widget.date.year, widget.date.month),
+      future: TransactionService().getTransactions(
+          selectedSubSector, widget.date.year, widget.date.month),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data.length == 0) {
@@ -510,6 +515,7 @@ class _TransactionListState extends State<TransactionList> {
                           children: <Widget>[
                             FutureBuilder<Category>(
                               future: CategoryService().getCategoryById(
+                                selectedSubSector,
                                 dailyTransactions[index].categoryId,
                                 dailyTransactions[index].transactionType,
                               ),
@@ -773,11 +779,11 @@ class _TransactionListState extends State<TransactionList> {
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () async {
-                          await TransactionService()
-                              .deleteTransaction(transaction);
+                          await TransactionService().deleteTransaction(
+                              selectedSubSector, transaction);
                           Navigator.pop(context, true);
                           Navigator.pop(context, true);
-                          await widget.parent._updateChartData(widget.date);
+                          await widget.parent.updateChartData(widget.date);
                           setState(() {});
                         },
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),

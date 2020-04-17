@@ -32,6 +32,7 @@ class TransactionPage extends StatefulWidget {
 
 class _TransactionPageState extends State<TransactionPage> {
   TextEditingController _categoryName = TextEditingController();
+  String selectedSubSector;
   Lang language;
   double fontsize = 15.0;
   BoxDecoration _decoration = BoxDecoration(
@@ -49,6 +50,8 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
+    selectedSubSector =
+        Provider.of<SubSectorProvider>(context).selectedSubSector;
     return Container(
       decoration: Configuration().gradientDecoration,
       child: Scaffold(
@@ -138,7 +141,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       width: (MediaQuery.of(context).size.width / 100) * 60,
                       decoration: _decoration,
                       child: FutureBuilder<List<Category>>(
-                        future: CategoryService().getCategories(
+                        future: CategoryService().getCategories(selectedSubSector,
                           widget.transactionType == 0
                               ? CategoryType.INCOME
                               : CategoryType.EXPENSE,
@@ -484,12 +487,12 @@ class _TransactionPageState extends State<TransactionPage> {
         int _total;
         if (widget.transactionType == 1) {
           oldBudget = await BudgetService()
-              .getBudget(_selectedCategoryId, _selectedDateTime.month);
+              .getBudget(selectedSubSector,_selectedCategoryId, _selectedDateTime.month);
           _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
           _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
           _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
           if (_spent > _total) {
-            await BudgetService().updateBudget(
+            await BudgetService().updateBudget(selectedSubSector,
               Budget(
                 categoryId: _selectedCategoryId,
                 month: _selectedDateTime.month,
@@ -499,7 +502,7 @@ class _TransactionPageState extends State<TransactionPage> {
             );
             await _updateTransactionAndAccount(widget.transaction != null);
           } else {
-            await BudgetService().updateBudget(
+            await BudgetService().updateBudget(selectedSubSector,
               Budget(
                 categoryId: oldBudget.categoryId,
                 month: oldBudget.month,
@@ -524,12 +527,12 @@ class _TransactionPageState extends State<TransactionPage> {
       int _total;
       if (widget.transactionType == 1) {
         oldBudget = await BudgetService()
-            .getBudget(widget.transaction.categoryId, _selectedDateTime.month);
+            .getBudget(selectedSubSector,widget.transaction.categoryId, _selectedDateTime.month);
         _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
         _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
         _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
         if (_spent > _total) {
-          await BudgetService().updateBudget(
+          await BudgetService().updateBudget(selectedSubSector,
             Budget(
               categoryId: widget.transaction.categoryId,
               month: _selectedDateTime.month,
@@ -539,7 +542,7 @@ class _TransactionPageState extends State<TransactionPage> {
           );
           await _updateTransactionAndAccount(widget.transaction != null);
         } else {
-          await BudgetService().updateBudget(
+          await BudgetService().updateBudget(selectedSubSector,
             Budget(
               categoryId: oldBudget.categoryId,
               month: oldBudget.month,
@@ -556,7 +559,7 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   _updateTransactionAndAccount(bool isUpdate) async {
-    int transactionId = await TransactionService().updateTransaction(
+    int transactionId = await TransactionService().updateTransaction(selectedSubSector,
       Transaction(
         amount: _amountController.text,
         categoryId:
@@ -739,7 +742,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       child: InkWell(
                         onTap: () async {
                           if (_formKey1.currentState.validate()) {
-                            await CategoryService().addCategory(
+                            await CategoryService().addCategory(selectedSubSector,
                               Category(
                                 en: _categoryName.text,
                                 np: _categoryName.text,

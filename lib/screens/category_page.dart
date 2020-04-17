@@ -20,6 +20,7 @@ class _CategoryPageState extends State<CategoryPage>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
   Lang language;
+  String selectedSubSector;
 
   var _categoryName = TextEditingController();
   var _formKey = GlobalKey<FormState>();
@@ -41,6 +42,9 @@ class _CategoryPageState extends State<CategoryPage>
     return Consumer<PreferenceProvider>(
       builder: (context, preferenceProvider, _) {
         language = preferenceProvider.language;
+        selectedSubSector =
+            Provider.of<SubSectorProvider>(context).selectedSubSector;
+            
         return Theme(
           data: Theme.of(context)
               .copyWith(canvasColor: Configuration().yellowColor),
@@ -49,7 +53,7 @@ class _CategoryPageState extends State<CategoryPage>
             child: Scaffold(
               drawer: MyDrawer(),
               appBar: AppBar(
-                title: AdaptiveText('Categories'),
+                title: AdaptiveText('Categories ('+selectedSubSector.toString()+')'),
                 bottom: TabBar(
                   controller: _tabController,
                   indicatorColor: Colors.white,
@@ -73,11 +77,11 @@ class _CategoryPageState extends State<CategoryPage>
                 children: [CategoryType.EXPENSE, CategoryType.INCOME]
                     .map(
                       (categoryType) => _reorderableListView(
-                            categoryType == CategoryType.EXPENSE
-                                ? globals.expenseCategories
-                                : globals.incomeCategories,
-                            categoryType,
-                          ),
+                        categoryType == CategoryType.EXPENSE
+                            ? globals.expenseCategories
+                            : globals.incomeCategories,
+                        categoryType,
+                      ),
                     )
                     .toList(),
               ),
@@ -106,7 +110,7 @@ class _CategoryPageState extends State<CategoryPage>
         ),
         SizedBox(height: 20.0),
         FutureBuilder<List<Category>>(
-          future: CategoryService().getStockCategories(type),
+          future: CategoryService().getStockCategories(selectedSubSector, type),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var _disabledCategories = snapshot.data;
@@ -143,10 +147,11 @@ class _CategoryPageState extends State<CategoryPage>
                           borderRadius: BorderRadius.circular(50.0),
                           splashColor: Colors.green,
                           onTap: () async {
-                            var categoryList =
-                                await CategoryService().getCategories(type);
+                            var categoryList = await CategoryService()
+                                .getCategories(selectedSubSector, type);
                             if (!categoryList.contains(category)) {
                               await CategoryService().addCategory(
+                                selectedSubSector,
                                 category,
                                 type: type,
                                 isStockCategory: true,
@@ -264,6 +269,7 @@ class _CategoryPageState extends State<CategoryPage>
                 ),
                 onPressed: () async {
                   await CategoryService().deleteCategory(
+                    selectedSubSector,
                     categoryId,
                     _tabController.index == 0
                         ? CategoryType.EXPENSE
@@ -367,6 +373,7 @@ class _CategoryPageState extends State<CategoryPage>
                         onTap: () async {
                           if (_formKey.currentState.validate()) {
                             await CategoryService().addCategory(
+                              selectedSubSector,
                               Category(
                                 en: _categoryName.text,
                                 np: _categoryName.text,
@@ -409,14 +416,16 @@ class _CategoryPageState extends State<CategoryPage>
       globals.expenseCategories.removeAt(preIndex);
       globals.expenseCategories
           .insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
-      CategoryService().refreshCategories(globals.expenseCategories,
+      CategoryService().refreshCategories(
+          selectedSubSector, globals.expenseCategories,
           type: CategoryType.EXPENSE);
     } else {
       Category temp = globals.incomeCategories[preIndex];
       globals.incomeCategories.removeAt(preIndex);
       globals.incomeCategories
           .insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
-      CategoryService().refreshCategories(globals.incomeCategories,
+      CategoryService().refreshCategories(
+          selectedSubSector, globals.incomeCategories,
           type: CategoryType.INCOME);
     }
     setState(() {});

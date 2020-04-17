@@ -62,7 +62,11 @@ class _AccountPageState extends State<AccountPage> {
                 onPressed: () async {
                   if ((await showDialog(
                         context: context,
-                        builder: (context) => _AccountDialog(_accounts),
+                        builder: (context) =>
+                            ChangeNotifierProvider<PreferenceProvider>(
+                          builder: (context) => PreferenceProvider(),
+                          child: _AccountDialog(_accounts),
+                        ),
                       )) ??
                       false) {
                     _refreshBalance();

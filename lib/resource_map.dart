@@ -5,6 +5,7 @@ const Map<String, String> ResourceMap = {
   'saral lekha': 'सारल लेखा',
   'categories': 'श्रेणीहरू',
   'income': 'आम्दानी ',
+  'settings': 'सेटिंग्स',
   'expense': 'खर्च',
   'add': 'थप्नुहोस',
   'accounts': 'खाताहरू',
@@ -20,7 +21,7 @@ const Map<String, String> ResourceMap = {
   'are you sure to delete this account?':
       'के तपाई यो खाता मेटाउन निश्चित हुनुहुन्छ?',
   'budget': 'बजेट',
-  'monthly budget': 'मासिक बजेट',
+  'expense projection': 'खर्चको अनुमान',
   'click to set budget': 'बजेट तय गर्न क्लिक गर्नुहोस',
   'set budget': 'बजेट तय गर्नुहोस',
   'update budget': 'बजेट संशोधन गर्नुहोस',
@@ -28,8 +29,9 @@ const Map<String, String> ResourceMap = {
   'dashboard': 'गृहपृष्ठ',
   'expense amount': 'खर्च भएको रकम',
   'business income': 'ब्यबसायबाट भएको आय',
+  'select your preferences': 'तपाईंको प्राथमिकता छान्नुहोस',
   'enter amount': 'रकम लेख्नुहोस',
-  'source of income':'आयको शिर्षक',
+  'source of income': 'आयको शिर्षक',
   'expense category': 'खर्चको शिर्षक',
   'select category': 'छान्नुहोस ',
   'date of expense': 'खर्च भएको मिति',
@@ -53,7 +55,7 @@ const Map<String, String> ResourceMap = {
   'warning': 'चेतावनी',
   'okay': 'ठिक छ',
   'cancel': 'रद्द गर्नुहोस',
-  'add new category':'नयाँ शिर्षक राख्नुहोस',
+  'add new category': 'नयाँ शिर्षक राख्नुहोस',
   'the data will be lost if you remove the app while using it as guest.':
       'दर्ता नगरी चलाउनुहुदा, यो एप्प हटाउनुभएको खण्डमा सबै डेटाहरु हराउन सक्छन।',
   'cannot delete! this account is linked with some transactions.':

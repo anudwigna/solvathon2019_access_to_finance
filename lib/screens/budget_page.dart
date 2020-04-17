@@ -25,6 +25,7 @@ class _BudgetPageState extends State<BudgetPage>
   int _currentMonth = NepaliDateTime.now().month;
   Lang language;
   TabController _tabController;
+  String selectedSubSector;
 
   var _budgetAmountController = TextEditingController();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -45,6 +46,8 @@ class _BudgetPageState extends State<BudgetPage>
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
+    selectedSubSector =
+        Provider.of<SubSectorProvider>(context).selectedSubSector;
     return Theme(
       data: Theme.of(context).copyWith(canvasColor: Colors.white),
       child: Container(
@@ -53,7 +56,7 @@ class _BudgetPageState extends State<BudgetPage>
           key: _scaffoldKey,
           drawer: MyDrawer(),
           appBar: AppBar(
-            title: AdaptiveText('Monthly Budget'),
+            title: AdaptiveText('Expense Projection ('+selectedSubSector.toString()+')'),
             bottom: TabBar(
               controller: _tabController,
               isScrollable: true,
@@ -93,18 +96,19 @@ class _BudgetPageState extends State<BudgetPage>
 
   Widget _buildBody(int month) {
     return FutureBuilder<List<Category>>(
-      future: CategoryService().getCategories(CategoryType.EXPENSE),
+      future: CategoryService()
+          .getCategories(selectedSubSector, CategoryType.EXPENSE),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return ListView.separated(
             itemCount: snapshot.data.length,
             itemBuilder: (context, index) => Padding(
-                  padding: EdgeInsets.only(
-                    top: index == 0 ? 20 : 0,
-                    bottom: index == snapshot.data.length - 1 ? 30 : 0,
-                  ),
-                  child: _buildCard(snapshot.data[index], month),
-                ),
+              padding: EdgeInsets.only(
+                top: index == 0 ? 20 : 0,
+                bottom: index == snapshot.data.length - 1 ? 30 : 0,
+              ),
+              child: _buildCard(snapshot.data[index], month),
+            ),
             separatorBuilder: (context, _) => SizedBox(height: 20.0),
           );
         } else
@@ -117,7 +121,7 @@ class _BudgetPageState extends State<BudgetPage>
 
   Widget _buildCard(Category category, int month) {
     return FutureBuilder<Budget>(
-      future: BudgetService().getBudget(category.id, month),
+      future: BudgetService().getBudget(selectedSubSector, category.id, month),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Column(
@@ -228,34 +232,33 @@ class _BudgetPageState extends State<BudgetPage>
                                       _setBudgetDialog(snapshot.data, category,
                                           action: 'update');
                                     } else {
-                                      await showDialog(
+                                      showDialog(
                                         context: context,
                                         builder: (context) {
                                           return _clearBudgetDialog(
                                               snapshot.data, category);
                                         },
                                       );
-                                      setState(() {});
                                     }
                                   },
                                   itemBuilder: (context) => [
-                                        PopupMenuItem(
-                                          value: 1,
-                                          child: AdaptiveText(
-                                            'Update Budget',
-                                            style: TextStyle(
-                                                color: Colors.grey[700]),
-                                          ),
-                                        ),
-                                        PopupMenuItem(
-                                          value: 2,
-                                          child: AdaptiveText(
-                                            'Clear Budget',
-                                            style: TextStyle(
-                                                color: Colors.grey[700]),
-                                          ),
-                                        ),
-                                      ],
+                                    PopupMenuItem(
+                                      value: 1,
+                                      child: AdaptiveText(
+                                        'Update Budget',
+                                        style:
+                                            TextStyle(color: Colors.grey[700]),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 2,
+                                      child: AdaptiveText(
+                                        'Clear Budget',
+                                        style:
+                                            TextStyle(color: Colors.grey[700]),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               )
                             : Container(
@@ -326,10 +329,12 @@ class _BudgetPageState extends State<BudgetPage>
                   child: InkWell(
                     onTap: () async {
                       if (await TransactionService().isBudgetEditable(
+                          selectedSubSector,
                           budget.categoryId,
                           budget.month,
                           NepaliDateTime.now().year)) {
-                        await BudgetService().clearBudget(budget);
+                        await BudgetService()
+                            .clearBudget(selectedSubSector, budget);
                       } else {
                         _scaffoldKey.currentState.showSnackBar(
                           SnackBar(
@@ -338,7 +343,8 @@ class _BudgetPageState extends State<BudgetPage>
                           ),
                         );
                       }
-                      Navigator.pop(context, true);
+                      setState(() {});
+                      Navigator.of(context, rootNavigator: true).pop();
                     },
                     borderRadius: BorderRadius.all(Radius.circular(30.0)),
                     child: Padding(
@@ -469,6 +475,7 @@ class _BudgetPageState extends State<BudgetPage>
     if (_formKey.currentState.validate()) {
       if (action == 'set') {
         await BudgetService().updateBudget(
+          selectedSubSector,
           Budget(
             categoryId: oldBudgetData.categoryId ?? categoryId,
             month: oldBudgetData.month ?? _tabController.index + 1,
@@ -478,12 +485,13 @@ class _BudgetPageState extends State<BudgetPage>
         );
       } else {
         int amount = int.tryParse(_budgetAmountController.text) ?? 0;
-        String spentString = (await BudgetService().getBudget(
+        String spentString = (await BudgetService().getBudget(selectedSubSector,
                 categoryId, oldBudgetData.month ?? _tabController.index + 1))
             .spent;
         int spent = int.tryParse(spentString ?? '0') ?? 0;
         if (amount > spent) {
           await BudgetService().updateBudget(
+            selectedSubSector,
             Budget(
               categoryId: oldBudgetData.categoryId ?? categoryId,
               month: oldBudgetData.month ?? _tabController.index + 1,
@@ -499,7 +507,7 @@ class _BudgetPageState extends State<BudgetPage>
           );
         }
       }
-      Navigator.pop(context);
+      Navigator.of(context, rootNavigator: true).pop();
       _budgetAmountController.clear();
       setState(() {});
     }
