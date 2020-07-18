@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:saral_lekha/providers/preference_provider.dart';
-import 'package:saral_lekha/screens/account_page.dart';
-import 'package:saral_lekha/screens/budget_page.dart';
-import 'package:saral_lekha/screens/category_page.dart';
-import 'package:saral_lekha/screens/homepage.dart';
-import 'package:saral_lekha/screens/setting.dart';
-import 'package:saral_lekha/screens/splashscreen.dart';
-import 'package:saral_lekha/services/preference_service.dart';
+import 'package:munshiji/configuration.dart';
+import 'package:munshiji/providers/preference_provider.dart';
+import 'package:munshiji/screens/account_page.dart';
+import 'package:munshiji/screens/budget_page.dart';
+import 'package:munshiji/screens/category_page.dart';
+import 'package:munshiji/screens/homepage.dart';
+
+import 'package:munshiji/screens/splashscreen.dart';
+import 'package:munshiji/screens/userProfilepage.dart';
+import 'package:munshiji/services/preference_service.dart';
 
 import 'globals.dart' as globals;
 
 void main() async {
-  //WidgetFlutterBinding.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();
   globals.language = (await PreferenceService.instance.getLanguage()) ?? 'en';
   //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(Sarallekha());
+  runApp(Munshiji());
 }
 
-class Sarallekha extends StatelessWidget {
+class Munshiji extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PreferenceProvider>(
       builder: (context) => PreferenceProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Saral Lekha',
+        title: 'Munshiji',
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: MaterialColor(0xffffffff, {}),
@@ -36,7 +37,7 @@ class Sarallekha extends StatelessWidget {
                 elevation: 0,
               ),
           scaffoldBackgroundColor: Colors.transparent,
-          canvasColor: Colors.transparent,
+          canvasColor: Colors.white,
         ),
         routes: {
           '/': (context) => SplashScreen(),
@@ -59,7 +60,7 @@ class _WrapperPageState extends State<WrapperPage> {
       builder: (context) => SubSectorProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Saral Lekha',
+        title: 'Munshiji',
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: MaterialColor(0xffffffff, {}),
@@ -68,10 +69,11 @@ class _WrapperPageState extends State<WrapperPage> {
                 elevation: 0,
               ),
           scaffoldBackgroundColor: Colors.transparent,
-          canvasColor: Colors.transparent,
+          canvasColor: Configuration().appColor,
         ),
         routes: {
           '/': (context) => HomePage(),
+          '/profilepage': (context) => UserProfilePage(),
           '/home': (context) => HomePage(),
           '/category': (context) => CategoryPage(),
           '/budget': (context) => BudgetPage(),

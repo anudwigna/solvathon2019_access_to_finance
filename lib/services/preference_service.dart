@@ -21,6 +21,16 @@ class PreferenceService {
     return (await prefs.get('IS_FIRST_START')) as bool ?? true;
   }
 
+  Future<bool> isUserRegistered() async {
+    var prefs = await _init();
+    return (await prefs.get('IS_USER_REGISTERED')) as bool ?? false;
+  }
+
+  Future setIsUserRegistered() async {
+    var prefs = await _init();
+    prefs.set('IS_USER_REGISTERED', true);
+  }
+
   Future setLanguage(String value) async {
     var prefs = await _init();
     prefs.set('LANGUAGE', value);
@@ -70,16 +80,6 @@ class PreferenceService {
     var prefs = await _init();
     return (await prefs.get('CURRENT_TRANSACTION_INDEX')) as int;
   }
-
-  // Future setSubSectorCount(int value) async {
-  //   var prefs = await _init();
-  //   prefs.set('SUBSECTOR_COUNT', value);
-  // }
-
-  // Future<int> getSubSectorCount() async {
-  //   var prefs = await _init();
-  //   return (await prefs.get('SUBSECTOR_COUNT')) as int;
-  // }
 
   Future setSubSectors(List<dynamic> value) async {
     var prefs = await _init();

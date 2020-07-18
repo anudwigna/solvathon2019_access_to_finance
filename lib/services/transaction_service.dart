@@ -1,12 +1,12 @@
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:saral_lekha/models/account/account.dart';
-import 'package:saral_lekha/models/budget/budget.dart';
-import 'package:saral_lekha/models/database_and_store.dart';
-import 'package:saral_lekha/models/transaction/transaction.dart' as t;
-import 'package:saral_lekha/services/account_service.dart';
-import 'package:saral_lekha/services/budget_service.dart';
-import 'package:saral_lekha/services/preference_service.dart';
+import 'package:munshiji/models/account/account.dart';
+import 'package:munshiji/models/budget/budget.dart';
+import 'package:munshiji/models/database_and_store.dart';
+import 'package:munshiji/models/transaction/transaction.dart' as t;
+import 'package:munshiji/services/account_service.dart';
+import 'package:munshiji/services/budget_service.dart';
+import 'package:munshiji/services/preference_service.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
@@ -18,8 +18,8 @@ class TransactionService {
   Future<DatabaseAndStore> getDatabaseAndStore(String subSector) async {
     DatabaseFactory dbFactory = databaseFactoryIo;
     return DatabaseAndStore(
-      database:
-          await dbFactory.openDatabase(await _getDbPath('${subSector.toLowerCase()}Transaction.db')),
+      database: await dbFactory.openDatabase(
+          await _getDbPath('${subSector.toLowerCase()}Transaction.db')),
       store: intMapStoreFactory.store('transaction'),
     );
   }
@@ -29,8 +29,9 @@ class TransactionService {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future<List<int>> getTotalIncomeExpense(String subSector,int year, int month) async {
-    var dbStore = await getDatabaseAndStore( subSector);
+  Future<List<double>> getTotalIncomeExpense(
+      String subSector, int year, int month) async {
+    var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
         Filter.equals('year', year),
@@ -54,10 +55,14 @@ class TransactionService {
         }
       },
     );
-    return [income, expense];
+    return [
+      (income == 0) ? 0.0 : income * 1.0,
+      expense == 0 ? 0.0 : expense * 1.0
+    ];
   }
 
-  Future<bool> isBudgetEditable(String subSector,int categoryId, int month, int year) async {
+  Future<bool> isBudgetEditable(
+      String subSector, int categoryId, int month, int year) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
@@ -68,12 +73,13 @@ class TransactionService {
     );
     var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
     if ((snapshot?.length ?? 0) > 0) {
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
-  Future<List<t.Transaction>> getTransactions(String subSector,int year, int month) async {
+  Future<List<t.Transaction>> getTransactions(
+      String subSector, int year, int month) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
@@ -81,6 +87,7 @@ class TransactionService {
         Filter.equals('month', month),
       ]),
     );
+
     var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
     return snapshot
         .map((record) => t.Transaction.fromJson(record.value))
@@ -90,7 +97,8 @@ class TransactionService {
   /// Updates the transaction
   ///
   /// Adds new transaction record if record doesn't exist. Returns TransactionId.
-  Future<int> updateTransaction(String subSector,t.Transaction transaction) async {
+  Future<int> updateTransaction(
+      String subSector, t.Transaction transaction) async {
     int transactionId;
     var dbStore = await getDatabaseAndStore(subSector);
     Filter checkRecord = Filter.equals(
@@ -129,7 +137,7 @@ class TransactionService {
     return transactionId;
   }
 
-  Future deleteTransaction(String subSector,t.Transaction transaction) async {
+  Future deleteTransaction(String subSector, t.Transaction transaction) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.equals(
@@ -143,7 +151,6 @@ class TransactionService {
     if (transaction.transactionType == 0) {
       int newBalance =
           int.parse(_associatedAccount.balance) - int.parse(transaction.amount);
-      print(newBalance);
       await AccountService().updateAccount(
         Account(
           name: _associatedAccount.name,
@@ -155,7 +162,6 @@ class TransactionService {
     } else {
       int newBalance =
           int.parse(_associatedAccount.balance) + int.parse(transaction.amount);
-      print(newBalance);
       await AccountService().updateAccount(
         Account(
           name: _associatedAccount.name,
@@ -167,10 +173,10 @@ class TransactionService {
     }
     if (transaction.transactionType == 1) {
       Budget budget = await BudgetService()
-          .getBudget(subSector,transaction.categoryId, transaction.month);
-      print(budget.spent);
+          .getBudget(subSector, transaction.categoryId, transaction.month);
       int newSpent = int.parse(budget.spent) - int.parse(transaction.amount);
-      await BudgetService().updateBudget(subSector,
+      await BudgetService().updateBudget(
+        subSector,
         Budget(
           categoryId: budget.categoryId,
           month: budget.month,
@@ -182,7 +188,8 @@ class TransactionService {
     await dbStore.store.delete(dbStore.database, finder: finder);
   }
 
-  Future deleteAllTransactionsForCategory(String subSector,int categoryId) async {
+  Future deleteAllTransactionsForCategory(
+      String subSector, int categoryId) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.equals(

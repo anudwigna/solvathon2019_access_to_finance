@@ -1,17 +1,17 @@
 //English letter should e in lower case
 const Map<String, String> ResourceMap = {
   'nepali language': 'नेपाली भाषा',
-  'saral_lekha': 'सारल लेखा',
-  'saral lekha': 'सारल लेखा',
+  'munshiji': 'मुंशीजी',
   'categories': 'श्रेणीहरू',
   'income': 'आम्दानी ',
   'settings': 'सेटिंग्स',
   'expense': 'खर्च',
   'add': 'थप्नुहोस',
   'accounts': 'खाताहरू',
-  'current balance': 'हालको मौज्दात',
+  'current balance': 'हालको ब्यालेन्स',
   'npr': 'रू',
   'person': 'व्यक्ति',
+  'profile': 'प्रोफाइल',
   'other': 'अन्य',
   'bank': 'बैंक',
   'cash': 'नगद',
@@ -77,4 +77,19 @@ const Map<String, String> ResourceMap = {
   'update expense': 'खर्च हेरफेर गर्नुहोस',
   'are you sure you want to delete this category?':
       'के तपाई साचै यो कारोबार हटाउन चाहनुहुन्छ ?',
+  'cash outflow projection': 'पैसा खर्च',
+  'cash in': 'आमदानी',
+  'cash out': 'खर्च',
+  'gender': 'लिङ्ग',
+  'edit': 'बदल्नु्',
+  'email address': 'इ-मेल ठेगाना',
+  'address': 'ठेगाना',
+  'date of birth (B.S)': 'जन्म मिति (B.S)',
+  'date of birth (A.D)': 'जन्म मिति (A.D)',
+  'first name': 'नाम',
+  'last name': 'थर',
+  'phone number': 'फोन नम्बर',
+  'date of birth': 'जन्म मिति',
+
+
 };

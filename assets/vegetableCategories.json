@@ -1,0 +1,100 @@
+{
+  "expense": [  
+    {
+      "id": 100,
+      "en": "Capital Investment",
+      "np": "पुंजी लगानी ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 101,
+      "en": "Infrastructure development",
+      "np": "पूर्वाधार बिकाश ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 102,
+      "en": "Machine and Equiment",
+       "np": "मेशीन र उपकरण",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 103,
+      "en": "Purchase of Seed/Seedling",
+      "np": "बिउ / बिरुवाको खरिद  ",
+      "iconName": "hornbill"
+    },
+      {
+      "id": 104,
+      "en": "Purchase of Fertilizer",
+      "np": "प्रांगारिक मलको खरिद",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 105,
+      "en": "Purchase of Pesticides",
+      "np": "किटनासकको खरिद ",
+      "iconName": "hornbill"
+    },
+      {
+      "id": 106,
+      "en": "Human Resource/Labour",
+       "np": "मानव जनशक्ति वा श्रम",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 107,
+      "en": "Utilities",
+      "np": "उपयोगिताहरु",
+      "iconName": "hornbill"
+    },{
+      "id": 108,
+      "en": "Insurance",
+      "np": "बीमा",
+      "iconName": "hornbill"
+    },{
+      "id": 109,
+      "en": "Repair and Maintenance",
+      "np": "मर्मत र सम्भार",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 110,
+      "en": "Management",
+      "np": "ब्यबस्थापन",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 111,
+      "en": "Interest on loan",
+      "np": "ऋणमा ब्याज", 
+      "iconName": "hornbill"
+    }
+  ], 
+  "income": [
+    {
+      "id": 121,
+      "en": "Sales of vegetable",
+      "np": "तरकारीको बिक्रि ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 122,
+      "en": "Sales of seeds/seedlings",
+      "np": "बिउ / बिरुवाको बिक्रि" ,
+      "iconName": "hornbill"
+    },
+     {
+      "id": 123,
+      "en": "Sales of catch crops",
+      "np": "क्याच बालीको बिक्रि" ,
+      "iconName": "hornbill"
+    },
+     {
+      "id": 124,
+      "en": "Farm visit and trainings",
+      "np": "फार्म भ्रमण र प्रशिक्षण",
+      "iconName": "hornbill"
+    }
+  ]
+}

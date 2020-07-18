@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:provider/provider.dart';
-import 'package:saral_lekha/components/adaptive_text.dart';
-import 'package:saral_lekha/icons/vector_icons.dart';
-import 'package:saral_lekha/models/account/account.dart';
-import 'package:saral_lekha/globals.dart' as globals;
-import 'package:saral_lekha/models/budget/budget.dart';
-import 'package:saral_lekha/models/category/category.dart';
-import 'package:saral_lekha/models/transaction/transaction.dart';
-import 'package:saral_lekha/providers/preference_provider.dart';
-import 'package:saral_lekha/services/account_service.dart';
-import 'package:saral_lekha/services/budget_service.dart';
-import 'package:saral_lekha/services/category_service.dart';
-import 'package:saral_lekha/services/transaction_service.dart';
-
+import 'package:munshiji/components/adaptive_text.dart';
+import 'package:munshiji/components/screen_size_config.dart';
+import 'package:munshiji/icons/vector_icons.dart';
+import 'package:munshiji/models/account/account.dart';
+import 'package:munshiji/globals.dart' as globals;
+import 'package:munshiji/models/budget/budget.dart';
+import 'package:munshiji/models/category/category.dart';
+import 'package:munshiji/models/transaction/transaction.dart';
+import 'package:munshiji/providers/preference_provider.dart';
+import 'package:munshiji/services/account_service.dart';
+import 'package:munshiji/services/budget_service.dart';
+import 'package:munshiji/services/category_service.dart';
+import 'package:munshiji/services/transaction_service.dart';
 import '../configuration.dart';
+import '../globals.dart';
 import '../providers/preference_provider.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -36,10 +38,10 @@ class _TransactionPageState extends State<TransactionPage> {
   Lang language;
   double fontsize = 15.0;
   BoxDecoration _decoration = BoxDecoration(
-    color: Colors.white,
-  );
+      border: Border.all(color: Colors.grey),
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(5));
   var _formKey = GlobalKey<FormState>();
-  var _formKey1 = GlobalKey<FormState>();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   var _dropdownKey = GlobalKey();
   var _amountController = TextEditingController();
@@ -52,18 +54,38 @@ class _TransactionPageState extends State<TransactionPage> {
     language = Provider.of<PreferenceProvider>(context).language;
     selectedSubSector =
         Provider.of<SubSectorProvider>(context).selectedSubSector;
-    return Container(
-      decoration: Configuration().gradientDecoration,
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: widget.transaction != null
-              ? AdaptiveText(
-                  'Update ${widget.transactionType == 0 ? 'Income' : 'Expense'}')
-              : AdaptiveText(
-                  'Add ${widget.transactionType == 0 ? 'Income' : 'Expense'}'),
-        ),
-        body: _buildBody(),
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Color(0xff2b2f8e),
+        title: widget.transaction != null
+            ? AdaptiveText(
+                'Update ${widget.transactionType == 0 ? 'Income' : 'Expense'}')
+            : AdaptiveText(
+                'Add ${widget.transactionType == 0 ? 'Income' : 'Expense'}'),
+      ),
+      body: Stack(
+        children: [
+          Container(
+            height: ScreenSizeConfig.blockSizeHorizontal * 50,
+            color: Color(0xff2b2f8e),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
+                    )),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: _buildBody()),
+          ),
+        ],
       ),
     );
   }
@@ -85,14 +107,15 @@ class _TransactionPageState extends State<TransactionPage> {
                         (widget.transactionType == 1)
                             ? 'Expense Amount'
                             : 'Business Income',
-                        style: TextStyle(fontSize: fontsize)),
+                        style:
+                            TextStyle(fontSize: fontsize, color: Colors.black)),
                   ),
                   SizedBox(
                     width: 5,
                   ),
                   Container(
                     key: new GlobalKey(),
-                    width: (MediaQuery.of(context).size.width / 100) * 60,
+                    width: (MediaQuery.of(context).size.width / 100) * 45,
                     padding: EdgeInsets.only(left: 12.0),
                     decoration: _decoration,
                     child: Form(
@@ -114,8 +137,8 @@ class _TransactionPageState extends State<TransactionPage> {
                           hintText: language == Lang.EN
                               ? 'Enter amount'
                               : 'रकम लेख्नुहोस',
-                          hintStyle:
-                              TextStyle(color: Colors.grey, fontSize: fontsize),
+                          hintStyle: TextStyle(
+                              fontSize: fontsize, color: Colors.grey[700]),
                         ),
                       ),
                     ),
@@ -132,16 +155,18 @@ class _TransactionPageState extends State<TransactionPage> {
                           (widget.transactionType == 1)
                               ? 'Expense Category'
                               : 'Source of Income',
-                          style: TextStyle(fontSize: fontsize)),
+                          style: TextStyle(
+                              fontSize: fontsize, color: Colors.black)),
                     ),
                     SizedBox(
                       width: 5,
                     ),
                     Container(
-                      width: (MediaQuery.of(context).size.width / 100) * 60,
+                      width: (MediaQuery.of(context).size.width / 100) * 45,
                       decoration: _decoration,
                       child: FutureBuilder<List<Category>>(
-                        future: CategoryService().getCategories(selectedSubSector,
+                        future: CategoryService().getCategories(
+                          selectedSubSector,
                           widget.transactionType == 0
                               ? CategoryType.INCOME
                               : CategoryType.EXPENSE,
@@ -154,43 +179,112 @@ class _TransactionPageState extends State<TransactionPage> {
                               child: DropdownButtonHideUnderline(
                                 key: _dropdownKey,
                                 child: DropdownButton<int>(
+                                  isExpanded: true,
                                   icon: Icon(
                                     Icons.arrow_drop_down,
                                     color: Colors.grey[700],
                                   ),
-                                  hint: AdaptiveText(
-                                    'Select Category',
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
+                                  hint: Padding(
+                                    padding: const EdgeInsets.only(top: 15.0),
+                                    child: AdaptiveText(
+                                      'Select Category',
+                                      style: TextStyle(
+                                        color: Colors.grey[700],
+                                      ),
                                     ),
                                   ),
                                   value: _selectedCategoryId,
+                                  selectedItemBuilder: (BuildContext context) {
+                                    return snapshot.data
+                                        .map<Widget>((Category item) {
+                                      return Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          SizedBox(width: 5.0),
+                                          Icon(
+                                            VectorIcons.fromName(
+                                              item.iconName,
+                                              provider:
+                                                  IconProvider.FontAwesome5,
+                                            ),
+                                            color: Colors.blue,
+                                            size: fontsize,
+                                          ),
+                                          SizedBox(width: 10.0),
+                                          Flexible(
+                                            child: AdaptiveText(
+                                              '',
+                                              category: item,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 12,
+                                                color: const Color(0xff272b37),
+                                                height: 1.6666666666666667,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList();
+                                  },
                                   items: [
                                     for (int i = 0;
                                         i < snapshot.data.length;
                                         i++)
                                       DropdownMenuItem<int>(
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Icon(
-                                              VectorIcons.fromName(
-                                                snapshot.data[i].iconName,
-                                                provider:
-                                                    IconProvider.FontAwesome5,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: <Widget>[
+                                                  SizedBox(width: 5.0),
+                                                  Icon(
+                                                    VectorIcons.fromName(
+                                                      snapshot.data[i].iconName,
+                                                      provider: IconProvider
+                                                          .FontAwesome5,
+                                                    ),
+                                                    color: Colors.blue,
+                                                    size: fontsize,
+                                                  ),
+                                                  SizedBox(width: 10.0),
+                                                  Flexible(
+                                                    child: AdaptiveText(
+                                                      '',
+                                                      category:
+                                                          snapshot.data[i],
+                                                      overflow:
+                                                          TextOverflow.fade,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 12,
+                                                        color: const Color(
+                                                            0xff272b37),
+                                                        height:
+                                                            1.6666666666666667,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              color: Colors.grey,
-                                              size: fontsize,
-                                            ),
-                                            SizedBox(width: 5.0),
-                                            AdaptiveText(
-                                              '',
-                                              category: snapshot.data[i],
-                                              style: TextStyle(
-                                                color: Colors.grey[700],
+                                              SizedBox(
+                                                height: 8,
                                               ),
-                                            ),
-                                          ],
+                                              Divider(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.5))
+                                            ],
+                                          ),
                                         ),
                                         value: snapshot.data[i].id,
                                       ),
@@ -199,16 +293,24 @@ class _TransactionPageState extends State<TransactionPage> {
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: <Widget>[
+                                                SizedBox(width: 5.0),
                                                 Icon(
                                                   Icons.create,
                                                   color: Colors.grey,
                                                   size: fontsize,
                                                 ),
-                                                SizedBox(width: 5.0),
-                                                AdaptiveText(
-                                                  'Add new Category',
-                                                  style: TextStyle(
-                                                    color: Colors.grey[700],
+                                                SizedBox(width: 10.0),
+                                                Flexible(
+                                                  child: AdaptiveText(
+                                                    'Add new Category',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 12,
+                                                      color: const Color(
+                                                          0xff272b37),
+                                                      height:
+                                                          1.6666666666666667,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -248,11 +350,12 @@ class _TransactionPageState extends State<TransactionPage> {
                           widget.transactionType == 0
                               ? 'Deposited to:  '
                               : 'Paid from:  ',
-                          style: TextStyle(fontSize: fontsize),
+                          style: TextStyle(
+                              fontSize: fontsize, color: Colors.black),
                         ),
                       ),
                     Container(
-                      width: (MediaQuery.of(context).size.width / 100) * 60,
+                      width: (MediaQuery.of(context).size.width / 100) * 45,
                       decoration: _decoration,
                       child: FutureBuilder<List<Account>>(
                         future: AccountService().getAccounts(),
@@ -319,7 +422,8 @@ class _TransactionPageState extends State<TransactionPage> {
                         widget.transactionType == 0
                             ? '  मा जम्मा गरियो '
                             : '  बाट तिरिएको',
-                        style: TextStyle(fontSize: fontsize),
+                        style:
+                            TextStyle(fontSize: fontsize, color: Colors.black),
                       ),
                   ],
                 ),
@@ -328,7 +432,7 @@ class _TransactionPageState extends State<TransactionPage> {
                   (widget.transactionType == 1)
                       ? 'Date of Expense'
                       : 'Date of Income',
-                  style: TextStyle(fontSize: fontsize)),
+                  style: TextStyle(fontSize: fontsize, color: Colors.black)),
               SizedBox(height: 5.0),
               Padding(
                 padding: EdgeInsets.only(left: 20, right: 20),
@@ -336,29 +440,22 @@ class _TransactionPageState extends State<TransactionPage> {
                   elevation: 0,
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.grey),
                     borderRadius: BorderRadius.all(
-                      Radius.circular(15.0),
+                      Radius.circular(8.0),
                     ),
                   ),
                   child: InkWell(
                     onTap: () async {
-                      _selectedDateTime = await showNepaliDatePicker(
-                          context: context,
-                          initialDate: NepaliDateTime.now(),
-                          firstDate: NepaliDateTime(2070),
-                          lastDate: NepaliDateTime(2090),
-                          language: language == Lang.EN
-                              ? Language.ENGLISH
-                              : Language.NEPALI,
-                          builder: (context, widget) {
-                            return Theme(
-                              data: ThemeData.light().copyWith(
-                                primaryColor: Configuration().redColor,
-                                accentColor: Configuration().redColor,
-                              ),
-                              child: widget,
-                            );
-                          });
+                      _selectedDateTime = await showAdaptiveDatePicker(
+                        context: context,
+                        initialDate: NepaliDateTime.now(),
+                        firstDate: NepaliDateTime(2070),
+                        lastDate: NepaliDateTime(2090),
+                        language: language == Lang.EN
+                            ? Language.english
+                            : Language.nepali,
+                      );
                       if (_selectedDateTime != null) {
                         setState(() {});
                       } else {
@@ -373,10 +470,11 @@ class _TransactionPageState extends State<TransactionPage> {
                       child: Row(
                         children: <Widget>[
                           AdaptiveText(
-                            NepaliDateFormatter("MMMM dd, y (EEE)",
-                                    language: language == Lang.EN
-                                        ? Language.ENGLISH
-                                        : Language.NEPALI)
+                            NepaliDateFormat(
+                                    "MMMM dd, y (EEE)",
+                                    language == Lang.EN
+                                        ? Language.english
+                                        : Language.nepali)
                                 .format(_selectedDateTime),
                             style: TextStyle(
                               color: Colors.grey[700],
@@ -384,9 +482,10 @@ class _TransactionPageState extends State<TransactionPage> {
                             ),
                           ),
                           Expanded(child: Container()),
-                          Icon(
-                            Icons.date_range,
-                            color: Colors.grey[600],
+                          SvgPicture.string(
+                            calendar,
+                            allowDrawingOutsideViewBox: true,
+                            height: 20,
                           ),
                         ],
                       ),
@@ -396,7 +495,7 @@ class _TransactionPageState extends State<TransactionPage> {
               ),
               SizedBox(height: 20.0),
               AdaptiveText('Description (Optional)',
-                  style: TextStyle(fontSize: fontsize)),
+                  style: TextStyle(fontSize: fontsize, color: Colors.black)),
               SizedBox(height: 5.0),
               Container(
                 decoration: _decoration,
@@ -410,15 +509,21 @@ class _TransactionPageState extends State<TransactionPage> {
                       border: InputBorder.none,
                       hintText: (widget.transactionType == 1)
                           ? language == Lang.EN
-                              ? 'Enter expense description'
+                              ? 'Enter description (Optional)'
                               : 'खर्च सम्बन्धि थप विवरण भए लेखुहोस्'
                           : language == Lang.EN
-                              ? 'Enter income description'
+                              ? 'Enter description (Optional)'
                               : 'खर्च सम्बन्धि थप विवरण भए लेखुहोस्',
                       hintStyle: TextStyle(color: Colors.grey, fontSize: 15.0),
                       counterStyle: TextStyle(color: Colors.grey),
                     ),
-                    maxLines: 3,
+                    buildCounter: (context,
+                            {currentLength, isFocused, maxLength}) =>
+                        Container(
+                      height: 1,
+                      width: 1,
+                    ),
+                    maxLines: 4,
                     maxLength: 80,
                   ),
                 ),
@@ -429,14 +534,14 @@ class _TransactionPageState extends State<TransactionPage> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      color: Colors.white),
+                      color: Color(0xff2E4FFF)),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () => widget.transaction == null
                           ? _addTransaction()
                           : _updateTransaction(),
-                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      borderRadius: BorderRadius.all(Radius.circular(21.0)),
                       child: Padding(
                         padding: EdgeInsets.all(14.0),
                         child: AdaptiveText(
@@ -449,7 +554,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                     : 'अद्यावधिक गर्नुहोस्',
                             textAlign: TextAlign.center,
                             style:
-                                TextStyle(fontSize: 17.0, color: Colors.black)),
+                                TextStyle(fontSize: 15.0, color: Colors.white)),
                       ),
                     ),
                   ),
@@ -486,13 +591,14 @@ class _TransactionPageState extends State<TransactionPage> {
         int _spent;
         int _total;
         if (widget.transactionType == 1) {
-          oldBudget = await BudgetService()
-              .getBudget(selectedSubSector,_selectedCategoryId, _selectedDateTime.month);
+          oldBudget = await BudgetService().getBudget(
+              selectedSubSector, _selectedCategoryId, _selectedDateTime.month);
           _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
           _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
           _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
           if (_spent > _total) {
-            await BudgetService().updateBudget(selectedSubSector,
+            await BudgetService().updateBudget(
+              selectedSubSector,
               Budget(
                 categoryId: _selectedCategoryId,
                 month: _selectedDateTime.month,
@@ -502,7 +608,8 @@ class _TransactionPageState extends State<TransactionPage> {
             );
             await _updateTransactionAndAccount(widget.transaction != null);
           } else {
-            await BudgetService().updateBudget(selectedSubSector,
+            await BudgetService().updateBudget(
+              selectedSubSector,
               Budget(
                 categoryId: oldBudget.categoryId,
                 month: oldBudget.month,
@@ -526,13 +633,14 @@ class _TransactionPageState extends State<TransactionPage> {
       int _spent;
       int _total;
       if (widget.transactionType == 1) {
-        oldBudget = await BudgetService()
-            .getBudget(selectedSubSector,widget.transaction.categoryId, _selectedDateTime.month);
+        oldBudget = await BudgetService().getBudget(selectedSubSector,
+            widget.transaction.categoryId, _selectedDateTime.month);
         _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
         _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
         _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
         if (_spent > _total) {
-          await BudgetService().updateBudget(selectedSubSector,
+          await BudgetService().updateBudget(
+            selectedSubSector,
             Budget(
               categoryId: widget.transaction.categoryId,
               month: _selectedDateTime.month,
@@ -542,7 +650,8 @@ class _TransactionPageState extends State<TransactionPage> {
           );
           await _updateTransactionAndAccount(widget.transaction != null);
         } else {
-          await BudgetService().updateBudget(selectedSubSector,
+          await BudgetService().updateBudget(
+            selectedSubSector,
             Budget(
               categoryId: oldBudget.categoryId,
               month: oldBudget.month,
@@ -559,7 +668,8 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   _updateTransactionAndAccount(bool isUpdate) async {
-    int transactionId = await TransactionService().updateTransaction(selectedSubSector,
+    int transactionId = await TransactionService().updateTransaction(
+      selectedSubSector,
       Transaction(
         amount: _amountController.text,
         categoryId:
@@ -587,184 +697,107 @@ class _TransactionPageState extends State<TransactionPage> {
     );
   }
 
-  // Future<bool> _warnUser() async => await showDialog(
-  //       context: context,
-  //       barrierDismissible: false,
-  //       builder: (context) {
-  //         return AlertDialog(
-  //           backgroundColor: Colors.white,
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(20.0),
-  //           ),
-  //           title: Row(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: <Widget>[
-  //               AdaptiveText(
-  //                 'Warning',
-  //                 textAlign: TextAlign.center,
-  //                 style: TextStyle(
-  //                   color: Colors.red,
-  //                 ),
-  //               ),
-  //               Expanded(
-  //                 child: Container(),
-  //               ),
-  //               IconButton(
-  //                 icon: Transform.rotate(
-  //                   angle: 40.0,
-  //                   child: Icon(
-  //                     Icons.add_circle_outline,
-  //                     size: 30.0,
-  //                     color: Colors.red,
-  //                   ),
-  //                 ),
-  //                 onPressed: () => Navigator.pop(context, false),
-  //               ),
-  //             ],
-  //           ),
-  //           content: AdaptiveText(
-  //             'Budget is not enough for the transaction. Do you really want to add the transaction?',
-  //             style: TextStyle(
-  //               color: Colors.black,
-  //             ),
-  //           ),
-  //           actions: <Widget>[
-  //             SimpleDialogOption(
-  //               child: AdaptiveText(
-  //                 'UPDATE BUDGET',
-  //                 style: TextStyle(
-  //                   color: Colors.black,
-  //                 ),
-  //               ),
-  //               onPressed: () {
-  //                 Navigator.pop(context, false);
-  //                 Navigator.pushNamed(
-  //                   context,
-  //                   '/budget',
-  //                 );
-  //               },
-  //             ),
-  //             SimpleDialogOption(
-  //               child: AdaptiveText(
-  //                 'OKAY',
-  //                 style: TextStyle(
-  //                   color: Colors.black,
-  //                 ),
-  //               ),
-  //               onPressed: () => Navigator.pop(context, true),
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     );
-
   _showMessage(String message) {
     _scaffoldKey.currentState
         .showSnackBar(SnackBar(content: AdaptiveText(message)));
   }
 
   Future _showAddCategoryBottomSheet() async {
-    await showModalBottomSheet(
-      isScrollControlled: true,
+    GlobalKey<FormState> formKey = GlobalKey();
+    await showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
-        return AnimatedPadding(
-          padding: MediaQuery.of(context).viewInsets,
-          duration: Duration(milliseconds: 100),
-          curve: Curves.decelerate,
+        return Dialog(
           child: Container(
             decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0))),
+                borderRadius: BorderRadius.all(Radius.circular(8.0))),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    VectorIcons.fromName('hornbill',
+                        provider: IconProvider.FontAwesome5),
+                    color: Colors.grey,
+                    size: 28,
+                  ),
+                  onPressed: () {},
+                ),
+                Text(
+                  language == Lang.EN
+                      ? 'Enter new category'
+                      : 'नयाँ श्रेणी लेख्नुहोस',
+                  style: TextStyle(color: Colors.black, fontSize: 20.0),
+                ),
                 Padding(
-                  padding: EdgeInsets.only(
-                      top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20.0),
-                          ),
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            VectorIcons.fromName('hornbill',
-                                provider: IconProvider.FontAwesome5),
-                            color: Colors.black,
-                          ),
-                          onPressed: () {},
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: formKey,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.withOpacity(0.7)),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: TextFormField(
+                        validator: validator,
+                        autofocus: true,
+                        controller: _categoryName,
+                        style:
+                            TextStyle(color: Colors.grey[800], fontSize: 20.0),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(8.0),
                         ),
                       ),
-                      SizedBox(width: 10.0),
-                      Expanded(
-                        child: Form(
-                          key: _formKey1,
-                          child: TextFormField(
-                            validator: validator,
-                            controller: _categoryName,
-                            style: TextStyle(
-                                color: Colors.grey[800], fontSize: 20.0),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: language == Lang.EN
-                                  ? 'Enter new category'
-                                  : 'नयाँ श्रेणी लेख्नुहोस',
-                              hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 20.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      gradient: LinearGradient(
-                        colors: Configuration().gradientColors,
-                        begin: FractionalOffset.centerLeft,
-                        end: FractionalOffset.centerRight,
-                      ),
-                    ),
-                    child: Material(
-                      child: InkWell(
-                        onTap: () async {
-                          if (_formKey1.currentState.validate()) {
-                            await CategoryService().addCategory(selectedSubSector,
-                              Category(
-                                en: _categoryName.text,
-                                np: _categoryName.text,
-                                iconName: 'hornbill',
-                                id: _categoryName.text.hashCode,
-                              ),
-                              type: widget.transactionType == 0
-                                  ? CategoryType.INCOME
-                                  : CategoryType.EXPENSE,
-                            );
-                            Navigator.pop(context);
-                          }
-                          _categoryName.clear();
-                        },
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: AdaptiveText(
-                            'ADD',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20.0),
-                          ),
+                        color: Configuration().incomeColor),
+                    child: InkWell(
+                      onTap: () async {
+                        if (formKey.currentState.validate()) {
+                          await CategoryService().addCategory(
+                            selectedSubSector,
+                            Category(
+                              en: _categoryName.text,
+                              np: _categoryName.text,
+                              iconName: 'hornbill',
+                              id: _categoryName.text.hashCode,
+                            ),
+                            type: widget.transactionType == 1
+                                ? CategoryType.EXPENSE
+                                : CategoryType.INCOME,
+                          );
+                          Navigator.pop(context);
+                        }
+                        _categoryName.clear();
+                      },
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 18),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.add),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            AdaptiveText(
+                              'Add Category',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20.0),
+                            ),
+                          ],
                         ),
                       ),
                     ),

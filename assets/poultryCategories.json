@@ -1,0 +1,118 @@
+{
+  "expense": [  
+    {
+      "id": 100,
+      "en": "Capital Investment",
+      "np": "पुंजी लगानी ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 101,
+      "en": "Purchase of Chicks",
+      "np": "चल्लाको खरिद",
+      "iconName": "hornbill"    
+       },
+       {
+      "id": 102,
+      "en": "Purchase of Feeds",
+      "np": "दानाको खरिद ",
+      "iconName": "hornbill"    
+       },
+    {
+      "id": 103,
+      "en": "Infrastructure development",
+      "np": "पूर्वाधार बिकाश ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 104,
+      "en": "Machine and Equipment",
+      "np": "मेसिन र उपकरण",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 105,
+      "en": "Medicine and Vaccination",
+      "np": "खोप तथा उपचार खर्च ",
+      "iconName": "hornbill"    
+       },
+        {
+      "id": 106,
+      "en": "Human Resource and Labour",
+      "np": "मानव जनशक्ति वा श्रम ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 107,
+      "en": "Utilities",
+      "np": "उपयोगितहरु",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 108,
+      "en": "Furniture",
+      "np": "फर्नीचर",
+      "iconName": "hornbill"    
+       },
+    {
+      "id": 108,
+      "en": "Insurance",
+      "np": "बीमा",
+      "iconName": "hornbill"
+    },{
+      "id": 110,
+      "en": "Repair and Maintenance",
+      "np": "मर्मत र सम्भार",
+      "iconName": "hornbill"
+    },{
+      "id": 111,
+      "en": "Management",
+      "np": "ब्यबस्थापन ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 112,
+      "en": "Interest on loan",
+      "np": "ऋणमा ब्याज",
+      "iconName": "hornbill"
+    }
+  ], 
+  "income": [
+    {
+      "id": 221,
+      "en": "Sales of layers",
+      "np": "लेयार्स कुखुराको बिक्रि",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 222,
+      "en": "Sales of broilers",
+      "np": "ब्रोइलेर कुखुराको बिक्रि",
+      "iconName": "hornbill"
+    },
+     {
+      "id": 223,
+      "en": "Sales of chicks",
+      "np": "चल्लाहरुको बिक्रि",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 223,
+      "en": "Sales of eggs(layers)",
+      "np": "अण्डाहरूको बिक्री",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 223,
+      "en": "Sales of manure",
+      "np": "सुली मल को बिक्रि",
+      "iconName": "hornbill"
+    },
+     {
+      "id": 224,
+      "en": "Farm visit and trainings",
+     "np": "फार्म भ्रमण र प्रशिक्षण",
+      "iconName": "hornbill"
+    }
+  ]
+}

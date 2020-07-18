@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:saral_lekha/providers/preference_provider.dart';
-import 'package:saral_lekha/services/preference_service.dart';
+import 'package:munshiji/providers/preference_provider.dart';
+import 'package:munshiji/services/preference_service.dart';
+import 'package:munshiji/components/adaptive_text.dart';
 
 import '../configuration.dart';
 
@@ -16,13 +17,13 @@ class LanguageSelectionPage extends StatelessWidget {
           children: <Widget>[
             Flexible(flex: 3, child: Container()),
             Image.asset(
-              'assets/saral_lekha_logo.png',
+              'assets/munshiji_logo.png',
               height: 150.0,
               width: 150.0,
             ),
             SizedBox(height: 10.0),
-            Text(
-              'Saral Lekha',
+            AdaptiveText(
+              'Munshiji',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,
@@ -52,7 +53,7 @@ class LanguageSelectionPage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
               child: MaterialButton(
-                splashColor: Configuration().yellowColor,
+                splashColor: Configuration().appColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(20.0),
@@ -95,7 +96,7 @@ class LanguageSelectionPage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
               child: MaterialButton(
-                splashColor: Configuration().yellowColor,
+                splashColor: Configuration().appColor,
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(
@@ -123,6 +124,6 @@ class LanguageSelectionPage extends StatelessWidget {
     );
   }
 
-   _navigateToHome(BuildContext context) =>
-       Navigator.pushReplacementNamed(context, '/home');
+  _navigateToHome(BuildContext context) =>
+      Navigator.pushReplacementNamed(context, '/home');
 }

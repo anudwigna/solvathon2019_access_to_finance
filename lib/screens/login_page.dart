@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:saral_lekha/components/adaptive_text.dart';
-import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:munshiji/components/adaptive_text.dart';
+import 'package:munshiji/providers/preference_provider.dart';
 
 import '../configuration.dart';
 
@@ -49,13 +48,13 @@ class _LoginPageState extends State<LoginPage> {
           children: <Widget>[
             _spacing(2),
             Image.asset(
-              'assets/saral_lekha_logo.png',
+              'assets/munshiji_logo.png',
               width: 150,
               height: 150,
             ),
             SizedBox(height: 10.0),
-            Text(
-              (language == Lang.EN) ? 'Saral Lekha' : 'सारल लेखा',
+            AdaptiveText(
+              'Munshiji',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,
@@ -171,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
               borderRadius: BorderRadius.circular(20.0),
               child: Ink(
                 decoration: BoxDecoration(
-                  color: Configuration().yellowColor,
+                  color: Configuration().appColor,
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: InkWell(

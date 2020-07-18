@@ -1,4 +1,4 @@
-package np.com.qubex.sarallekha;
+package np.com.aria.munshiji;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

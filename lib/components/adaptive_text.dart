@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:saral_lekha/models/category/category.dart';
-import 'package:saral_lekha/providers/preference_provider.dart';
+import 'package:munshiji/models/category/category.dart';
+import 'package:munshiji/providers/preference_provider.dart';
 
 import '../resource_map.dart';
 

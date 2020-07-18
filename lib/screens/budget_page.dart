@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:provider/provider.dart';
-import 'package:saral_lekha/components/adaptive_text.dart';
-import 'package:saral_lekha/components/drawer.dart';
-import 'package:saral_lekha/icons/vector_icons.dart';
-import 'package:saral_lekha/models/budget/budget.dart';
-import 'package:saral_lekha/models/category/category.dart';
-import 'package:saral_lekha/providers/preference_provider.dart';
-import 'package:saral_lekha/services/budget_service.dart';
-import 'package:saral_lekha/services/category_service.dart';
-import 'package:saral_lekha/services/transaction_service.dart';
+import 'package:munshiji/components/adaptive_text.dart';
+import 'package:munshiji/components/drawer.dart';
+import 'package:munshiji/icons/vector_icons.dart';
+import 'package:munshiji/models/budget/budget.dart';
+import 'package:munshiji/models/category/category.dart';
+import 'package:munshiji/providers/preference_provider.dart';
+import 'package:munshiji/services/budget_service.dart';
+import 'package:munshiji/services/category_service.dart';
+import 'package:munshiji/services/transaction_service.dart';
 
 import '../configuration.dart';
 
@@ -48,74 +48,111 @@ class _BudgetPageState extends State<BudgetPage>
     language = Provider.of<PreferenceProvider>(context).language;
     selectedSubSector =
         Provider.of<SubSectorProvider>(context).selectedSubSector;
-    return Theme(
-      data: Theme.of(context).copyWith(canvasColor: Colors.white),
-      child: Container(
-        decoration: Configuration().gradientDecoration,
-        child: Scaffold(
-          key: _scaffoldKey,
-          drawer: MyDrawer(),
-          appBar: AppBar(
-            title: AdaptiveText('Expense Projection ('+selectedSubSector.toString()+')'),
-            bottom: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              tabs: [
-                for (int month = 1; month <= 12; month++)
-                  language == Lang.EN
-                      ? Tab(
-                          child: Text(
-                            NepaliDateFormatter("MMMM ''yy").format(
-                              NepaliDateTime(_currentYear, month),
-                            ),
-                          ),
-                        )
-                      : Tab(
-                          child: Text(
-                            NepaliDateFormatter("MMMM ''yy",
-                                    language: Language.NEPALI)
-                                .format(
-                              NepaliDateTime(_currentYear, month),
-                            ),
-                            style: TextStyle(color: Colors.white),
-                          ),
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: Configuration().appColor,
+      drawer: MyDrawer(),
+      appBar: AppBar(
+        title: AdaptiveText('Cash Outflow Projection'),
+        bottom: TabBar(
+          controller: _tabController,
+          indicator: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Configuration().incomeColor,
+          ),
+          isScrollable: true,
+          tabs: [
+            for (int month = 1; month <= 12; month++)
+              language == Lang.EN
+                  ? Tab(
+                      child: Text(NepaliDateFormat("MMMM ''yy").format(
+                        NepaliDateTime(_currentYear, month),
+                      )),
+                    )
+                  : Tab(
+                      child: Text(
+                        NepaliDateFormat("MMMM ''yy", Language.nepali).format(
+                          NepaliDateTime(_currentYear, month),
                         ),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              for (int month = 1; month <= 12; month++) _buildBody(month),
-            ],
-          ),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+          ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          for (int month = 1; month <= 12; month++) _buildBody(month),
+        ],
       ),
     );
   }
 
   Widget _buildBody(int month) {
-    return FutureBuilder<List<Category>>(
-      future: CategoryService()
-          .getCategories(selectedSubSector, CategoryType.EXPENSE),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.separated(
-            itemCount: snapshot.data.length,
-            itemBuilder: (context, index) => Padding(
-              padding: EdgeInsets.only(
-                top: index == 0 ? 20 : 0,
-                bottom: index == snapshot.data.length - 1 ? 30 : 0,
+    return Padding(
+      padding: const EdgeInsets.only(top: 23.0),
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(50.0),
+              topRight: Radius.circular(50.0),
+            )),
+        padding: const EdgeInsets.only(top: 30),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: AdaptiveText(
+                  selectedSubSector,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    color: const Color(0xff1e1e1e),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
-              child: _buildCard(snapshot.data[index], month),
-            ),
-            separatorBuilder: (context, _) => SizedBox(height: 20.0),
-          );
-        } else
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-      },
+              Expanded(
+                child: FutureBuilder<List<Category>>(
+                  future: CategoryService()
+                      .getCategories(selectedSubSector, CategoryType.EXPENSE),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return ListView.separated(
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, index) => Padding(
+                          padding: EdgeInsets.only(
+                            top: index == 0 ? 10 : 0,
+                            bottom: index == snapshot.data.length - 1 ? 30 : 0,
+                          ),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(
+                                    color: Colors.grey.withOpacity(0.7))),
+                            child: _buildCard(snapshot.data[index], month),
+                          ),
+                        ),
+                        separatorBuilder: (context, _) =>
+                            SizedBox(height: 20.0),
+                      );
+                    } else
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -126,148 +163,116 @@ class _BudgetPageState extends State<BudgetPage>
         if (snapshot.hasData) {
           return Column(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    '${language == Lang.EN ? NepaliNumber.formatWithComma(snapshot.data.spent ?? '0') : NepaliNumber.fromString(snapshot.data.spent ?? '0', true)} /',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w300,
-                      color: getProgressValue(
-                                  snapshot.data.spent, snapshot.data.total) >
-                              1
-                          ? Colors.red[200]
-                          : Colors.white,
+              PopupMenuButton<int>(
+                color: Colors.white,
+                onSelected: (value) async {
+                  if (value == 1) {
+                    _setBudgetDialog(snapshot.data, category,
+                        action: snapshot.data.spent == null ? 'set' : 'update');
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return _clearBudgetDialog(snapshot.data, category);
+                      },
+                    );
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 1,
+                    child: AdaptiveText(
+                      snapshot.data.spent == null
+                          ? 'Set Budget'
+                          : 'Update Budget',
+                      style: TextStyle(color: Colors.grey[700]),
                     ),
                   ),
-                  Text(
-                    '${language == Lang.EN ? NepaliNumber.formatWithComma(snapshot.data.total ?? '0') : NepaliNumber.fromString(snapshot.data.total ?? '0', true)}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: getProgressValue(
-                                  snapshot.data.spent, snapshot.data.total) >
-                              1
-                          ? Colors.red[200]
-                          : Colors.white,
-                    ),
-                  ),
-                  SizedBox(width: 25.0),
-                ],
-              ),
-              Stack(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14.0),
-                      child: InkWell(
-                        onTap: snapshot.data.total != null
-                            ? null
-                            : () => _setBudgetDialog(snapshot.data, category,
-                                action: snapshot.data.spent == null
-                                    ? 'set'
-                                    : 'update'),
-                        borderRadius: BorderRadius.circular(14.0),
-                        child: SizedBox(
-                          height: 50.0,
-                          child: LinearProgressIndicator(
-                            value: getProgressValue(
-                              snapshot.data.spent,
-                              snapshot.data.total,
-                            ),
-                            valueColor: AlwaysStoppedAnimation(
-                              getProgressValue(snapshot.data.spent,
-                                          snapshot.data.total) >
-                                      1
-                                  ? Colors.red.withOpacity(0.4)
-                                  : Colors.white.withOpacity(0.2),
-                            ),
-                            backgroundColor: Colors.white.withOpacity(0.05),
-                          ),
-                        ),
+                  if (snapshot.data.spent != null)
+                    PopupMenuItem(
+                      value: 2,
+                      child: AdaptiveText(
+                        'Clear Budget',
+                        style: TextStyle(color: Colors.grey[700]),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 26.0, right: 10.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          VectorIcons.fromName(category.iconName,
-                              provider: IconProvider.FontAwesome5),
-                          size: 14.0,
-                        ),
-                        SizedBox(width: 10.0),
-                        Column(
+                ],
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: 15, right: 15.0, top: 13, bottom: 13),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(
+                        VectorIcons.fromName(category.iconName,
+                            provider: IconProvider.FontAwesome5),
+                        size: 20.0,
+                        color: Configuration().incomeColor,
+                      ),
+                      SizedBox(width: 15.0),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             AdaptiveText(
                               '',
                               category: category,
-                              style: TextStyle(fontSize: 16.0),
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.black),
                             ),
-                            if (snapshot.data.total == null) ...[
-                              SizedBox(height: 5.0),
-                              AdaptiveText(
-                                'Click to set budget',
-                                style: TextStyle(fontSize: 10.0),
-                              ),
-                            ],
+                            SizedBox(height: 2.0),
+                            AdaptiveText(
+                              (snapshot.data.total == null)
+                                  ? 'Click to set budget'
+                                  : 'Click to update budget',
+                              style: TextStyle(
+                                  fontSize: 11.0,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
-                        Expanded(
-                          child: Container(),
-                        ),
-                        snapshot.data.total != null
-                            ? Theme(
-                                data: Theme.of(context)
-                                    .copyWith(cardColor: Colors.white),
-                                child: PopupMenuButton<int>(
-                                  onSelected: (value) async {
-                                    if (value == 1) {
-                                      _setBudgetDialog(snapshot.data, category,
-                                          action: 'update');
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return _clearBudgetDialog(
-                                              snapshot.data, category);
-                                        },
-                                      );
-                                    }
-                                  },
-                                  itemBuilder: (context) => [
-                                    PopupMenuItem(
-                                      value: 1,
-                                      child: AdaptiveText(
-                                        'Update Budget',
-                                        style:
-                                            TextStyle(color: Colors.grey[700]),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      value: 2,
-                                      child: AdaptiveText(
-                                        'Clear Budget',
-                                        style:
-                                            TextStyle(color: Colors.grey[700]),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(
-                                height: 50.0,
-                              ),
-                      ],
-                    ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text(
+                            NepaliNumberFormat(
+                                        decimalDigits: 0,
+                                        language: (language == Lang.EN)
+                                            ? Language.english
+                                            : Language.nepali)
+                                    .format(snapshot.data.spent ?? 0) +
+                                '/',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Configuration().incomeColor,
+                            ),
+                          ),
+                          Text(
+                            NepaliNumberFormat(
+                                    decimalDigits: 0,
+                                    language: (language == Lang.EN)
+                                        ? Language.english
+                                        : Language.nepali)
+                                .format(snapshot.data.total ?? 0),
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Configuration().incomeColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ],
           );
@@ -294,7 +299,7 @@ class _BudgetPageState extends State<BudgetPage>
       data: Theme.of(context).copyWith(canvasColor: Colors.white),
       child: Dialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            borderRadius: BorderRadius.all(Radius.circular(8.0))),
         backgroundColor: Colors.white,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -311,53 +316,51 @@ class _BudgetPageState extends State<BudgetPage>
                     ? 'Are you sure to clear the budget for ${category.en}?'
                     : 'के तपाई ${category.np}को लागि बजेट खाली गर्न निश्चित हुनुहुन्छ?',
                 style: TextStyle(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w300,
-                  fontSize: 20.0,
+                  color: Colors.black,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 16.0,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
             Padding(
               padding: EdgeInsets.all(20.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                  color: Colors.red,
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () async {
-                      if (await TransactionService().isBudgetEditable(
-                          selectedSubSector,
-                          budget.categoryId,
-                          budget.month,
-                          NepaliDateTime.now().year)) {
-                        await BudgetService()
-                            .clearBudget(selectedSubSector, budget);
-                      } else {
-                        _scaffoldKey.currentState.showSnackBar(
-                          SnackBar(
-                            content: AdaptiveText(
-                                'Budget cannot be cleared as it in use.'),
-                          ),
-                        );
-                      }
-                      setState(() {});
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: AdaptiveText(
-                        'CLEAR BUDGET',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 20.0),
+              child: InkWell(
+                onTap: () async {
+                  if (await TransactionService().isBudgetEditable(
+                      selectedSubSector,
+                      budget.categoryId,
+                      budget.month,
+                      NepaliDateTime.now().year)) {
+                    await BudgetService()
+                        .clearBudget(selectedSubSector, budget);
+                  } else {
+                    _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: AdaptiveText(
+                            'Budget cannot be cleared as it is in use.'),
                       ),
-                    ),
+                    );
+                  }
+                  setState(() {});
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(21.0),
+                    color: const Color(0xfffc717f),
+                  ),
+                  child: AdaptiveText(
+                    'Clear Budget',
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
+            ),
+            SizedBox(
+              height: 10.0,
             ),
           ],
         ),
@@ -378,91 +381,94 @@ class _BudgetPageState extends State<BudgetPage>
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(32.0))),
             backgroundColor: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                SizedBox(height: 15.0),
-                AdaptiveText(
-                  '',
-                  category: category,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w300,
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Icon(
+                    VectorIcons.fromName(category.iconName,
+                        provider: IconProvider.FontAwesome5),
+                    size: 30.0,
+                    color: Configuration().incomeColor,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(20.0),
+                  SizedBox(height: 15.0),
+                  AdaptiveText(
+                    '',
+                    category: category,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w300,
                     ),
-                    child: Form(
-                      key: _formKey,
-                      child: TextFormField(
-                        validator: (value) => value.length == 0
-                            ? language == Lang.EN
-                                ? 'Cannot be empty'
-                                : 'खाली  हुनसक्दैन '
-                            : null,
-                        controller: _budgetAmountController,
-                        autofocus: true,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly
-                        ],
-                        style:
-                            TextStyle(color: Colors.grey[800], fontSize: 20.0),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: language == Lang.EN
-                              ? 'Enter budget amount'
-                              : 'बजेट रकम लेख्नुहोस',
-                          hintStyle:
-                              TextStyle(color: Colors.grey, fontSize: 20.0),
-                          prefixIcon: Icon(
-                            Icons.dialpad,
-                            color: Colors.grey,
+                    textAlign: TextAlign.center,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.withOpacity(0.7)),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: TextFormField(
+                          validator: (value) => value.length == 0
+                              ? language == Lang.EN
+                                  ? 'Cannot be empty'
+                                  : 'खाली  हुनसक्दैन '
+                              : null,
+                          controller: _budgetAmountController,
+                          autofocus: true,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            WhitelistingTextInputFormatter.digitsOnly
+                          ],
+                          style: TextStyle(color: Colors.grey, fontSize: 20.0),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.only(
+                              left: 10.0,
+                            ),
+                            border: InputBorder.none,
+                            hintText: language == Lang.EN
+                                ? 'Enter budget amount'
+                                : 'बजेट रकम लेख्नुहोस',
+                            hintStyle:
+                                TextStyle(color: Colors.grey, fontSize: 20.0),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      gradient: LinearGradient(
-                        colors: Configuration().gradientColors,
-                        begin: FractionalOffset.centerLeft,
-                        end: FractionalOffset.centerRight,
-                      ),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => _setBudget(oldBudgetData, category.id,
-                            action: action),
+                  Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Configuration().incomeColor,
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: AdaptiveText(
-                            action == 'set' ? 'SET BUDGET' : 'UPDATE BUDGET',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20.0),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => _setBudget(oldBudgetData, category.id,
+                              action: action),
+                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: AdaptiveText(
+                              action == 'set' ? 'SET BUDGET' : 'UPDATE BUDGET',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 15.0),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
