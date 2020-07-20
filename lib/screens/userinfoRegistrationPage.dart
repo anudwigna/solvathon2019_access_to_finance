@@ -7,15 +7,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:munshiji/services/preference_service.dart';
-import 'package:munshiji/components/adaptive_text.dart';
+import 'package:MunshiG/services/preference_service.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:nepali_utils/nepali_utils.dart';
-import 'package:munshiji/components/screen_size_config.dart';
-import 'package:munshiji/configuration.dart';
-import 'package:munshiji/globals.dart';
-import 'package:munshiji/models/user/user.dart';
-import 'package:munshiji/screens/setting.dart';
-import 'package:munshiji/services/user_service.dart';
+import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/configuration.dart';
+import 'package:MunshiG/globals.dart';
+import 'package:MunshiG/models/user/user.dart';
+import 'package:MunshiG/screens/setting.dart';
+import 'package:MunshiG/services/user_service.dart';
 
 class UserInfoRegistrationPage extends StatefulWidget {
   final User userData;
@@ -36,7 +36,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
   TextEditingController addressController = TextEditingController();
   DateTime dateTime;
   List<String> genders = ['Male', 'Female', 'Other'];
-  String genderValue;
+  String genderValue = 'Male';
   int popId = 0;
   File image;
   OutlineInputBorder border = OutlineInputBorder(
@@ -44,7 +44,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(color: Colors.black, width: 1.5));
   TextStyle hintTextStyle = TextStyle(
-      color: Colors.grey[700], fontSize: 14, fontWeight: FontWeight.bold);
+      color: Colors.grey[700], fontSize: 14, fontWeight: FontWeight.w500);
   TextStyle titleStyle =
       TextStyle(color: Colors.black, fontWeight: FontWeight.bold);
 
@@ -79,7 +79,15 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
             Center(
               child: InkWell(
                 onTap: () {
-                  addNewUser(User(phonenumber: '123456789'));
+                  FocusScope.of(context).requestFocus(new FocusNode());
+                  if (phoneNumberController.text.length < 10) {
+                    _scaffoldKey.currentState.removeCurrentSnackBar();
+                    _scaffoldKey.currentState.showSnackBar(SnackBar(
+                        content: Text(
+                            'Valid Phone Number must be added to Continue')));
+                  } else {
+                    addNewUser(User(phonenumber: '123456789'));
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -173,8 +181,9 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                               controller: fnameController,
                               hintText: 'John',
                               title: 'First Name',
-                              validator: (value) =>
-                                  value.isEmpty ? "First Name Required" : null,
+                              validator: (value) => value.trim.call().isEmpty
+                                  ? "First Name Required"
+                                  : null,
                             )),
                             SizedBox(
                               width: ScreenSizeConfig.blockSizeVertical * 3.5,
@@ -183,9 +192,10 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 child: bodyField(
                                     title: 'Last Name',
                                     hintText: 'Doe',
-                                    validator: (value) => value.isEmpty
-                                        ? "First Name Required"
-                                        : null,
+                                    validator: (value) =>
+                                        value.trim.call().isEmpty
+                                            ? "First Name Required"
+                                            : null,
                                     controller: lnameController)),
                           ],
                         ),
@@ -199,7 +209,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                             hintText: '9818212123',
                             title: 'Phone Number',
                             maxlength: 10,
-                            validator: (value) => value.length < 10
+                            validator: (value) => value.trim.call().length < 10
                                 ? "Invalid Phone Number"
                                 : null),
                         SizedBox(
@@ -249,6 +259,12 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                         enabledBorder: border,
                                         disabledBorder: border,
                                         focusedBorder: border,
+                                        errorBorder: OutlineInputBorder(
+                                            gapPadding: 0,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            borderSide: BorderSide(
+                                                color: Colors.red, width: 1.5)),
                                         contentPadding:
                                             const EdgeInsets.all(0)),
                                     child: Padding(
@@ -301,8 +317,9 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                             controller: addressController,
                             hintText: 'Lagankhel, Lalitpur',
                             title: 'Address',
-                            validator: (value) =>
-                                value.isEmpty ? "Address Required" : null),
+                            validator: (value) => value.trim.call().isEmpty
+                                ? "Address Required"
+                                : null),
                         SizedBox(
                           height: ScreenSizeConfig.blockSizeHorizontal * 4.5,
                         ),
@@ -310,7 +327,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                             controller: emailController,
                             hintText: 'hello@gmail.com',
                             title: 'Email Address',
-                            validator: (value) => value.isEmpty
+                            validator: (value) => value.trim.call().isEmpty
                                 ? "Email Address Required"
                                 : null),
                         SizedBox(
@@ -323,6 +340,8 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 borderRadius: BorderRadius.circular(8)),
                             color: Configuration().incomeColor,
                             onPressed: () async {
+                              FocusScope.of(context)
+                                  .requestFocus(new FocusNode());
                               if (dateTime == null) {}
                               if (_formKey.currentState.validate()) {
                                 String imageDir;
@@ -353,14 +372,14 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                   }
                                 }
                                 User user = User(
-                                    address: addressController.text,
+                                    address: addressController.text.trim(),
                                     dob: dateTime,
-                                    emailAddress: emailController.text,
+                                    emailAddress: emailController.text.trim(),
                                     gender: genderValue,
                                     image: (imageDir != null) ? imageDir : null,
-                                    name: fnameController.text +
+                                    name: fnameController.text.trim() +
                                         ' ' +
-                                        lnameController.text,
+                                        lnameController.text.trim(),
                                     phonenumber: phoneNumberController.text);
                                 if (widget.userData == null) {
                                   addNewUser(user);
@@ -480,6 +499,10 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                       .format(dateTime ?? DateTime.now()),
           border: border,
           enabledBorder: border,
+          errorBorder: OutlineInputBorder(
+              gapPadding: 0,
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.red, width: 1.5)),
           disabledBorder: border,
           focusedBorder: border,
         ),
@@ -515,8 +538,22 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
               ? [WhitelistingTextInputFormatter.digitsOnly]
               : [],
           maxLength: maxlength,
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontSize: 16),
           decoration: InputDecoration(
+            prefixIcon: (maxlength != null)
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      '+977 ',
+                      style: hintTextStyle,
+                    ),
+                  )
+                : null,
+            prefixIconConstraints: BoxConstraints(
+              maxWidth: (14 * 4.0),
+            ),
+            errorStyle: TextStyle(color: Colors.red),
+            prefixStyle: TextStyle(color: Colors.grey),
             hintStyle: hintTextStyle,
             contentPadding: EdgeInsets.symmetric(horizontal: 8),
             hintText: hintText,

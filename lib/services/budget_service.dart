@@ -1,7 +1,7 @@
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:munshiji/models/budget/budget.dart';
-import 'package:munshiji/models/database_and_store.dart';
+import 'package:MunshiG/models/budget/budget.dart';
+import 'package:MunshiG/models/database_and_store.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 

@@ -1,12 +1,12 @@
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:munshiji/models/account/account.dart';
-import 'package:munshiji/models/budget/budget.dart';
-import 'package:munshiji/models/database_and_store.dart';
-import 'package:munshiji/models/transaction/transaction.dart' as t;
-import 'package:munshiji/services/account_service.dart';
-import 'package:munshiji/services/budget_service.dart';
-import 'package:munshiji/services/preference_service.dart';
+import 'package:MunshiG/models/account/account.dart';
+import 'package:MunshiG/models/budget/budget.dart';
+import 'package:MunshiG/models/database_and_store.dart';
+import 'package:MunshiG/models/transaction/transaction.dart' as t;
+import 'package:MunshiG/services/account_service.dart';
+import 'package:MunshiG/services/budget_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 

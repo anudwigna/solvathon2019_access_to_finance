@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:munshiji/components/adaptive_text.dart';
-import 'package:munshiji/components/drawer.dart';
-import 'package:munshiji/configuration.dart';
-import 'package:munshiji/globals.dart' as globals;
-import 'package:munshiji/models/account/account.dart';
-import 'package:munshiji/services/account_service.dart';
-import 'package:munshiji/services/category_service.dart';
-import 'package:munshiji/services/preference_service.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/configuration.dart';
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/models/account/account.dart';
+import 'package:MunshiG/services/account_service.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
 
 class Settings extends StatefulWidget {
 //0=First time page , 1= Settings page from inapp
@@ -232,12 +232,12 @@ class _SettingsState extends State<Settings> {
                             await _loadCategories(_newSelectedSubSectors);
                             _newSelectedSubSectors.clear();
                             _key.currentState.showSnackBar(SnackBar(
-                              content: Text('Action Completed'),
+                              content: AdaptiveText('New Preference has been added'),
                               backgroundColor: Colors.green,
                             ));
                           } else {
                             _key.currentState.showSnackBar(SnackBar(
-                              content: Text('No Changes has been made'),
+                              content: AdaptiveText('No Changes has been made'),
                               backgroundColor: Colors.red,
                             ));
                           }

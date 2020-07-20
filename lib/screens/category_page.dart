@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:munshiji/components/adaptive_text.dart';
-import 'package:munshiji/components/drawer.dart';
-import 'package:munshiji/globals.dart' as globals;
-import 'package:munshiji/icons/vector_icons.dart';
-import 'package:munshiji/models/category/category.dart';
-import 'package:munshiji/providers/preference_provider.dart';
-import 'package:munshiji/services/category_service.dart';
-import 'package:munshiji/components/reorderable_list.dart' as Component;
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/icons/vector_icons.dart';
+import 'package:MunshiG/models/category/category.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/components/reorderable_list.dart' as Component;
 import '../components/screen_size_config.dart';
 
 import '../configuration.dart';

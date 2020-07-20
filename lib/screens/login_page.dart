@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:munshiji/components/adaptive_text.dart';
-import 'package:munshiji/providers/preference_provider.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
 
 import '../configuration.dart';
 
@@ -48,13 +48,13 @@ class _LoginPageState extends State<LoginPage> {
           children: <Widget>[
             _spacing(2),
             Image.asset(
-              'assets/munshiji_logo.png',
+              'assets/MunshiG_logo.png',
               width: 150,
               height: 150,
             ),
             SizedBox(height: 10.0),
             AdaptiveText(
-              'Munshiji',
+              'MunshiG',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:munshiji/globals.dart' as globals;
-import 'package:munshiji/providers/preference_provider.dart';
-import 'package:munshiji/screens/homepage.dart';
-import 'package:munshiji/screens/setting.dart';
-import 'package:munshiji/services/category_service.dart';
-import 'package:munshiji/services/preference_service.dart';
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/screens/homepage.dart';
+import 'package:MunshiG/screens/setting.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
 import '../configuration.dart';
 import '../globals.dart';
 import 'adaptive_text.dart';

@@ -1,4 +1,4 @@
-package np.com.aria.munshiji;
+package np.com.aria.munshig;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

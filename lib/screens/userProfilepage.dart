@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:munshiji/components/adaptive_text.dart';
-import 'package:munshiji/components/drawer.dart';
-import 'package:munshiji/components/screen_size_config.dart';
-import 'package:munshiji/configuration.dart';
-import 'package:munshiji/models/user/user.dart';
-import 'package:munshiji/screens/userinfoRegistrationPage.dart';
-import 'package:munshiji/services/user_service.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/configuration.dart';
+import 'package:MunshiG/models/user/user.dart';
+import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
+import 'package:MunshiG/services/user_service.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override

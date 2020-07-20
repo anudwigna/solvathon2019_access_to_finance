@@ -1,7 +1,7 @@
 //English letter should e in lower case
 const Map<String, String> ResourceMap = {
   'nepali language': 'नेपाली भाषा',
-  'munshiji': 'मुंशीजी',
+  'munshig': 'मुंशीजी',
   'categories': 'श्रेणीहरू',
   'income': 'आम्दानी ',
   'settings': 'सेटिंग्स',
@@ -10,6 +10,8 @@ const Map<String, String> ResourceMap = {
   'accounts': 'खाताहरू',
   'current balance': 'हालको ब्यालेन्स',
   'npr': 'रू',
+  'new preference has been added': 'नयाँ प्राथमिकता थपिएको छ',
+  'no changes has been made': 'कुनै परिवर्तन गरिएको छैन',
   'person': 'व्यक्ति',
   'profile': 'प्रोफाइल',
   'other': 'अन्य',
@@ -90,6 +92,4 @@ const Map<String, String> ResourceMap = {
   'last name': 'थर',
   'phone number': 'फोन नम्बर',
   'date of birth': 'जन्म मिति',
-
-
 };

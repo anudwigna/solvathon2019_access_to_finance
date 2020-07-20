@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:provider/provider.dart';
-import 'package:munshiji/components/adaptive_text.dart';
-import 'package:munshiji/components/drawer.dart';
-import 'package:munshiji/icons/vector_icons.dart';
-import 'package:munshiji/models/budget/budget.dart';
-import 'package:munshiji/models/category/category.dart';
-import 'package:munshiji/providers/preference_provider.dart';
-import 'package:munshiji/services/budget_service.dart';
-import 'package:munshiji/services/category_service.dart';
-import 'package:munshiji/services/transaction_service.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/icons/vector_icons.dart';
+import 'package:MunshiG/models/budget/budget.dart';
+import 'package:MunshiG/models/category/category.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/services/budget_service.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/transaction_service.dart';
 
 import '../configuration.dart';
 

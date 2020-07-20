@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:munshiji/globals.dart' as globals;
+import 'package:MunshiG/globals.dart' as globals;
 
 enum Lang { EN, NP }
 

@@ -3,7 +3,7 @@ library globals.dart;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:munshiji/models/category/category.dart';
+import 'package:MunshiG/models/category/category.dart';
 
 List<Category> incomeCategories;
 List<Category> expenseCategories;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:munshiji/components/screen_size_config.dart';
-import 'package:munshiji/globals.dart' as globals;
-import 'package:munshiji/screens/setting.dart';
-import 'package:munshiji/screens/userinfoRegistrationPage.dart';
+import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/screens/setting.dart';
+import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
 
-import 'package:munshiji/services/category_service.dart';
-import 'package:munshiji/services/preference_service.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

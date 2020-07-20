@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:munshiji/providers/preference_provider.dart';
-import 'package:munshiji/services/preference_service.dart';
-import 'package:munshiji/components/adaptive_text.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/services/preference_service.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
 
 import '../configuration.dart';
 
@@ -17,13 +17,13 @@ class LanguageSelectionPage extends StatelessWidget {
           children: <Widget>[
             Flexible(flex: 3, child: Container()),
             Image.asset(
-              'assets/munshiji_logo.png',
+              'assets/MunshiG_logo.png',
               height: 150.0,
               width: 150.0,
             ),
             SizedBox(height: 10.0),
             AdaptiveText(
-              'Munshiji',
+              'MunshiG',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,

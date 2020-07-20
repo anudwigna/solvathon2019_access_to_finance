@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:munshiji/configuration.dart';
-import 'package:munshiji/providers/preference_provider.dart';
-import 'package:munshiji/screens/account_page.dart';
-import 'package:munshiji/screens/budget_page.dart';
-import 'package:munshiji/screens/category_page.dart';
-import 'package:munshiji/screens/homepage.dart';
+import 'package:MunshiG/configuration.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/screens/account_page.dart';
+import 'package:MunshiG/screens/budget_page.dart';
+import 'package:MunshiG/screens/category_page.dart';
+import 'package:MunshiG/screens/homepage.dart';
 
-import 'package:munshiji/screens/splashscreen.dart';
-import 'package:munshiji/screens/userProfilepage.dart';
-import 'package:munshiji/services/preference_service.dart';
+import 'package:MunshiG/screens/splashscreen.dart';
+import 'package:MunshiG/screens/userProfilepage.dart';
+import 'package:MunshiG/services/preference_service.dart';
 
 import 'globals.dart' as globals;
 
@@ -18,17 +18,17 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   globals.language = (await PreferenceService.instance.getLanguage()) ?? 'en';
   //SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(Munshiji());
+  runApp(MunshiG());
 }
 
-class Munshiji extends StatelessWidget {
+class MunshiG extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PreferenceProvider>(
       builder: (context) => PreferenceProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Munshiji',
+        title: 'MunshiG',
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: MaterialColor(0xffffffff, {}),
@@ -60,7 +60,7 @@ class _WrapperPageState extends State<WrapperPage> {
       builder: (context) => SubSectorProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Munshiji',
+        title: 'MunshiG',
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: MaterialColor(0xffffffff, {}),

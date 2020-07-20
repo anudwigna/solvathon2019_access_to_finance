@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:munshiji/components/adaptive_text.dart';
-import 'package:munshiji/components/drawer.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/drawer.dart';
 import 'package:nepali_utils/nepali_utils.dart';
-import 'package:munshiji/models/account/account.dart';
-import 'package:munshiji/providers/preference_provider.dart';
-import 'package:munshiji/services/account_service.dart';
+import 'package:MunshiG/models/account/account.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/services/account_service.dart';
 import '../globals.dart';
 import '../configuration.dart';
 
