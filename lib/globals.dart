@@ -1,5 +1,7 @@
 library globals.dart;
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -32,6 +34,12 @@ Future<bool> checkPermission(GlobalKey<ScaffoldState> _scaffoldKey) async {
     ));
   }
   return status.isGranted;
+}
+
+bool fileExists(String path) {
+  File file = File(path);
+  bool test = file.existsSync();
+  return test;
 }
 
 const String dashboard =

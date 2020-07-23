@@ -56,8 +56,11 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
       dateTime = widget.userData?.dob ?? null;
       emailController.text = widget.userData?.emailAddress ?? '';
       genderValue = widget.userData?.gender ?? null;
-      image =
-          widget.userData?.image != null ? File(widget.userData.image) : null;
+      image = widget.userData?.image != null
+          ? fileExists(widget.userData.image)
+              ? File(widget.userData.image)
+              : null
+          : null;
       fnameController.text = widget.userData?.name?.split(' ')?.first ?? '';
       lnameController.text = widget.userData?.name?.split(' ')?.last ?? '';
       phoneNumberController.text = widget.userData?.phonenumber ?? '';
@@ -86,7 +89,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                         content: Text(
                             'Valid Phone Number must be added to Continue')));
                   } else {
-                    addNewUser(User(phonenumber: '123456789'));
+                    addNewUser(User(phonenumber: phoneNumberController.text));
                   }
                 },
                 child: Padding(
@@ -270,39 +273,43 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                           left: 10.0, right: 5),
-                                      child: DropdownButtonFormField<String>(
-                                          isExpanded: false,
-                                          validator: (value) {
-                                            return value != null
-                                                ? null
-                                                : 'Gender Required';
-                                          },
-                                          value: genderValue,
-                                          decoration: InputDecoration(
-                                            hintText: 'Gender',
-                                            hintStyle: hintTextStyle,
-                                            border: InputBorder.none,
-                                            disabledBorder: InputBorder.none,
-                                            enabledBorder: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                          ),
-                                          items: genders
-                                              .map((e) =>
-                                                  DropdownMenuItem<String>(
-                                                      value: e,
-                                                      child: Container(
-                                                          child: Text(
-                                                        e,
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.black),
-                                                      ))))
-                                              .toList(),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              genderValue = value;
-                                            });
-                                          }),
+                                      child: Theme(
+                                        data:
+                                            ThemeData(cardColor: Colors.white),
+                                        child: DropdownButtonFormField<String>(
+                                            isExpanded: false,
+                                            validator: (value) {
+                                              return value != null
+                                                  ? null
+                                                  : 'Gender Required';
+                                            },
+                                            value: genderValue,
+                                            decoration: InputDecoration(
+                                              hintText: 'Gender',
+                                              hintStyle: hintTextStyle,
+                                              border: InputBorder.none,
+                                              disabledBorder: InputBorder.none,
+                                              enabledBorder: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                            ),
+                                            items: genders
+                                                .map((e) =>
+                                                    DropdownMenuItem<String>(
+                                                        value: e,
+                                                        child: Container(
+                                                            child: Text(
+                                                          e,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black),
+                                                        ))))
+                                                .toList(),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                genderValue = value;
+                                              });
+                                            }),
+                                      ),
                                     ),
                                   ),
                                 ],

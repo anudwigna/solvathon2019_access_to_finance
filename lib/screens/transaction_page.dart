@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:nepali_utils/nepali_utils.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
@@ -49,6 +53,7 @@ class _TransactionPageState extends State<TransactionPage> {
   var _amountController = TextEditingController();
   var _descriptionController = TextEditingController();
   int _selectedCategoryId;
+  File descriptonImage;
   Account _selectedAccount;
   NepaliDateTime _selectedDateTime = NepaliDateTime.now();
   @override
@@ -61,7 +66,6 @@ class _TransactionPageState extends State<TransactionPage> {
       _selectedCategoryId = widget.transaction.categoryId;
       _amountController.text = widget.transaction.amount;
       _descriptionController.text = widget.transaction.memo;
-      print(widget.transaction.timestamp);
       List<String> zz =
           widget.transaction.timestamp.split('T').first.split('-').toList();
       _selectedDateTime = NepaliDateTime(
@@ -535,6 +539,38 @@ class _TransactionPageState extends State<TransactionPage> {
                     style:
                         TextStyle(color: Colors.grey[800], fontSize: fontsize),
                     decoration: InputDecoration(
+                      suffixIcon: descriptonImage == null
+                          ? InkWell(
+                              onTap: () async {
+                                bool callback =
+                                    await checkPermission(_scaffoldKey);
+                                if (!callback) {
+                                  return;
+                                }
+                                try {
+                                  final img = await ImagePicker()
+                                      .getImage(source: ImageSource.gallery);
+                                  if (img != null) {
+                                    setState(() {
+                                      descriptonImage = File(img.path);
+                                    });
+                                  }
+                                } catch (e) {
+                                  print('err');
+                                }
+                              },
+                              child: Icon(
+                                Icons.attach_file,
+                                color: Colors.yellow,
+                              ))
+                          : Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Image.file(
+                                descriptonImage,
+                                fit: BoxFit.contain,
+                                width: 60,
+                              ),
+                            ),
                       border: InputBorder.none,
                       hintText: (widget.transactionType == 1)
                           ? language == Lang.EN
@@ -621,7 +657,10 @@ class _TransactionPageState extends State<TransactionPage> {
         int _total;
         if (widget.transactionType == 1) {
           oldBudget = await BudgetService().getBudget(
-              selectedSubSector, _selectedCategoryId, _selectedDateTime.month);
+              selectedSubSector,
+              _selectedCategoryId,
+              _selectedDateTime.month,
+              _selectedDateTime.year);
           _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
           _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
           _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
@@ -632,6 +671,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 categoryId: _selectedCategoryId,
                 month: _selectedDateTime.month,
                 spent: '$_spent',
+                year: _selectedDateTime.year,
                 total: oldBudget.total,
               ),
             );
@@ -643,6 +683,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 categoryId: oldBudget.categoryId,
                 month: oldBudget.month,
                 spent: '$_spent',
+                year: oldBudget.year,
                 total: oldBudget.total,
               ),
             );
@@ -651,6 +692,24 @@ class _TransactionPageState extends State<TransactionPage> {
         } else {
           await _updateTransactionAndAccount(widget.transaction != null);
         }
+        String imageDir;
+        if (descriptonImage != null) {
+          Directory dir = await getApplicationSupportDirectory();
+          String ext = descriptonImage.path.split('/').last.split('.').last;
+          imageDir = dir.path +
+              '/transaction' +
+              _selectedDateTime.toIso8601String().toString() +
+              "." +
+              ext;
+          try {
+            await descriptonImage.copy(imageDir);
+          } catch (e) {
+            _scaffoldKey.currentState.removeCurrentSnackBar();
+            _scaffoldKey.currentState.showSnackBar(
+                SnackBar(content: Text('Error, Image cannot be uploaded')));
+            return;
+          }
+        }
         Navigator.pop(context, true);
       }
     }
@@ -658,19 +717,20 @@ class _TransactionPageState extends State<TransactionPage> {
 
   Future _updateTransaction() async {
     if (_formKey.currentState.validate()) {
-      var oldBudget;
+      Budget oldBudget;
       int _spent;
       int _total;
       if (widget.transactionType == 1) {
-        oldBudget = await BudgetService().getBudget(selectedSubSector,
-            widget.transaction.categoryId, _selectedDateTime.month);
+        oldBudget = await BudgetService().getBudget(
+            selectedSubSector,
+            widget.transaction.categoryId,
+            _selectedDateTime.month,
+            _selectedDateTime.year);
         _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
 
         int checkExpense = (int.tryParse(widget.transaction.amount) ?? 0) -
             (int.tryParse(_amountController.text ?? '0') ?? 0);
-
         _spent -= checkExpense;
-
         _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
         if (_spent > _total) {
           await BudgetService().updateBudget(
@@ -679,6 +739,7 @@ class _TransactionPageState extends State<TransactionPage> {
               categoryId: widget.transaction.categoryId,
               month: _selectedDateTime.month,
               spent: '$_spent',
+              year: _selectedDateTime.year,
               total: oldBudget.total,
             ),
           );
@@ -690,6 +751,7 @@ class _TransactionPageState extends State<TransactionPage> {
               categoryId: oldBudget.categoryId,
               month: oldBudget.month,
               spent: '$_spent',
+              year: oldBudget.year,
               total: oldBudget.total,
             ),
           );

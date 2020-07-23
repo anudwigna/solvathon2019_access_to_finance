@@ -11,12 +11,14 @@ Budget _$BudgetFromJson(Map<String, dynamic> json) {
       month: json['month'] as int,
       total: json['total'] as String,
       spent: json['spent'] as String,
-      categoryId: json['categoryId'] as int);
+      categoryId: json['categoryId'] as int,
+      year: json['year'] as int);
 }
 
 Map<String, dynamic> _$BudgetToJson(Budget instance) => <String, dynamic>{
       'month': instance.month,
       'total': instance.total,
       'spent': instance.spent,
-      'categoryId': instance.categoryId
+      'categoryId': instance.categoryId,
+      'year': instance.year
     };

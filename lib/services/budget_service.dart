@@ -24,12 +24,14 @@ class BudgetService {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future<Budget> getBudget(String subSector, int categoryId, int month) async {
+  Future<Budget> getBudget(
+      String subSector, int categoryId, int month, int year) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
         Filter.equals('month', month),
         Filter.equals('categoryId', categoryId),
+        Filter.equals('year', year)
       ]),
     );
     var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
@@ -53,6 +55,10 @@ class BudgetService {
         Filter.equals(
           'categoryId',
           budget.categoryId,
+        ),
+        Filter.equals(
+          'year',
+          budget.year,
         )
       ]);
       bool recordFound =
@@ -86,6 +92,10 @@ class BudgetService {
         Filter.equals(
           'categoryId',
           budget.categoryId,
+        ),
+        Filter.equals(
+          'year',
+          budget.year,
         )
       ]),
     );

@@ -1,4 +1,4 @@
-![Image of Saral Lekha App](/assets/saral_lekha_logo.png)
+![Image of Saral Lekha App](/assets/images/munshiji-logo.png)
 
 # Saral Lekha Mobile Application
 Women’s access to finance is a complex issue in Nepal. Government of Nepal has given directive to commercial banks to provide women entrepreneurs with collateral free subsidized loan of up to NPR 1.5 million. Commercial banks are also required to disburse agriculture loan equivalent to 10% of their total loan portfolio. However, this loan can only be accessed by women registered as sole proprietorship and require sound business/production plan.

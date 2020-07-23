@@ -173,8 +173,8 @@ class TransactionService {
       );
     }
     if (transaction.transactionType == 1) {
-      Budget budget = await BudgetService()
-          .getBudget(subSector, transaction.categoryId, transaction.month);
+      Budget budget = await BudgetService().getBudget(subSector,
+          transaction.categoryId, transaction.month, transaction.year);
       int newSpent = int.parse(budget.spent) - int.parse(transaction.amount);
       await BudgetService().updateBudget(
         subSector,
@@ -183,6 +183,7 @@ class TransactionService {
           month: budget.month,
           spent: '$newSpent',
           total: budget.total,
+          year: budget.year,
         ),
       );
     }

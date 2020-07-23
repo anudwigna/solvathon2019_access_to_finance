@@ -26,15 +26,33 @@ class _BudgetPageState extends State<BudgetPage>
   Lang language;
   TabController _tabController;
   String selectedSubSector;
+  final int noOfmonths = 60;
 
   var _budgetAmountController = TextEditingController();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  var _dateResolver = <NepaliDateTime>[];
   @override
   void initState() {
     super.initState();
-    _tabController =
-        TabController(length: 12, vsync: this, initialIndex: _currentMonth - 1);
+    initializeDateResolver();
+    _tabController = TabController(
+        length: 60,
+        vsync: this,
+        initialIndex: noOfmonths - (12 - _currentMonth + 1));
+  }
+
+  initializeDateResolver() {
+    // int _year = _currentYear;
+    // int _firstMonth;
+    // bool _incrementer;
+    int initYear = _currentYear - 4;
+    int indexYear = initYear;
+    for (int i = 1; i <= noOfmonths; i++) {
+      _dateResolver.add(NepaliDateTime(indexYear, (i % 12 == 0) ? 12 : i % 12));
+      if (i % 12 == 0) {
+        indexYear++;
+      }
+    }
   }
 
   @override
@@ -62,17 +80,22 @@ class _BudgetPageState extends State<BudgetPage>
           ),
           isScrollable: true,
           tabs: [
-            for (int month = 1; month <= 12; month++)
+            for (int index = 0; index < noOfmonths; index++)
+              //   for (int month = 1; month <= 12; month++)
               language == Lang.EN
                   ? Tab(
                       child: Text(NepaliDateFormat("MMMM ''yy").format(
-                        NepaliDateTime(_currentYear, month),
+                        NepaliDateTime(
+                          _dateResolver[index].year,
+                          _dateResolver[index].month,
+                        ),
                       )),
                     )
                   : Tab(
                       child: Text(
                         NepaliDateFormat("MMMM ''yy", Language.nepali).format(
-                          NepaliDateTime(_currentYear, month),
+                          NepaliDateTime(_dateResolver[index].year,
+                              _dateResolver[index].month),
                         ),
                         style: TextStyle(color: Colors.white),
                       ),
@@ -83,13 +106,17 @@ class _BudgetPageState extends State<BudgetPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          for (int month = 1; month <= 12; month++) _buildBody(month),
+          for (int month = 0; month < noOfmonths; month++)
+            _buildBody(
+              _dateResolver[month].month,
+              _dateResolver[month].year,
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildBody(int month) {
+  Widget _buildBody(int month, int year) {
     return Padding(
       padding: const EdgeInsets.only(top: 23.0),
       child: Container(
@@ -136,7 +163,8 @@ class _BudgetPageState extends State<BudgetPage>
                                 borderRadius: BorderRadius.circular(30),
                                 border: Border.all(
                                     color: Colors.grey.withOpacity(0.7))),
-                            child: _buildCard(snapshot.data[index], month),
+                            child:
+                                _buildCard(snapshot.data[index], month, year),
                           ),
                         ),
                         separatorBuilder: (context, _) =>
@@ -156,9 +184,10 @@ class _BudgetPageState extends State<BudgetPage>
     );
   }
 
-  Widget _buildCard(Category category, int month) {
+  Widget _buildCard(Category category, int month, int year) {
     return FutureBuilder<Budget>(
-      future: BudgetService().getBudget(selectedSubSector, category.id, month),
+      future: BudgetService()
+          .getBudget(selectedSubSector, category.id, month, year),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Column(
@@ -167,7 +196,7 @@ class _BudgetPageState extends State<BudgetPage>
                 color: Colors.white,
                 onSelected: (value) async {
                   if (value == 1) {
-                    _setBudgetDialog(snapshot.data, category,
+                    _setBudgetDialog(snapshot.data, category, year, month,
                         action: snapshot.data.spent == null ? 'set' : 'update');
                   } else {
                     showDialog(
@@ -331,7 +360,7 @@ class _BudgetPageState extends State<BudgetPage>
                       selectedSubSector,
                       budget.categoryId,
                       budget.month,
-                      NepaliDateTime.now().year)) {
+                      budget.year)) {
                     await BudgetService()
                         .clearBudget(selectedSubSector, budget);
                   } else {
@@ -370,7 +399,8 @@ class _BudgetPageState extends State<BudgetPage>
 
   var _formKey = GlobalKey<FormState>();
 
-  void _setBudgetDialog(Budget oldBudgetData, Category category,
+  void _setBudgetDialog(
+      Budget oldBudgetData, Category category, int year, int month,
       {String action = 'set'}) {
     showDialog(
       context: context,
@@ -452,7 +482,8 @@ class _BudgetPageState extends State<BudgetPage>
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: () => _setBudget(oldBudgetData, category.id,
+                          onTap: () => _setBudget(
+                              oldBudgetData, category.id, year, month,
                               action: action),
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
                           child: Padding(
@@ -476,7 +507,7 @@ class _BudgetPageState extends State<BudgetPage>
     );
   }
 
-  Future _setBudget(Budget oldBudgetData, int categoryId,
+  Future _setBudget(Budget oldBudgetData, int categoryId, int year, int month,
       {String action = 'set'}) async {
     if (_formKey.currentState.validate()) {
       if (action == 'set') {
@@ -484,15 +515,21 @@ class _BudgetPageState extends State<BudgetPage>
           selectedSubSector,
           Budget(
             categoryId: oldBudgetData.categoryId ?? categoryId,
-            month: oldBudgetData.month ?? _tabController.index + 1,
+            month: oldBudgetData.month ?? month,
             spent: '0',
+            year: oldBudgetData.year ?? year,
             total: _budgetAmountController.text,
           ),
         );
       } else {
         int amount = int.tryParse(_budgetAmountController.text) ?? 0;
-        String spentString = (await BudgetService().getBudget(selectedSubSector,
-                categoryId, oldBudgetData.month ?? _tabController.index + 1))
+        String spentString = (await BudgetService().getBudget(
+                selectedSubSector,
+                categoryId,
+                oldBudgetData.month ?? month,
+                oldBudgetData.year ?? year))
+
+            ///--------------change yearrrrr
             .spent;
         int spent = int.tryParse(spentString ?? '0') ?? 0;
         if (amount > spent) {
@@ -500,7 +537,8 @@ class _BudgetPageState extends State<BudgetPage>
             selectedSubSector,
             Budget(
               categoryId: oldBudgetData.categoryId ?? categoryId,
-              month: oldBudgetData.month ?? _tabController.index + 1,
+              month: oldBudgetData.month ?? month,
+              year: oldBudgetData.year ?? year,
               spent: spentString,
               total: _budgetAmountController.text,
             ),

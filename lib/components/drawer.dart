@@ -45,6 +45,7 @@ class _MyDrawerState extends State<MyDrawer> {
               child: Image.asset(
                 "assets/images/munshiji-logo.png",
                 height: 60.0,
+                color: Color(0xff2b2f8e),
                 fit: BoxFit.contain,
               ),
             ),
@@ -131,7 +132,7 @@ class _MyDrawerState extends State<MyDrawer> {
               dense: true,
               leading: Icon(
                 Icons.person,
-                color: Colors.blue,
+                color: Configuration().incomeColor,
               ),
               title: AdaptiveText(
                 'Profile',
