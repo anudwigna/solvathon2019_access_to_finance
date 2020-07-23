@@ -13,14 +13,15 @@ dependencies:
   sembast: ^1.15.4
   provider: ^2.0.0+1
   nepali_date_picker: ^4.1.0
-  flutter_circular_chart: ^0.1.0
+  # flutter_circular_chart: ^0.1.0
   country_pickers: ^1.1.0
   intl: ^0.16.1
   image_picker: ^0.6.7+4
   permission_handler: ^5.0.1+1
-  adobe_xd: ^0.1.4
+  # adobe_xd: ^0.1.4
   flutter_svg: ^0.17.4
   sleek_circular_slider: ^1.1.0
+  package_info: ^0.4.1
 
 dev_dependencies:
   flutter_test:

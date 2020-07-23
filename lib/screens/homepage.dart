@@ -1,6 +1,5 @@
 import 'package:MunshiG/services/preference_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:provider/provider.dart';
@@ -32,8 +31,8 @@ class HomePageState extends State<HomePage>
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
   final int noOfmonths = 60;
-  List<GlobalKey<AnimatedCircularChartState>> _chartKey =
-      new List<GlobalKey<AnimatedCircularChartState>>();
+  // List<GlobalKey<AnimatedCircularChartState>> _chartKey =
+  //     new List<GlobalKey<AnimatedCircularChartState>>();
   var _dateResolver = <NepaliDateTime>[];
   var _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -149,12 +148,7 @@ class HomePageState extends State<HomePage>
     );
   }
 
-  initChartController(NepaliDateTime date) {
-    _chartKey.add(GlobalKey<AnimatedCircularChartState>());
-  }
-
   Widget _buildBody(NepaliDateTime date) {
-    initChartController(date);
     return Padding(
       padding: const EdgeInsets.only(top: 15.0),
       child: Material(
@@ -191,7 +185,6 @@ class HomePageState extends State<HomePage>
                             child:
                                 Center(child: _centerWidget(income, expense)),
                           ),
-                          key: _chartKey[date.month - 1],
                           initialValue: isExpenseGreater ? 100 : (percentSaved),
                           appearance: CircularSliderAppearance(
                             angleRange: 360,

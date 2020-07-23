@@ -288,14 +288,16 @@ class _CategoryPageState extends State<CategoryPage>
                               size: 20.0,
                             ),
                           ),
-                          AdaptiveText(
-                            '',
-                            category: categories[i],
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 15,
-                              color: const Color(0xff272b37),
-                              height: 1.4285714285714286,
+                          Flexible(
+                            child: AdaptiveText(
+                              '',
+                              category: categories[i],
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                color: const Color(0xff272b37),
+                                height: 1.4285714285714286,
+                              ),
                             ),
                           ),
                         ],

@@ -6,6 +6,7 @@ import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
 
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/preference_service.dart';
+import 'package:package_info/package_info.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -73,15 +74,22 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 10.0),
               child: SizedBox(
-                child: Text(
-                  'Version 1.0',
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: const Color(0xffffffff),
-                  ),
-                  textAlign: TextAlign.center,
+                child: FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    return Text(
+                      snapshot.hasData
+                          ? 'Version' + ' ' + snapshot.data.version
+                          : '',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        color: const Color(0xffffffff),
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
                 ),
               ),
             ),
