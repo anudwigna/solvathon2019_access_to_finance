@@ -25,8 +25,10 @@ class TransactionPage extends StatefulWidget {
   //0 = Income   1 = Expense
   final int transactionType;
   final Transaction transaction;
+  final String selectedSubSector;
 
-  TransactionPage(this.transactionType, {this.transaction});
+  TransactionPage(this.transactionType,
+      {this.transaction, @required this.selectedSubSector});
 
   @override
   _TransactionPageState createState() => _TransactionPageState();
@@ -50,10 +52,29 @@ class _TransactionPageState extends State<TransactionPage> {
   Account _selectedAccount;
   NepaliDateTime _selectedDateTime = NepaliDateTime.now();
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    selectedSubSector = widget.selectedSubSector;
+
+    if (widget.transaction != null) {
+      _selectedCategoryId = widget.transaction.categoryId;
+      _amountController.text = widget.transaction.amount;
+      _descriptionController.text = widget.transaction.memo;
+      print(widget.transaction.timestamp);
+      List<String> zz =
+          widget.transaction.timestamp.split('T').first.split('-').toList();
+      _selectedDateTime = NepaliDateTime(
+        int.parse(zz[0]),
+        int.parse(zz[1]),
+        int.parse(zz[2]),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
-    selectedSubSector =
-        Provider.of<SubSectorProvider>(context).selectedSubSector;
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,
@@ -124,7 +145,7 @@ class _TransactionPageState extends State<TransactionPage> {
                         validator: (value) => value.length == 0
                             ? language == Lang.EN ? 'Required' : 'अनिवार्य'
                             : null,
-                        autofocus: true,
+                        autofocus: false,
                         controller: _amountController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
@@ -145,37 +166,40 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                 ],
               ),
-              if (widget.transaction == null) SizedBox(height: 20.0),
-              if (widget.transaction == null)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: AdaptiveText(
-                          (widget.transactionType == 1)
-                              ? 'Expense Category'
-                              : 'Source of Income',
-                          style: TextStyle(
-                              fontSize: fontsize, color: Colors.black)),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      width: (MediaQuery.of(context).size.width / 100) * 45,
-                      decoration: _decoration,
-                      child: FutureBuilder<List<Category>>(
-                        future: CategoryService().getCategories(
-                          selectedSubSector,
-                          widget.transactionType == 0
-                              ? CategoryType.INCOME
-                              : CategoryType.EXPENSE,
-                        ),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5.0),
+              //  if (widget.transaction == null)
+              SizedBox(height: 20.0),
+              //    if (widget.transaction == null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                    child: AdaptiveText(
+                        (widget.transactionType == 1)
+                            ? 'Expense Category'
+                            : 'Source of Income',
+                        style:
+                            TextStyle(fontSize: fontsize, color: Colors.black)),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Container(
+                    width: (MediaQuery.of(context).size.width / 100) * 45,
+                    decoration: _decoration,
+                    child: FutureBuilder<List<Category>>(
+                      future: CategoryService().getCategories(
+                        selectedSubSector,
+                        widget.transactionType == 0
+                            ? CategoryType.INCOME
+                            : CategoryType.EXPENSE,
+                      ),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: IgnorePointer(
+                              ignoring: widget.transaction != null,
                               child: DropdownButtonHideUnderline(
                                 key: _dropdownKey,
                                 child: DropdownButton<int>(
@@ -331,16 +355,18 @@ class _TransactionPageState extends State<TransactionPage> {
                                   },
                                 ),
                               ),
-                            );
-                          } else {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                        },
-                      ),
+                            ),
+                          );
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                      },
                     ),
-                  ],
-                ),
-              if (widget.transaction == null) SizedBox(height: 20.0),
+                  ),
+                ],
+              ),
+              if (widget.transaction == null)
+                SizedBox(height: 20.0),
               if (widget.transaction == null)
                 Row(
                   children: <Widget>[
@@ -447,10 +473,13 @@ class _TransactionPageState extends State<TransactionPage> {
                   ),
                   child: InkWell(
                     onTap: () async {
+                      if (widget.transaction != null) {
+                        return;
+                      }
                       _selectedDateTime = await showAdaptiveDatePicker(
                         context: context,
                         initialDate: NepaliDateTime.now(),
-                        firstDate: NepaliDateTime(2070),
+                        firstDate: NepaliDateTime(2073),
                         lastDate: NepaliDateTime(2090),
                         language: language == Lang.EN
                             ? Language.english
@@ -636,7 +665,12 @@ class _TransactionPageState extends State<TransactionPage> {
         oldBudget = await BudgetService().getBudget(selectedSubSector,
             widget.transaction.categoryId, _selectedDateTime.month);
         _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
-        _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
+
+        int checkExpense = (int.tryParse(widget.transaction.amount) ?? 0) -
+            (int.tryParse(_amountController.text ?? '0') ?? 0);
+
+        _spent -= checkExpense;
+
         _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
         if (_spent > _total) {
           await BudgetService().updateBudget(
@@ -664,6 +698,7 @@ class _TransactionPageState extends State<TransactionPage> {
       } else {
         await _updateTransactionAndAccount(widget.transaction != null);
       }
+      Navigator.pop(context, true);
     }
   }
 
@@ -671,30 +706,54 @@ class _TransactionPageState extends State<TransactionPage> {
     int transactionId = await TransactionService().updateTransaction(
       selectedSubSector,
       Transaction(
+        id: (widget.transaction != null) ? widget.transaction.id : null,
         amount: _amountController.text,
         categoryId:
             isUpdate ? widget.transaction.categoryId : _selectedCategoryId,
         memo: _descriptionController.text,
-        month: _selectedDateTime.month,
-        year: _selectedDateTime.year,
+        month: isUpdate ? widget.transaction.month : _selectedDateTime.month,
+        year: isUpdate ? widget.transaction.year : _selectedDateTime.year,
         transactionType: widget.transactionType,
-        timestamp: _selectedDateTime.toIso8601String(),
+        timestamp: isUpdate
+            ? widget.transaction.timestamp
+            : _selectedDateTime.toIso8601String(),
       ),
     );
-    await AccountService().updateAccount(
-      Account(
-        name: _selectedAccount.name,
-        type: _selectedAccount.type,
-        balance: widget.transactionType == 0
-            ? '${int.parse(_selectedAccount.balance) + int.parse(_amountController.text)}'
-            : '${int.parse(_selectedAccount.balance) - int.parse(_amountController.text)}',
-        transactionIds: [
-          if (_selectedAccount.transactionIds != null)
-            ..._selectedAccount.transactionIds,
-          transactionId,
-        ],
-      ),
-    );
+    if (!isUpdate) {
+      await AccountService().updateAccount(
+        Account(
+          name: _selectedAccount.name,
+          type: _selectedAccount.type,
+          balance: widget.transactionType == 0
+              ? '${int.parse(_selectedAccount.balance) + int.parse(_amountController.text)}'
+              : '${int.parse(_selectedAccount.balance) - int.parse(_amountController.text)}',
+          transactionIds: [
+            if (_selectedAccount.transactionIds != null)
+              ..._selectedAccount.transactionIds,
+            transactionId,
+          ],
+        ),
+      );
+    } else {
+      int checkExpense = (int.tryParse(widget.transaction.amount) ?? 0) -
+          (int.tryParse(_amountController.text ?? '0') ?? 0);
+      Account ac =
+          await AccountService().getAccountForTransaction(widget.transaction);
+      if (ac != null) {
+        await AccountService().updateAccount(
+          Account(
+            name: ac.name,
+            type: ac.type,
+            balance: widget.transactionType == 0
+                ? '${int.parse(ac.balance) - checkExpense}'
+                : '${int.parse(ac.balance) + checkExpense}',
+            transactionIds: [
+              if (ac.transactionIds != null) ...ac.transactionIds,
+            ],
+          ),
+        );
+      }
+    }
   }
 
   _showMessage(String message) {
@@ -743,7 +802,7 @@ class _TransactionPageState extends State<TransactionPage> {
                       ),
                       child: TextFormField(
                         validator: validator,
-                        autofocus: true,
+                        autofocus: false,
                         controller: _categoryName,
                         style:
                             TextStyle(color: Colors.grey[800], fontSize: 20.0),

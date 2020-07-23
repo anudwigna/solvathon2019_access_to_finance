@@ -145,6 +145,7 @@ class TransactionService {
         transaction.id,
       ),
     );
+
     Account _associatedAccount =
         await AccountService().getAccountForTransaction(transaction);
     _associatedAccount.transactionIds.remove(transaction.id);

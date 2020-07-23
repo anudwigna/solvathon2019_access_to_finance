@@ -1,3 +1,4 @@
+import 'package:MunshiG/services/preference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,39 +31,48 @@ class HomePageState extends State<HomePage>
   TabController _tabController;
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
+  final int noOfmonths = 60;
   List<GlobalKey<AnimatedCircularChartState>> _chartKey =
       new List<GlobalKey<AnimatedCircularChartState>>();
   var _dateResolver = <NepaliDateTime>[];
   var _scaffoldKey = GlobalKey<ScaffoldState>();
-  final int _initialIndex = 9;
 
   @override
   void initState() {
     super.initState();
     initializeDateResolver();
+
     _tabController = TabController(
-      length: 12,
+      length: noOfmonths,
       vsync: this,
-      initialIndex: _initialIndex,
+      initialIndex: noOfmonths - (12 - _currentMonth + 1),
     );
   }
 
   initializeDateResolver() {
-    int _year = _currentYear;
-    int _firstMonth;
-    bool _incrementer;
-    _firstMonth = _currentMonth - 9;
-    if (_firstMonth <= 0) {
-      _year = _currentYear - 1;
-    }
-    for (int i = 0; i < 12; i++) {
-      int _thisMonth = (_firstMonth + i) % 12;
-      if (_incrementer = _thisMonth == 0) {
-        _thisMonth = 12;
+    // int _year = _currentYear;
+    // int _firstMonth;
+    // bool _incrementer;
+    int initYear = _currentYear - 4;
+    int indexYear = initYear;
+    for (int i = 1; i <= noOfmonths; i++) {
+      _dateResolver.add(NepaliDateTime(indexYear, (i % 12 == 0) ? 12 : i % 12));
+      if (i % 12 == 0) {
+        indexYear++;
       }
-      _dateResolver.add(NepaliDateTime(_year, _thisMonth));
-      if (_incrementer) _year++;
     }
+    // _firstMonth = _currentMonth - 9;
+    // if (_firstMonth <= 0) {
+    //   _year = _currentYear - 1;
+    // }
+    // for (int i = 0; i < 12; i++) {
+    //   int _thisMonth = (_firstMonth + i) % 12;
+    //   if (_incrementer = _thisMonth == 0) {
+    //     _thisMonth = 12;
+    //   }
+    //   _dateResolver.add(NepaliDateTime(_year, _thisMonth));
+    //   if (_incrementer) _year++;
+    // }
   }
 
   @override
@@ -103,7 +113,7 @@ class HomePageState extends State<HomePage>
               color: Configuration().incomeColor,
             ),
             tabs: [
-              for (int index = 0; index < 12; index++)
+              for (int index = 0; index < noOfmonths; index++)
                 language == Lang.EN
                     ? Tab(
                         child: Text(
@@ -131,7 +141,7 @@ class HomePageState extends State<HomePage>
         body: TabBarView(
           controller: _tabController,
           children: [
-            for (int index = 0; index < 12; index++)
+            for (int index = 0; index < noOfmonths; index++)
               _buildBody(_dateResolver[index]),
           ],
         ),
@@ -182,7 +192,7 @@ class HomePageState extends State<HomePage>
                                 Center(child: _centerWidget(income, expense)),
                           ),
                           key: _chartKey[date.month - 1],
-                          initialValue: isExpenseGreater ? 100 : percentSaved,
+                          initialValue: isExpenseGreater ? 100 : (percentSaved),
                           appearance: CircularSliderAppearance(
                             angleRange: 360,
                             startAngle: 270,
@@ -191,13 +201,10 @@ class HomePageState extends State<HomePage>
                               progressBarWidth: 10.0,
                             ),
                             customColors: CustomSliderColors(
-                              trackColor: Color(0xff7635C7),
+                              trackColor: Configuration().expenseColor,
                               progressBarColors: (isExpenseGreater)
                                   ? [Colors.red, Colors.red]
-                                  : [
-                                      Configuration().expenseColor,
-                                      Configuration().expenseColor
-                                    ],
+                                  : [Color(0xff7635C7), Color(0xff7635C7)],
                               hideShadow: true,
                             ),
                             infoProperties: InfoProperties(
@@ -226,7 +233,10 @@ class HomePageState extends State<HomePage>
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TransactionPage(0),
+                                builder: (context) => TransactionPage(
+                                  0,
+                                  selectedSubSector: selectedSubSector,
+                                ),
                               ),
                             ).then((onValue) {
                               if (onValue ?? false) {
@@ -254,7 +264,10 @@ class HomePageState extends State<HomePage>
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TransactionPage(1),
+                                builder: (context) => TransactionPage(
+                                  1,
+                                  selectedSubSector: selectedSubSector,
+                                ),
                               ),
                             ).then((onValue) {
                               if (onValue ?? false) {
@@ -420,7 +433,7 @@ class HomePageState extends State<HomePage>
       width: 38,
       child: Center(
         child: Icon(
-          Icons.add,
+          (cashIn) ? Icons.add : Icons.remove,
           size: 30,
         ),
       ),
@@ -442,11 +455,24 @@ class TransactionList extends StatefulWidget {
 class _TransactionListState extends State<TransactionList> {
   var _transactionMap = <String, List<Transaction>>{};
   List<bool> _expansionRecords;
-
+  List<double> income, expense;
   @override
   void initState() {
     super.initState();
+    initData();
+  }
+
+  initData() {
     _transactionMap = _buildTransactionMap(widget.transactionData);
+    income = List.filled(_transactionMap.length, 0.0);
+    expense = List.filled(_transactionMap.length, 0.0);
+    int z = 0;
+    _transactionMap.forEach((key, value) {
+      final vv = getIncomeExpense(value);
+      income[z] = vv[0];
+      expense[z] = vv[1];
+      z++;
+    });
     _expansionRecords = List.filled(_transactionMap.length, false);
   }
 
@@ -454,8 +480,7 @@ class _TransactionListState extends State<TransactionList> {
   void didUpdateWidget(TransactionList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.transactionData.length != oldWidget.transactionData.length) {
-      _transactionMap = _buildTransactionMap(widget.transactionData);
-      _expansionRecords = List.filled(_transactionMap.length, false);
+      initData();
     }
   }
 
@@ -491,13 +516,11 @@ class _TransactionListState extends State<TransactionList> {
                         children: [
                           _aggregate(
                             0,
-                            getIncomeExpense(
-                                _transactionMap.values.toList()[i], 0),
+                            income[i],
                           ),
                           _aggregate(
                             1,
-                            getIncomeExpense(
-                                _transactionMap.values.toList()[i], 1),
+                            expense[i],
                           ),
                         ],
                       ),
@@ -511,16 +534,16 @@ class _TransactionListState extends State<TransactionList> {
     );
   }
 
-  double getIncomeExpense(List<Transaction> data, int type) {
-    double value = 0.0;
-    var list = (type == 0)
-        ? data.takeWhile((value) => (value.transactionType == 0)).toList()
-        : data.skipWhile((value) => (value.transactionType == 0)).toList();
-    list.forEach((element) {
-      value = value + double.parse(element.amount);
+  List<double> getIncomeExpense(List<Transaction> data) {
+    double inValue = 0.0;
+    double exValue = 0.0;
+    data.forEach((element) {
+      if (element.transactionType == 0) {
+        inValue = inValue + double.parse(element.amount);
+      } else
+        exValue = exValue + double.parse(element.amount);
     });
-
-    return value;
+    return [inValue, exValue];
   }
 
   Widget _aggregate(int transactionType, double amount) {
@@ -530,8 +553,8 @@ class _TransactionListState extends State<TransactionList> {
         children: [
           Material(
             color: (transactionType == 0)
-                ? Configuration().expenseColor
-                : Colors.grey[400],
+                ? Configuration().incomeColor
+                : Configuration().expenseColor,
             shape: CircleBorder(),
             child: SizedBox(
               width: 10.0,
@@ -720,7 +743,22 @@ class _TransactionListState extends State<TransactionList> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => Navigator.pop(context, false),
+                      onTap: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionPage(
+                              transaction.transactionType,
+                              transaction: transaction,
+                              selectedSubSector: selectedSubSector,
+                            ),
+                          ),
+                        ).then((value) {
+                          if (value ?? false) {
+                            Navigator.pop(context, true);
+                          }
+                        });
+                      },
                       child: Container(
                         padding:
                             EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
@@ -802,8 +840,8 @@ class _TransactionListState extends State<TransactionList> {
 
   TextStyle getTextStyle(Transaction transaction) => TextStyle(
       color: transaction.transactionType == 0
-          ? Configuration().expenseColor
-          : Colors.black,
+          ? Configuration().incomeColor
+          : Configuration().expenseColor,
       fontWeight: FontWeight.bold);
 
   Map<String, List<Transaction>> _buildTransactionMap(

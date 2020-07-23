@@ -68,7 +68,7 @@ class PreferenceService {
 
   Future<int> getCurrentExpenseCategoryIndex() async {
     var prefs = await _init();
-    return (await prefs.get('CURRENT_EXPENSE_CATEGORY_INDEX')) as int;
+    return (await prefs.get('CURRENT_EXPENSE_CATEGORY_INDEX') ?? 0) as int;
   }
 
   Future setCurrentTransactionIndex(int value) async {
@@ -78,7 +78,7 @@ class PreferenceService {
 
   Future<int> getCurrentTransactionIndex() async {
     var prefs = await _init();
-    return (await prefs.get('CURRENT_TRANSACTION_INDEX')) as int;
+    return (await prefs.get('CURRENT_TRANSACTION_INDEX') ?? 0) as int;
   }
 
   Future setSubSectors(List<dynamic> value) async {

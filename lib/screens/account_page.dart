@@ -658,10 +658,10 @@ class __AccountDialogState extends State<_AccountDialog> {
     if (_formKey.currentState.validate()) {
       await AccountService().addAccount(
         Account(
-          name: _accountNameController.text,
-          balance: _openingBalanceController.text,
-          type: _accountType,
-        ),
+            name: _accountNameController.text,
+            balance: _openingBalanceController.text,
+            type: _accountType,
+            transactionIds: []),
       );
       Navigator.pop(context, true);
     }

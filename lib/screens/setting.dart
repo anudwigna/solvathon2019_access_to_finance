@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
@@ -24,7 +25,9 @@ class _SettingsState extends State<Settings> {
   List<dynamic> _subSectorsData = globals.subSectors ?? [];
   List<dynamic> _newSelectedSubSectors = [];
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
-  final Color selectedColor = Color(0xff7133BF);
+  final Color selectedColor = Configuration().expenseColor;
+  final Color unSelectedColor = Configuration().incomeColor.withOpacity(0.8);
+  //Color(0xff7133BF);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,19 +107,24 @@ class _SettingsState extends State<Settings> {
                                                               .contains(snapshot
                                                                   .data[index]))
                                                       ? selectedColor
-                                                      : Colors.black,
+                                                      : unSelectedColor,
                                                   width: 2)),
-                                          padding: EdgeInsets.all(15),
-                                          child: Image.asset(
-                                            'assets/${snapshot.data[index].toString().toLowerCase()}_logo.png',
-                                            fit: BoxFit.contain,
-                                            color: (_subSectorsData.contains(
-                                                        snapshot.data[index]) ||
-                                                    _newSelectedSubSectors
-                                                        .contains(snapshot
-                                                            .data[index]))
-                                                ? selectedColor
-                                                : Colors.black,
+                                          child: Center(
+                                            child: Image.asset(
+                                              'assets/${snapshot.data[index].toString().toLowerCase()}_logo.png',
+                                              fit: BoxFit.contain,
+                                              width: ScreenSizeConfig
+                                                      .blockSizeHorizontal *
+                                                  16,
+                                              color: (_subSectorsData.contains(
+                                                          snapshot
+                                                              .data[index]) ||
+                                                      _newSelectedSubSectors
+                                                          .contains(snapshot
+                                                              .data[index]))
+                                                  ? selectedColor
+                                                  : unSelectedColor,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -132,7 +140,7 @@ class _SettingsState extends State<Settings> {
                                                       .contains(
                                                           snapshot.data[index]))
                                               ? selectedColor
-                                              : Colors.black,
+                                              : unSelectedColor,
                                         ),
                                       )
                                     ],
@@ -215,7 +223,8 @@ class _SettingsState extends State<Settings> {
                             });
                             await _loadCategories(_subSectorsData);
                             await Future.delayed(Duration(seconds: 2));
-                            Navigator.pushReplacementNamed(context, '/wrapper');
+                            Navigator.pushNamedAndRemoveUntil(context,
+                                '/wrapper', (Route<dynamic> route) => false);
                           } else {
                             _key.currentState.showSnackBar(SnackBar(
                               content:
@@ -232,7 +241,8 @@ class _SettingsState extends State<Settings> {
                             await _loadCategories(_newSelectedSubSectors);
                             _newSelectedSubSectors.clear();
                             _key.currentState.showSnackBar(SnackBar(
-                              content: AdaptiveText('New Preference has been added'),
+                              content:
+                                  AdaptiveText('New Preference has been added'),
                               backgroundColor: Colors.green,
                             ));
                           } else {
@@ -303,10 +313,15 @@ class _SettingsState extends State<Settings> {
 
     if (widget.type == 0) {
       // globals.selectedSubSector = _subSectors[0];
-      await PreferenceService.instance.setCurrentIncomeCategoryIndex(1000);
-      await PreferenceService.instance.setCurrentExpenseCategoryIndex(10000);
-      await PreferenceService.instance.setCurrentTransactionIndex(1);
-      await AccountService().addAccount(
+      if (await PreferenceService.instance.getCurrentIncomeCategoryIndex() == 0)
+        await PreferenceService.instance.setCurrentIncomeCategoryIndex(1000);
+      if (await PreferenceService.instance.getCurrentExpenseCategoryIndex() ==
+          0)
+        await PreferenceService.instance.setCurrentExpenseCategoryIndex(10000);
+
+      if (await PreferenceService.instance.getCurrentTransactionIndex() == 0)
+        await PreferenceService.instance.setCurrentTransactionIndex(1);
+      final ll = await AccountService().checkifAccountExists(
         Account(
           name: 'Cash',
           type: 2,
@@ -314,6 +329,15 @@ class _SettingsState extends State<Settings> {
           transactionIds: [],
         ),
       );
+      if ((!ll) ?? false)
+        await AccountService().addAccount(
+          Account(
+            name: 'Cash',
+            type: 2,
+            balance: '0',
+            transactionIds: [],
+          ),
+        );
     }
   }
 }

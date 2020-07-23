@@ -36,8 +36,8 @@ const Map<String, String> ResourceMap = {
   'source of income': 'आयको शिर्षक',
   'expense category': 'खर्चको शिर्षक',
   'select category': 'छान्नुहोस ',
-  'date of expense': 'खर्च भएको मिति',
-  'date of income': 'आय भएको मिति',
+  'date of expense': 'नगद बाहिरिएको मिति',
+  'date of income': 'नगद भित्रीएको मिति',
   'add income': 'आम्दानी राख्नुहोस',
   'add expense': 'खर्च राख्नुहोस',
   'sorry, income for current month can only be added!':
@@ -75,13 +75,13 @@ const Map<String, String> ResourceMap = {
   'more categories': 'थप श्रेणीहरू',
   'are you sure you want to delete this category? deleting the category will also clear all the records related to it.':
       ' के तपाई साचै यो श्रेणी हटाउन चाहनुहुन्छ ? हटाउनु भएको खण्डमा यो श्रेणीसँग सम्बन्धित सबै कारोबारहरूपनि मेटिने छन।',
-  'update income': 'आम्दानी  हेरफेर गर्नुहोस',
+  'update income': 'आम्दानी हेरफेर गर्नुहोस',
   'update expense': 'खर्च हेरफेर गर्नुहोस',
   'are you sure you want to delete this category?':
       'के तपाई साचै यो कारोबार हटाउन चाहनुहुन्छ ?',
-  'cash outflow projection': 'पैसा खर्च',
-  'cash in': 'आमदानी',
-  'cash out': 'खर्च',
+  'cash outflow projection': 'नगद बाहिरिने प्रक्षेपण',
+  'cash in': 'नगद भित्रीएको',
+  'cash out': 'नगद बाहिरिएको',
   'gender': 'लिङ्ग',
   'edit': 'बदल्नु्',
   'email address': 'इ-मेल ठेगाना',

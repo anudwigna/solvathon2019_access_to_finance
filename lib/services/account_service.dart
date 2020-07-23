@@ -81,4 +81,14 @@ class AccountService {
     }
     return _account;
   }
+
+  Future<bool> checkifAccountExists(Account account) async {
+    var dbStore = await getDatabaseAndStore();
+    Filter filter = Filter.and([
+      Filter.equals('name', account.name),
+      Filter.equals('type', account.type),
+    ]);
+    int zz = await dbStore.store.count(dbStore.database, filter: filter);
+    return zz > 0;
+  }
 }
