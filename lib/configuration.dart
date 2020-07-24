@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:nepali_utils/nepali_utils.dart';
 
 class Configuration {
   TextStyle get whiteText => TextStyle(
         color: Colors.white,
       );
 
-  //Color get yellowColor => Color(0xeef8aa2c);
-  Color get yellowColor => Colors.blue;
-
-  //Color get redColor => Color(0xeee62844);
-  Color get redColor => Colors.blue;
+  Color get appColor => Color(0xff2B2F8E);
+  Color get redColor => Color(0xff263547);
+  Color get expenseColor => Color(0xffFBA41F);
+  Color get incomeColor => Color(0xff2E4FFF);
+  Color get selectedColor => Color(0xff7133BF);
 
   Widget get drawerItemDivider => Padding(
         padding: EdgeInsets.symmetric(horizontal: 15.0),
@@ -27,7 +28,11 @@ class Configuration {
       );
 
   List<Color> get gradientColors => [
-        yellowColor,
+        appColor,
         redColor,
       ];
+
+  NepaliDateTime toNepaliDateTime(DateTime dateTime) {
+    return NepaliDateTime(dateTime.year, dateTime.month, dateTime.day);
+  }
 }

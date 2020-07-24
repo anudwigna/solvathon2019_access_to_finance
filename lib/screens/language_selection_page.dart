@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/preference_service.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/services/preference_service.dart';
+import 'package:MunshiG/components/adaptive_text.dart';
 
 import '../configuration.dart';
 
@@ -16,13 +17,13 @@ class LanguageSelectionPage extends StatelessWidget {
           children: <Widget>[
             Flexible(flex: 3, child: Container()),
             Image.asset(
-              'assets/sampatti_logo.png',
+              'assets/MunshiG_logo.png',
               height: 150.0,
               width: 150.0,
             ),
             SizedBox(height: 10.0),
-            Text(
-              'SAMPATTI',
+            AdaptiveText(
+              'MunshiG',
               style: TextStyle(
                 fontWeight: FontWeight.w100,
                 fontSize: 30.0,
@@ -52,7 +53,7 @@ class LanguageSelectionPage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
               child: MaterialButton(
-                splashColor: Configuration().yellowColor,
+                splashColor: Configuration().appColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(
                     Radius.circular(20.0),
@@ -95,7 +96,7 @@ class LanguageSelectionPage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
               child: MaterialButton(
-                splashColor: Configuration().yellowColor,
+                splashColor: Configuration().appColor,
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(
@@ -124,5 +125,5 @@ class LanguageSelectionPage extends StatelessWidget {
   }
 
   _navigateToHome(BuildContext context) =>
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushReplacementNamed(context, '/home');
 }

@@ -1,118 +1,260 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/preference_service.dart';
-
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/screens/homepage.dart';
+import 'package:MunshiG/screens/setting.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
 import '../configuration.dart';
+import '../globals.dart';
 import 'adaptive_text.dart';
 
-class MyDrawer extends StatelessWidget {
+class MyDrawer extends StatefulWidget {
+  final HomePageState homePageState;
+
+  const MyDrawer({Key key, this.homePageState}) : super(key: key);
+  @override
+  _MyDrawerState createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  TextStyle _style = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 16,
+    color: const Color(0xff1e1e1e),
+  );
   @override
   Widget build(BuildContext context) {
     var preferenceProvider = Provider.of<PreferenceProvider>(context);
+    var selectedSubSector = Provider.of<SubSectorProvider>(context);
     return Container(
+      color: const Color(0xffffffff),
       width: MediaQuery.of(context).size.width * 0.8,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: Configuration().gradientColors,
-          begin: FractionalOffset.bottomRight,
-          end: FractionalOffset.topLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: Padding(
+        padding: MediaQuery.of(context).viewPadding,
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 15,
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Image.asset(
+                "assets/images/munshiji-logo.png",
+                height: 60.0,
+                color: Color(0xff2b2f8e),
+                fit: BoxFit.contain,
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Theme(
+              data: ThemeData(
+                textTheme: TextTheme(
+                  subhead: TextStyle(fontSize: 18),
+                ),
+                canvasColor: Configuration().appColor,
+                brightness: Brightness.dark,
+                primarySwatch: MaterialColor(0xffffffff, {}),
+              ),
+              child: DropdownButton<String>(
+                  isDense: true,
+                  iconEnabledColor: Colors.black,
+                  iconDisabledColor: Colors.black,
+                  isExpanded: true,
+                  value: selectedSubSector.selectedSubSector,
+                  iconSize: 30,
+                  dropdownColor: Colors.white,
+                  items: [
+                    for (String subSector in globals.subSectors)
+                      DropdownMenuItem(
+                        child: Text(
+                          subSector,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 15,
+                            color: const Color(0xff1e1e1e),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        value: subSector,
+                      )
+                  ],
+                  onChanged: (onValue) async {
+                    if (onValue != selectedSubSector.selectedSubSector) {
+                      globals.selectedSubSector = onValue;
+                      selectedSubSector.selectedSubSector = onValue;
+                      PreferenceService.instance.setSelectedSubSector(onValue);
+                      globals.incomeCategories = await CategoryService()
+                          .getCategories(selectedSubSector.selectedSubSector,
+                              CategoryType.INCOME);
+                      globals.expenseCategories = await CategoryService()
+                          .getCategories(selectedSubSector.selectedSubSector,
+                              CategoryType.EXPENSE);
+                      if (widget.homePageState != null) {
+                        await widget.homePageState.updateChartData();
+                      }
+                      setState(() {});
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/home',
+                        ModalRoute.withName('/home'),
+                      );
+                    }
+                  }),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                dashboard,
+                allowDrawingOutsideViewBox: true,
+                alignment: Alignment.bottomCenter,
+              ),
+              title: AdaptiveText(
+                'Dashboard',
+                style: _style,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/home',
+                ModalRoute.withName('/home'),
+              ),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              dense: true,
+              leading: Icon(
+                Icons.person,
+                color: Configuration().incomeColor,
+              ),
+              title: AdaptiveText(
+                'Profile',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/profilepage',
+                ModalRoute.withName('/home'),
+              ),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                categories,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Categories',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/category',
+                ModalRoute.withName('/home'),
+              ),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                castOutflow,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Cash Outflow Projection',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/budget',
+                ModalRoute.withName('/home'),
+              ),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                accounts,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Accounts',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/account',
+                ModalRoute.withName('/home'),
+              ),
+            ),
+            Expanded(child: Container()),
+            Column(
+              children: <Widget>[
+                ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                  leading: SvgPicture.string(
+                    settings,
+                    allowDrawingOutsideViewBox: true,
+                  ),
+                  title: AdaptiveText(
+                    'Settings',
+                    style: _style,
+                    textAlign: TextAlign.left,
+                  ),
+                  onTap: () => Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => Settings(
+                                type: 1,
+                              )),
+                      (Route<dynamic> route) => false),
+                ),
+                ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                  leading: SvgPicture.string(
+                    nepaliLanguage,
+                    allowDrawingOutsideViewBox: true,
+                  ),
+                  title: AdaptiveText(
+                    'Nepali Language',
+                    style: _style,
+                    textAlign: TextAlign.left,
+                  ),
+                  trailing: Switch(
+                    value:
+                        preferenceProvider.language == Lang.NP ? true : false,
+                    activeColor: Colors.white,
+                    inactiveTrackColor: Colors.black,
+                    inactiveThumbColor: Colors.white,
+                    activeTrackColor: Configuration().incomeColor,
+                    onChanged: (nepaliSelected) {
+                      if (nepaliSelected) {
+                        PreferenceService.instance.setLanguage('np');
+                        globals.language = 'np';
+                        preferenceProvider.language = Lang.NP;
+                      } else {
+                        PreferenceService.instance.setLanguage('en');
+                        globals.language = 'en';
+                        preferenceProvider.language = Lang.EN;
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 20,
+            )
+          ],
         ),
-      ),
-      child: ListView(
-        physics: BouncingScrollPhysics(),
-        children: <Widget>[
-          UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-            ),
-            accountName: Text("Welcome Guest User!"),
-            accountEmail: Text("guestuser@gmail.com"),
-          ),
-          Configuration().drawerItemDivider,
-          ListTile(
-            leading: Icon(Icons.category),
-            title: AdaptiveText(
-              'Dashboard',
-              style: Configuration().whiteText,
-            ),
-            onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/home',
-                  ModalRoute.withName('/home'),
-                ),
-          ),
-          Configuration().drawerItemDivider,
-          ListTile(
-            leading: Icon(Icons.category),
-            title: AdaptiveText(
-              'Categories',
-              style: Configuration().whiteText,
-            ),
-            onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/category',
-                  ModalRoute.withName('/home'),
-                ),
-          ),
-          // ListTile(
-          //   leading: Icon(Icons.category),
-          //   title: Text('Test Page'),
-          //   onTap: () => Navigator.pushNamedAndRemoveUntil(
-          //         context,
-          //         '/test',
-          //         ModalRoute.withName('/test'),
-          //       ),
-          // ),
-          ListTile(
-            leading: Icon(Icons.card_travel),
-            title: AdaptiveText(
-              'Budget',
-              style: Configuration().whiteText,
-            ),
-            onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/budget',
-                  ModalRoute.withName('/home'),
-                ),
-          ),
-          ListTile(
-            leading: Icon(Icons.account_balance),
-            title: AdaptiveText(
-              'Accounts',
-              style: Configuration().whiteText,
-            ),
-            onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/account',
-                  ModalRoute.withName('/home'),
-                ),
-          ),
-          Configuration().drawerItemDivider,
-          ListTile(
-            leading: Icon(Icons.language),
-            title: AdaptiveText(
-              'Nepali Language',
-              style: Configuration().whiteText,
-            ),
-            trailing: Switch(
-              value: preferenceProvider.language == Lang.NP ? true : false,
-              activeColor: Colors.white,
-              onChanged: (nepaliSelected) {
-                if (nepaliSelected) {
-                  PreferenceService.instance.setLanguage('np');
-                  globals.language = 'np';
-                  preferenceProvider.language = Lang.NP;
-                } else {
-                  PreferenceService.instance.setLanguage('en');
-                  globals.language = 'en';
-                  preferenceProvider.language = Lang.EN;
-                }
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

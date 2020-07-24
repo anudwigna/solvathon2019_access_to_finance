@@ -1,12 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/models/account/account.dart';
-import 'package:sampatti/services/account_service.dart';
-import 'package:sampatti/services/category_service.dart';
-import 'package:sampatti/services/preference_service.dart';
+import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/screens/setting.dart';
+import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
+
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
+import 'package:package_info/package_info.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -17,82 +17,85 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    PreferenceService.instance.getIsFirstStart().then(
-      (isFirstStart) async {
-        if (isFirstStart) {
-          await _loadCategories();
-          Navigator.pushReplacementNamed(context, '/language');
-        } else {
-          globals.incomeCategories =
-              await CategoryService().getCategories(CategoryType.INCOME);
-          globals.expenseCategories =
-              await CategoryService().getCategories(CategoryType.EXPENSE);
-          Navigator.pushReplacementNamed(context, '/home');
-        }
-      },
-    );
-  }
-
-  // Loads categories from json file, first time the app is installed
-  _loadCategories() async {
-    //Reading categories.json file using assetBundle
-    dynamic categories =
-        jsonDecode(await rootBundle.loadString('assets/categories.json'));
-
-    var incomeDbStore =
-        await CategoryService().getDatabaseAndStore(CategoryType.INCOME);
-    var expenseDbStore =
-        await CategoryService().getDatabaseAndStore(CategoryType.EXPENSE);
-
-    var _incomeCategories =
-        await CategoryService().getStockCategories(CategoryType.INCOME);
-    var _expenseCategories =
-        await CategoryService().getStockCategories(CategoryType.EXPENSE);
-
-    _incomeCategories.forEach(
-      (category) async {
-        await incomeDbStore.store.record(category.id).put(
-              incomeDbStore.database,
-              category.toJson(),
-            );
-      },
-    );
-
-    _expenseCategories.forEach(
-      (category) async {
-        await expenseDbStore.store.record(category.id).put(
-              expenseDbStore.database,
-              category.toJson(),
-            );
-      },
-    );
-
-    print("Loaded categories from assets");
-    Future.delayed(Duration(seconds: 1), () async {
-      globals.incomeCategories =
-          await CategoryService().getCategories(CategoryType.INCOME);
-      globals.expenseCategories =
-          await CategoryService().getCategories(CategoryType.EXPENSE);
+    PreferenceService.instance.isUserRegistered().then((value) async {
+      if (value) {
+        PreferenceService.instance.getIsFirstStart().then(
+          (isFirstStart) async {
+            if (isFirstStart) {
+              await Future.delayed(Duration(seconds: 2));
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => Settings(
+                        type: 0,
+                      )));
+            } else {
+              globals.subSectors =
+                  await PreferenceService.instance.getSubSectors();
+              globals.selectedSubSector =
+                  await PreferenceService.instance.getSelectedSubSector();
+              globals.incomeCategories = await CategoryService().getCategories(
+                  globals.selectedSubSector, CategoryType.INCOME);
+              globals.expenseCategories = await CategoryService().getCategories(
+                  globals.selectedSubSector, CategoryType.EXPENSE);
+              await Future.delayed(Duration(seconds: 2));
+              Navigator.pushReplacementNamed(context, '/wrapper');
+            }
+          },
+        );
+      } else {
+        await PreferenceService.instance.setLanguage('en');
+        globals.language = 'en';
+        await Future.delayed(Duration(seconds: 2));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => UserInfoRegistrationPage()));
+      }
     });
-
-    await PreferenceService.instance.setCurrentIncomeCategoryIndex(1000);
-    await PreferenceService.instance.setCurrentExpenseCategoryIndex(10000);
-    await PreferenceService.instance.setCurrentTransactionIndex(1);
-
-    await AccountService().addAccount(
-      Account(
-        name: 'Cash',
-        type: 2,
-        balance: '0',
-        transactionIds: [],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
+    ScreenSizeConfig().init(context);
+    return Scaffold(
+      backgroundColor: const Color(0xff2b2f8e),
+      body: Stack(
+        fit: StackFit.loose,
+        children: <Widget>[
+          Container(
+            width: double.maxFinite,
+            height: double.maxFinite,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: const AssetImage('assets/images/splash.png'),
+                fit: BoxFit.fill,
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: SizedBox(
+                child: FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    return Text(
+                      snapshot.hasData
+                          ? 'Version' + ' ' + snapshot.data.version
+                          : '',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        color: const Color(0xffffffff),
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

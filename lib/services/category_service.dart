@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/models/category/category.dart';
-import 'package:sampatti/models/database_and_store.dart';
-import 'package:sampatti/services/budget_service.dart';
-import 'package:sampatti/services/preference_service.dart';
-import 'package:sampatti/services/transaction_service.dart';
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/models/category/category.dart';
+import 'package:MunshiG/models/database_and_store.dart';
+import 'package:MunshiG/services/budget_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
+import 'package:MunshiG/services/transaction_service.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
@@ -20,17 +20,20 @@ class CategoryService {
 
   factory CategoryService() => CategoryService._();
 
-  Future<DatabaseAndStore> getDatabaseAndStore(CategoryType type) async {
+  Future<DatabaseAndStore> getDatabaseAndStore(
+      String subSector, CategoryType type) async {
     DatabaseFactory dbFactory = databaseFactoryIo;
     return DatabaseAndStore(
-      database: await dbFactory.openDatabase(await _getDbPath('categories.db')),
+      database: await dbFactory.openDatabase(
+          await _getDbPath('${subSector.toLowerCase()}Categories.db')),
       store: intMapStoreFactory.store(
           type == CategoryType.INCOME ? 'in_categories' : 'ex_categories'),
     );
   }
 
-  Future<List<Category>> getCategories(CategoryType type) async {
-    var dbStore = await getDatabaseAndStore(type);
+  Future<List<Category>> getCategories(
+      String subSector, CategoryType type) async {
+    var dbStore = await getDatabaseAndStore(subSector, type);
     var snapshot = await dbStore.store.find(dbStore.database);
     return snapshot.map((record) => Category.fromJson(record.value)).toList();
   }
@@ -40,9 +43,9 @@ class CategoryService {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future<Category> getCategoryById(int id, int type) async {
+  Future<Category> getCategoryById(String subSector, int id, int type) async {
     var dbStore = await getDatabaseAndStore(
-        type == 0 ? CategoryType.INCOME : CategoryType.EXPENSE);
+        subSector, type == 0 ? CategoryType.INCOME : CategoryType.EXPENSE);
     Finder finder = Finder(filter: Filter.equals('id', id));
     var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
     if (snapshot.length == 0) {
@@ -51,9 +54,9 @@ class CategoryService {
     return Category.fromJson(snapshot[0].value);
   }
 
-  Future addCategory(Category category,
+  Future addCategory(String subSector, Category category,
       {@required CategoryType type, bool isStockCategory = false}) async {
-    var dbStore = await getDatabaseAndStore(type);
+    var dbStore = await getDatabaseAndStore(subSector, type);
     int currentIndex = type == CategoryType.EXPENSE
         ? await PreferenceService.instance.getCurrentExpenseCategoryIndex()
         : await PreferenceService.instance.getCurrentIncomeCategoryIndex();
@@ -73,22 +76,24 @@ class CategoryService {
             .setCurrentIncomeCategoryIndex(currentIndex + 1);
   }
 
-  Future deleteCategory(int categoryId, CategoryType type) async {
-    var dbStore = await getDatabaseAndStore(type);
+  Future deleteCategory(
+      String subSector, int categoryId, CategoryType type) async {
+    var dbStore = await getDatabaseAndStore(subSector, type);
     Finder finder = Finder(filter: Filter.equals('id', categoryId));
-    await TransactionService().deleteAllTransactionsForCategory(categoryId);
-    await BudgetService().deleteBudgetsForCategory(categoryId);
+    await TransactionService()
+        .deleteAllTransactionsForCategory(subSector, categoryId);
+    await BudgetService().deleteBudgetsForCategory(subSector, categoryId);
     await dbStore.store.delete(dbStore.database, finder: finder);
     if (type == CategoryType.EXPENSE) {
-      globals.expenseCategories = await getCategories(type);
+      globals.expenseCategories = await getCategories(subSector, type);
     } else {
-      globals.incomeCategories = await getCategories(type);
+      globals.incomeCategories = await getCategories(subSector, type);
     }
   }
 
-  Future refreshCategories(List<Category> categories,
+  Future refreshCategories(String subSector, List<Category> categories,
       {@required CategoryType type}) async {
-    var dbStore = await getDatabaseAndStore(type);
+    var dbStore = await getDatabaseAndStore(subSector, type);
     await dbStore.store.delete(dbStore.database);
     categories.forEach(
       (category) async {
@@ -97,10 +102,11 @@ class CategoryService {
     );
   }
 
-  Future<List<Category>> getStockCategories(CategoryType type) async {
+  Future<List<Category>> getStockCategories(
+      String subSector, CategoryType type) async {
     //Reading categories.json file using assetBundle
-    dynamic categories =
-        jsonDecode(await rootBundle.loadString('assets/categories.json'));
+    dynamic categories = jsonDecode(await rootBundle
+        .loadString('assets/${subSector.toLowerCase()}Categories.json'));
     List<dynamic> _categories =
         categories[type == CategoryType.INCOME ? 'income' : 'expense'];
     return _categories

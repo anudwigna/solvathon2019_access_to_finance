@@ -1,0 +1,135 @@
+{
+  "expense": [  {
+      "id": 100,
+      "en": "Capital Investment",
+      "np": "पुंजी लगानी",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 101,
+      "en": "Purchase of breeding doe/kids",
+      "np": "माउ बाख्राको/पाठा पाठी कोखरिद",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 102,
+      "en": "Purchase of breeding buck",
+      "np": " बोकाको खरिद",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 103,
+      "en": "Infrastructure development",
+      "np": "पूर्वाधार बिकाश",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 104,
+      "en": "Medicine and vaccination",
+      "np": "खोप तथा उपचार खर्च",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 105,
+      "en": "Furniture",
+      "np": "फर्नीचर",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 106,
+      "en": "Forage production cost",
+      "np": "घाँस उत्पादन खर्च",
+      "iconName": "hornbill"
+    },
+      {
+      "id": 107,
+      "en": "Human Resource/Labour",
+      "np": "मानव जनशक्ति वा श्रम",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 108,
+      "en": "Utilities",
+        "np": "उपयोगितहरु",
+      "iconName": "hornbill"
+    },
+    
+    {
+      "id": 109,
+      "en": "Insurance",
+      "np": "बीमा",
+      "iconName": "hornbill"
+    },
+    
+    {
+      "id": 110,
+      "en": "Repair and maintainance",
+       "np": "मर्मत र सम्भार",
+      "iconName": "hornbill"
+    },
+    
+    {
+      "id": 111,
+      "en": "Management",
+      "np": "ब्यबस्थापन",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 112,
+      "en": "Interest on loan",
+      "np": "ऋणमा ब्याज",
+      "iconName": "hornbill"
+    }
+  ], 
+  "income": [
+    {
+      "id": 200,
+      "en": "Sales of goat",
+      "np": "पाठा पाठीको बिक्रि",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 201,
+      "en": "Sales of breeding doe",
+      "np": "माउ बाख्राको बिक्रि",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 202,
+     "en": "Sales of breeding duck",
+      "np": "बोकाको बिक्रि",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 203,
+      "en": "Sales of marketable goat",
+      "np": "खसीको बिक्रि ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 204,
+      "en": "Sales of winnowing goat",
+      "np": "छाँटेको बाख्राको बिक्रि ",
+      "iconName": "hornbill"
+    },
+    {
+      "id": 205,
+      "en": "Sales of goat manure",
+      "np": "बाख्राको मल को बिक्रि",
+      "iconName": "hornbill"
+    },
+
+    {
+      "id": 206,
+      "en": "Sales of goat fur",
+      "np": "बाख्राको उन को बिक्रि",
+      "iconName": "hornbill"
+    },
+     {
+      "id": 207,
+      "en": "Farm visits and trainings",
+      "np": "फार्म भ्रमण र प्रशिक्षण",
+      "iconName": "hornbill"
+    }
+  ]
+}

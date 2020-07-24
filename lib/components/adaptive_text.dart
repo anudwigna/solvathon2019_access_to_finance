@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/models/category/category.dart';
-import 'package:sampatti/providers/preference_provider.dart';
+import 'package:MunshiG/models/category/category.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
 
 import '../resource_map.dart';
 
@@ -39,19 +39,19 @@ class AdaptiveText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<PreferenceProvider>(
       builder: (context, preferenceProvider, _) => Text(
-            preferenceProvider.language == Lang.EN
-                ? category == null ? data : category.en ?? data
-                : category == null
-                    ? ResourceMap[data.toLowerCase()] ?? data
-                    : category.np ?? data,
-            maxLines: maxLines,
-            overflow: overflow,
-            softWrap: softWrap,
-            style: style,
-            textAlign: textAlign,
-            textDirection: textDirection,
-            textScaleFactor: textScaleFactor,
-          ),
+        preferenceProvider.language == Lang.EN
+            ? category == null ? data : category.en ?? data
+            : category == null
+                ? ResourceMap[data.toLowerCase()] ?? data
+                : category.np ?? data,
+        maxLines: maxLines,
+        overflow: overflow,
+        softWrap: softWrap,
+        style: style,
+        textAlign: textAlign,
+        textDirection: textDirection,
+        textScaleFactor: textScaleFactor,
+      ),
     );
   }
 }

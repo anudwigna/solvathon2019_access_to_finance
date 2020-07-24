@@ -1,10 +1,10 @@
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sampatti/models/account/account.dart';
-import 'package:sampatti/models/database_and_store.dart';
+import 'package:MunshiG/models/account/account.dart';
+import 'package:MunshiG/models/database_and_store.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
-import 'package:sampatti/models/transaction/transaction.dart' as t;
+import 'package:MunshiG/models/transaction/transaction.dart' as t;
 
 class AccountService {
   AccountService._();
@@ -80,5 +80,15 @@ class AccountService {
       );
     }
     return _account;
+  }
+
+  Future<bool> checkifAccountExists(Account account) async {
+    var dbStore = await getDatabaseAndStore();
+    Filter filter = Filter.and([
+      Filter.equals('name', account.name),
+      Filter.equals('type', account.type),
+    ]);
+    int zz = await dbStore.store.count(dbStore.database, filter: filter);
+    return zz > 0;
   }
 }

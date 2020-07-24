@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sampatti/components/adaptive_text.dart';
-import 'package:sampatti/components/drawer.dart';
-import 'package:sampatti/globals.dart' as globals;
-import 'package:sampatti/icons/vector_icons.dart';
-import 'package:sampatti/models/category/category.dart';
-import 'package:sampatti/providers/preference_provider.dart';
-import 'package:sampatti/services/category_service.dart';
-import 'package:sampatti/components/reorderable_list.dart' as Component;
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/icons/vector_icons.dart';
+import 'package:MunshiG/models/category/category.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/components/reorderable_list.dart' as Component;
+import '../components/screen_size_config.dart';
 
 import '../configuration.dart';
 
@@ -20,6 +21,7 @@ class _CategoryPageState extends State<CategoryPage>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
   Lang language;
+  String selectedSubSector;
 
   var _categoryName = TextEditingController();
   var _formKey = GlobalKey<FormState>();
@@ -41,45 +43,97 @@ class _CategoryPageState extends State<CategoryPage>
     return Consumer<PreferenceProvider>(
       builder: (context, preferenceProvider, _) {
         language = preferenceProvider.language;
-        return Theme(
-          data: Theme.of(context)
-              .copyWith(canvasColor: Configuration().yellowColor),
-          child: Container(
-            decoration: Configuration().gradientDecoration,
-            child: Scaffold(
-              drawer: MyDrawer(),
-              appBar: AppBar(
-                title: AdaptiveText('Categories'),
-                bottom: TabBar(
-                  controller: _tabController,
-                  indicatorColor: Colors.white,
-                  tabs: [
-                    Tab(
-                      child: AdaptiveText('Expense'),
-                    ),
-                    Tab(
-                      child: AdaptiveText('Income'),
-                    ),
-                  ],
+        selectedSubSector =
+            Provider.of<SubSectorProvider>(context).selectedSubSector;
+        return Scaffold(
+          backgroundColor: Configuration().appColor,
+          drawer: MyDrawer(),
+          appBar: AppBar(
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  AdaptiveText('Categories'),
+                  Flexible(
+                      child: Text(' (' + selectedSubSector.toString() + ')'))
+                ]),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: _showAddCategoryBottomSheet,
+            child: Icon(Icons.add),
+            backgroundColor: Colors.white,
+          ),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(50.0),
+                  topRight: Radius.circular(50.0),
                 ),
               ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: _showAddCategoryBottomSheet,
-                child: Icon(Icons.add),
-                backgroundColor: Colors.white,
-              ),
-              body: TabBarView(
-                controller: _tabController,
-                children: [CategoryType.EXPENSE, CategoryType.INCOME]
-                    .map(
-                      (categoryType) => _reorderableListView(
-                            categoryType == CategoryType.EXPENSE
-                                ? globals.expenseCategories
-                                : globals.incomeCategories,
-                            categoryType,
+              padding:
+                  EdgeInsets.only(top: ScreenSizeConfig.blockSizeVertical * 7),
+              child: Column(
+                children: <Widget>[
+                  TabBar(
+                    isScrollable: true,
+                    indicator: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Configuration().incomeColor,
+                    ),
+                    controller: _tabController,
+                    unselectedLabelColor: Colors.black,
+                    labelColor: Colors.white,
+                    tabs: [
+                      Tab(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 0),
+                          child: AdaptiveText(
+                            'Cash Out',
+                            style: TextStyle(
+                                fontFamily: 'Source Sans Pro',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
                           ),
-                    )
-                    .toList(),
+                        ),
+                      ),
+                      Tab(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 0),
+                          child: AdaptiveText(
+                            'Cash In',
+                            style: TextStyle(
+                                fontFamily: 'Source Sans Pro',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: ScreenSizeConfig.blockSizeVertical * 5,
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [CategoryType.EXPENSE, CategoryType.INCOME]
+                          .map(
+                            (categoryType) => _reorderableListView(
+                              categoryType == CategoryType.EXPENSE
+                                  ? globals.expenseCategories
+                                  : globals.incomeCategories,
+                              categoryType,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -93,20 +147,8 @@ class _CategoryPageState extends State<CategoryPage>
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(left: 20.0),
-          child: AdaptiveText(
-            'More categories',
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        SizedBox(height: 20.0),
         FutureBuilder<List<Category>>(
-          future: CategoryService().getStockCategories(type),
+          future: CategoryService().getStockCategories(selectedSubSector, type),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var _disabledCategories = snapshot.data;
@@ -114,55 +156,95 @@ class _CategoryPageState extends State<CategoryPage>
                 _disabledCategories.removeWhere((dc) => dc.id == category.id);
               });
               return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  for (var category in _disabledCategories)
-                    ListTile(
-                      key: Key('${category.id}'),
-                      leading: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 0.4),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(
-                            VectorIcons.fromName(category.iconName,
-                                provider: IconProvider.FontAwesome5),
-                            size: 16.0,
-                          ),
-                        ),
-                      ),
-                      title: AdaptiveText(
-                        '',
-                        category: category,
-                      ),
-                      trailing: Material(
-                        color: Colors.white,
-                        shape: CircleBorder(),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(50.0),
-                          splashColor: Colors.green,
-                          onTap: () async {
-                            var categoryList =
-                                await CategoryService().getCategories(type);
-                            if (!categoryList.contains(category)) {
-                              await CategoryService().addCategory(
-                                category,
-                                type: type,
-                                isStockCategory: true,
-                              );
-                              setState(() {});
-                            }
-                          },
-                          child: Icon(
-                            Icons.add_circle,
-                            size: 20.0,
-                            color: Colors.green,
-                          ),
-                        ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.0),
+                    child: AdaptiveText(
+                      'More categories',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: _disabledCategories.length > 0
+                            ? Colors.black
+                            : Colors.grey,
+                        fontWeight: _disabledCategories.length > 0
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
-                  SizedBox(height: 80.0),
+                  ),
+                  SizedBox(height: 20.0),
+                  for (var categories in _disabledCategories)
+                    Column(
+                      children: <Widget>[
+                        DecoratedBox(
+                          key: Key('${categories.id}'),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                  color: Colors.grey.withOpacity(0.7))),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: ListTile(
+                              title: Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      VectorIcons.fromName(
+                                        categories.iconName,
+                                        provider: IconProvider.FontAwesome5,
+                                      ),
+                                      color: Configuration().incomeColor,
+                                      size: 20.0,
+                                    ),
+                                  ),
+                                  AdaptiveText(
+                                    '',
+                                    category: categories,
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 15,
+                                      color: const Color(0xff272b37),
+                                      height: 1.4285714285714286,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: InkWell(
+                                splashColor: Colors.transparent,
+                                onTap: () async {
+                                  var categoryList = await CategoryService()
+                                      .getCategories(selectedSubSector, type);
+                                  if (!categoryList.contains(categories)) {
+                                    await CategoryService().addCategory(
+                                      selectedSubSector,
+                                      categories,
+                                      type: type,
+                                      isStockCategory: true,
+                                    );
+                                    setState(() {});
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.add_circle,
+                                  size: 30.0,
+                                  color: Color(0xffB581F6),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        )
+                      ],
+                    ),
+                  SizedBox(
+                    height: 40,
+                  )
                 ],
               );
             } else {
@@ -178,57 +260,69 @@ class _CategoryPageState extends State<CategoryPage>
 
   Widget _reorderableListView(
       List<Category> categories, CategoryType categoryType) {
-    return Component.ReorderableListView(
-      children: [
-        for (int i = 0; i < categories.length; i++)
-          ListTile(
-            key: Key('$i'),
-            leading: Row(
-              mainAxisSize: MainAxisSize.min,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Component.ReorderableListView(
+        children: [
+          for (int i = 0; i < categories.length; i++)
+            Column(
+              key: Key('$i'),
               children: <Widget>[
-                Icon(
-                  Icons.drag_handle,
-                  color: Colors.white.withAlpha(80),
-                ),
-                SizedBox(width: 10.0),
-                Container(
+                DecoratedBox(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 0.4),
-                    shape: BoxShape.circle,
-                  ),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: Colors.grey.withOpacity(0.7))),
                   child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      VectorIcons.fromName(categories[i].iconName,
-                          provider: IconProvider.FontAwesome5),
-                      size: 16.0,
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              VectorIcons.fromName(
+                                categories[i].iconName,
+                                provider: IconProvider.FontAwesome5,
+                              ),
+                              color: Configuration().incomeColor,
+                              size: 20.0,
+                            ),
+                          ),
+                          Flexible(
+                            child: AdaptiveText(
+                              '',
+                              category: categories[i],
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                color: const Color(0xff272b37),
+                                height: 1.4285714285714286,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () => _showDeleteDialog(categories[i].id),
+                        child: Icon(
+                          Icons.remove_circle,
+                          size: 30.0,
+                          color: Color(0xffB581F6),
+                        ),
+                      ),
                     ),
                   ),
                 ),
+                SizedBox(
+                  height: 16,
+                )
               ],
             ),
-            title: AdaptiveText(
-              '',
-              category: categories[i],
-            ),
-            trailing: Material(
-              color: Colors.white,
-              shape: CircleBorder(),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(50.0),
-                splashColor: Colors.red,
-                onTap: () => _showDeleteDialog(categories[i].id),
-                child: Icon(
-                  Icons.remove_circle,
-                  size: 20.0,
-                  color: Colors.red,
-                ),
-              ),
-            ),
-          ),
-      ],
-      footer: _disabledCategories(categories, categoryType),
-      onReorder: _reorderCategoryList,
+        ],
+        footer: _disabledCategories(categories, categoryType),
+        onReorder: _reorderCategoryList,
+      ),
     );
   }
 
@@ -264,6 +358,7 @@ class _CategoryPageState extends State<CategoryPage>
                 ),
                 onPressed: () async {
                   await CategoryService().deleteCategory(
+                    selectedSubSector,
                     categoryId,
                     _tabController.index == 0
                         ? CategoryType.EXPENSE
@@ -288,106 +383,100 @@ class _CategoryPageState extends State<CategoryPage>
   }
 
   Future _showAddCategoryBottomSheet() async {
-    await showModalBottomSheet(
+    await showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
-        return AnimatedPadding(
-          padding: MediaQuery.of(context).viewInsets,
-          duration: Duration(milliseconds: 100),
-          curve: Curves.decelerate,
+        return Dialog(
           child: Container(
             decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0))),
+                borderRadius: BorderRadius.all(Radius.circular(8.0))),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    VectorIcons.fromName('hornbill',
+                        provider: IconProvider.FontAwesome5),
+                    color: Colors.grey,
+                    size: 28,
+                  ),
+                  onPressed: () {},
+                ),
+                Text(
+                  language == Lang.EN
+                      ? 'Enter new category'
+                      : 'नयाँ श्रेणी लेख्नुहोस',
+                  style: TextStyle(color: Colors.black, fontSize: 20.0),
+                ),
                 Padding(
-                  padding: EdgeInsets.only(
-                      top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20.0),
-                          ),
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            VectorIcons.fromName('hornbill',
-                                provider: IconProvider.FontAwesome5),
-                            color: Colors.black,
-                          ),
-                          onPressed: () {},
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.withOpacity(0.7)),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: TextFormField(
+                        validator: validator,
+                        autofocus: true,
+                        controller: _categoryName,
+                        style:
+                            TextStyle(color: Colors.grey[800], fontSize: 20.0),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(8.0),
                         ),
                       ),
-                      SizedBox(width: 10.0),
-                      Expanded(
-                        child: Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            validator: validator,
-                            controller: _categoryName,
-                            style: TextStyle(
-                                color: Colors.grey[800], fontSize: 20.0),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: language == Lang.EN
-                                  ? 'Enter new category'
-                                  : 'नयाँ श्रेणी लेख्नुहोस',
-                              hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 20.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(20.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      gradient: LinearGradient(
-                        colors: Configuration().gradientColors,
-                        begin: FractionalOffset.centerLeft,
-                        end: FractionalOffset.centerRight,
-                      ),
-                    ),
-                    child: Material(
-                      child: InkWell(
-                        onTap: () async {
-                          if (_formKey.currentState.validate()) {
-                            await CategoryService().addCategory(
-                              Category(
-                                en: _categoryName.text,
-                                np: _categoryName.text,
-                                iconName: 'hornbill',
-                                id: 300,
-                              ),
-                              type: _tabController.index == 0
-                                  ? CategoryType.EXPENSE
-                                  : CategoryType.INCOME,
-                            );
-                            Navigator.pop(context);
-                          }
-                          _categoryName.clear();
-                        },
                         borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: AdaptiveText(
-                            'ADD',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20.0),
-                          ),
+                        color: Configuration().incomeColor),
+                    child: InkWell(
+                      onTap: () async {
+                        if (_formKey.currentState.validate()) {
+                          await CategoryService().addCategory(
+                            selectedSubSector,
+                            Category(
+                              en: _categoryName.text,
+                              np: _categoryName.text,
+                              iconName: 'hornbill',
+                              id: _categoryName.text.hashCode,
+                            ),
+                            type: _tabController.index == 0
+                                ? CategoryType.EXPENSE
+                                : CategoryType.INCOME,
+                          );
+                          Navigator.pop(context);
+                        }
+                        _categoryName.clear();
+                      },
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 18),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.add),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            AdaptiveText(
+                              'Add Category',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 20.0),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -408,14 +497,16 @@ class _CategoryPageState extends State<CategoryPage>
       globals.expenseCategories.removeAt(preIndex);
       globals.expenseCategories
           .insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
-      CategoryService().refreshCategories(globals.expenseCategories,
+      CategoryService().refreshCategories(
+          selectedSubSector, globals.expenseCategories,
           type: CategoryType.EXPENSE);
     } else {
       Category temp = globals.incomeCategories[preIndex];
       globals.incomeCategories.removeAt(preIndex);
       globals.incomeCategories
           .insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
-      CategoryService().refreshCategories(globals.incomeCategories,
+      CategoryService().refreshCategories(
+          selectedSubSector, globals.incomeCategories,
           type: CategoryType.INCOME);
     }
     setState(() {});

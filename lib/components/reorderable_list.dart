@@ -364,7 +364,6 @@ class _ReorderableListContentState extends State<_ReorderableListContent>
       setState(() {
         if (startIndex != endIndex) widget.onReorder(startIndex, endIndex);
         // Animates leftover space in the drop area closed.
-        // TODO(djshuckerow): bring the animation in line with the Material
         // specifications.
         _ghostController.reverse(from: 0.1);
         _entranceController.reverse(from: 0.1);
@@ -455,7 +454,8 @@ class _ReorderableListContentState extends State<_ReorderableListContent>
           // These constraints will limit the cross axis of the drawn widget.
           constraints: constraints,
           child: Material(
-            elevation: 6.0,
+            elevation: 0.0,
+            color: Colors.transparent,
             child: toWrapWithSemantics,
           ),
         ),
@@ -533,7 +533,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent>
           return _dragging == toAccept && toAccept != toWrap.key;
         },
         onAccept: (Key accepted) {},
-        onLeave: (Key leaving) {},
+        onLeave: null,
       );
     });
   }

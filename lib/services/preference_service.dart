@@ -21,6 +21,16 @@ class PreferenceService {
     return (await prefs.get('IS_FIRST_START')) as bool ?? true;
   }
 
+  Future<bool> isUserRegistered() async {
+    var prefs = await _init();
+    return (await prefs.get('IS_USER_REGISTERED')) as bool ?? false;
+  }
+
+  Future setIsUserRegistered() async {
+    var prefs = await _init();
+    prefs.set('IS_USER_REGISTERED', true);
+  }
+
   Future setLanguage(String value) async {
     var prefs = await _init();
     prefs.set('LANGUAGE', value);
@@ -31,6 +41,16 @@ class PreferenceService {
     return (await prefs.get('LANGUAGE')) as String;
   }
 
+  Future setSelectedSubSector(String value) async {
+    var prefs = await _init();
+    prefs.set('SUBSECTOR', value);
+  }
+
+  Future<String> getSelectedSubSector() async {
+    var prefs = await _init();
+    return (await prefs.get('SUBSECTOR')) as String;
+  }
+
   Future setCurrentIncomeCategoryIndex(int value) async {
     var prefs = await _init();
     prefs.set('CURRENT_INCOME_CATEGORY_INDEX', value);
@@ -38,7 +58,7 @@ class PreferenceService {
 
   Future<int> getCurrentIncomeCategoryIndex() async {
     var prefs = await _init();
-    return (await prefs.get('CURRENT_INCOME_CATEGORY_INDEX')) as int;
+    return (await prefs.get('CURRENT_INCOME_CATEGORY_INDEX') ?? 0) as int;
   }
 
   Future setCurrentExpenseCategoryIndex(int value) async {
@@ -48,7 +68,7 @@ class PreferenceService {
 
   Future<int> getCurrentExpenseCategoryIndex() async {
     var prefs = await _init();
-    return (await prefs.get('CURRENT_EXPENSE_CATEGORY_INDEX')) as int;
+    return (await prefs.get('CURRENT_EXPENSE_CATEGORY_INDEX') ?? 0) as int;
   }
 
   Future setCurrentTransactionIndex(int value) async {
@@ -58,7 +78,17 @@ class PreferenceService {
 
   Future<int> getCurrentTransactionIndex() async {
     var prefs = await _init();
-    return (await prefs.get('CURRENT_TRANSACTION_INDEX')) as int;
+    return (await prefs.get('CURRENT_TRANSACTION_INDEX') ?? 0) as int;
+  }
+
+  Future setSubSectors(List<dynamic> value) async {
+    var prefs = await _init();
+    prefs.set('SUBSECTORS', value);
+  }
+
+  Future<List<dynamic>> getSubSectors() async {
+    var prefs = await _init();
+    return (await prefs.get('SUBSECTORS') ?? []) as List<dynamic>;
   }
 }
 
