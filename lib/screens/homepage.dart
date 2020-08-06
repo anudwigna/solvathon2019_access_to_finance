@@ -30,7 +30,7 @@ class HomePageState extends State<HomePage>
   TabController _tabController;
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
-  final int noOfmonths = 60;
+  final int noOfmonths = 132;
   // List<GlobalKey<AnimatedCircularChartState>> _chartKey =
   //     new List<GlobalKey<AnimatedCircularChartState>>();
   var _dateResolver = <NepaliDateTime>[];
@@ -44,7 +44,7 @@ class HomePageState extends State<HomePage>
     _tabController = TabController(
       length: noOfmonths,
       vsync: this,
-      initialIndex: noOfmonths - (12 - _currentMonth + 1),
+      initialIndex: _currentMonth + 1,
     );
   }
 
@@ -52,7 +52,7 @@ class HomePageState extends State<HomePage>
     // int _year = _currentYear;
     // int _firstMonth;
     // bool _incrementer;
-    int initYear = _currentYear - 4;
+    int initYear = _currentYear;
     int indexYear = initYear;
     for (int i = 1; i <= noOfmonths; i++) {
       _dateResolver.add(NepaliDateTime(indexYear, (i % 12 == 0) ? 12 : i % 12));

@@ -26,7 +26,7 @@ class _BudgetPageState extends State<BudgetPage>
   Lang language;
   TabController _tabController;
   String selectedSubSector;
-  final int noOfmonths = 60;
+  final int noOfmonths = 132;
 
   var _budgetAmountController = TextEditingController();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -36,16 +36,14 @@ class _BudgetPageState extends State<BudgetPage>
     super.initState();
     initializeDateResolver();
     _tabController = TabController(
-        length: 60,
-        vsync: this,
-        initialIndex: noOfmonths - (12 - _currentMonth + 1));
+        length: noOfmonths, vsync: this, initialIndex: _currentMonth + 1);
   }
 
   initializeDateResolver() {
     // int _year = _currentYear;
     // int _firstMonth;
     // bool _incrementer;
-    int initYear = _currentYear - 4;
+    int initYear = _currentYear;
     int indexYear = initYear;
     for (int i = 1; i <= noOfmonths; i++) {
       _dateResolver.add(NepaliDateTime(indexYear, (i % 12 == 0) ? 12 : i % 12));
