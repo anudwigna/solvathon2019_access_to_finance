@@ -6,7 +6,7 @@ import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
-import 'package:MunshiG/configuration.dart';
+import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/models/user/user.dart';
 import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
 import 'package:MunshiG/services/user_service.dart';

@@ -12,9 +12,12 @@ import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
 
-import '../configuration.dart';
+import '../config/configuration.dart';
 
 class BudgetPage extends StatefulWidget {
+  final bool isInflowProjection;
+
+  const BudgetPage({Key key, this.isInflowProjection}) : super(key: key);
   @override
   _BudgetPageState createState() => _BudgetPageState();
 }
@@ -27,16 +30,17 @@ class _BudgetPageState extends State<BudgetPage>
   TabController _tabController;
   String selectedSubSector;
   final int noOfmonths = 132;
-
+  bool isInflow;
   var _budgetAmountController = TextEditingController();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   var _dateResolver = <NepaliDateTime>[];
   @override
   void initState() {
+    isInflow = widget.isInflowProjection ?? false;
     super.initState();
     initializeDateResolver();
     _tabController = TabController(
-        length: noOfmonths, vsync: this, initialIndex: _currentMonth + 1);
+        length: noOfmonths, vsync: this, initialIndex: _currentMonth - 1);
   }
 
   initializeDateResolver() {
@@ -69,7 +73,8 @@ class _BudgetPageState extends State<BudgetPage>
       backgroundColor: Configuration().appColor,
       drawer: MyDrawer(),
       appBar: AppBar(
-        title: AdaptiveText('Cash Outflow Projection'),
+        title: AdaptiveText(
+            'Cash ' + (isInflow ? 'Inflow' : 'Outflow') + ' Projection'),
         bottom: TabBar(
           controller: _tabController,
           indicator: BoxDecoration(
@@ -80,24 +85,20 @@ class _BudgetPageState extends State<BudgetPage>
           tabs: [
             for (int index = 0; index < noOfmonths; index++)
               //   for (int month = 1; month <= 12; month++)
-              language == Lang.EN
-                  ? Tab(
-                      child: Text(NepaliDateFormat("MMMM ''yy").format(
-                        NepaliDateTime(
-                          _dateResolver[index].year,
-                          _dateResolver[index].month,
-                        ),
-                      )),
-                    )
-                  : Tab(
-                      child: Text(
-                        NepaliDateFormat("MMMM ''yy", Language.nepali).format(
-                          NepaliDateTime(_dateResolver[index].year,
-                              _dateResolver[index].month),
-                        ),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
+              Tab(
+                child: Text(
+                  NepaliDateFormat(
+                          "MMMM ''yy",
+                          language == Lang.EN
+                              ? Language.english
+                              : Language.nepali)
+                      .format(
+                    NepaliDateTime(
+                        _dateResolver[index].year, _dateResolver[index].month),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
           ],
         ),
       ),
@@ -145,8 +146,8 @@ class _BudgetPageState extends State<BudgetPage>
               ),
               Expanded(
                 child: FutureBuilder<List<Category>>(
-                  future: CategoryService()
-                      .getCategories(selectedSubSector, CategoryType.EXPENSE),
+                  future: CategoryService().getCategories(selectedSubSector,
+                      isInflow ? CategoryType.INCOME : CategoryType.EXPENSE),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ListView.separated(

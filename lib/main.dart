@@ -1,7 +1,9 @@
+import 'package:MunshiG/config/routegenerator.dart';
+import 'package:MunshiG/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:MunshiG/configuration.dart';
+import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/account_page.dart';
 import 'package:MunshiG/screens/budget_page.dart';
@@ -12,7 +14,7 @@ import 'package:MunshiG/screens/splashscreen.dart';
 import 'package:MunshiG/screens/userProfilepage.dart';
 import 'package:MunshiG/services/preference_service.dart';
 
-import 'globals.dart' as globals;
+import 'config/globals.dart' as globals;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +43,7 @@ class MunshiG extends StatelessWidget {
         ),
         routes: {
           '/': (context) => SplashScreen(),
-          '/wrapper': (context) => WrapperPage(),
+          wrapper: (context) => WrapperPage(),
         },
       ),
     );
@@ -71,14 +73,15 @@ class _WrapperPageState extends State<WrapperPage> {
           scaffoldBackgroundColor: Colors.transparent,
           canvasColor: Configuration().appColor,
         ),
+        onGenerateRoute: onGenerateRoute,
         routes: {
           '/': (context) => HomePage(),
-          '/profilepage': (context) => UserProfilePage(),
-          '/home': (context) => HomePage(),
-          '/category': (context) => CategoryPage(),
-          '/budget': (context) => BudgetPage(),
-          '/account': (context) => AccountPage(),
-          '/wrapper': (context) => WrapperPage(),
+          //   '/profilepage': (context) => UserProfilePage(),
+          //   '/home': (context) => HomePage(),
+          //   '/category': (context) => CategoryPage(),
+          //   '/budget': (context) => BudgetPage(),
+          //   '/account': (context) => AccountPage(),
+          //   '/wrapper': (context) => WrapperPage(),
         },
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:MunshiG/config/routes.dart';
 import 'package:MunshiG/services/preference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/components/drawer.dart';
-import 'package:MunshiG/globals.dart';
+import 'package:MunshiG/config/globals.dart';
 import 'package:MunshiG/icons/vector_icons.dart';
 import 'package:MunshiG/models/transaction/transaction.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
@@ -15,8 +16,8 @@ import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
-import '../configuration.dart';
-import '../globals.dart';
+import '../config/configuration.dart';
+import '../config/globals.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -44,7 +45,7 @@ class HomePageState extends State<HomePage>
     _tabController = TabController(
       length: noOfmonths,
       vsync: this,
-      initialIndex: _currentMonth + 1,
+      initialIndex: _currentMonth - 1,
     );
   }
 
@@ -791,8 +792,8 @@ class _TransactionListState extends State<TransactionList> {
       if (value ?? false) {
         Navigator.pushNamedAndRemoveUntil(
           context,
-          '/home',
-          ModalRoute.withName('/home'),
+          home,
+          ModalRoute.withName(home),
         );
       }
     });

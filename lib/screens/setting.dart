@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
-import 'package:MunshiG/configuration.dart';
-import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/config/configuration.dart';
+import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/models/account/account.dart';
 import 'package:MunshiG/services/account_service.dart';
 import 'package:MunshiG/services/category_service.dart';
@@ -223,8 +224,8 @@ class _SettingsState extends State<Settings> {
                             });
                             await _loadCategories(_subSectorsData);
                             await Future.delayed(Duration(seconds: 2));
-                            Navigator.pushNamedAndRemoveUntil(context,
-                                '/wrapper', (Route<dynamic> route) => false);
+                            Navigator.pushNamedAndRemoveUntil(context, wrapper,
+                                (Route<dynamic> route) => false);
                           } else {
                             _key.currentState.showSnackBar(SnackBar(
                               content:

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:MunshiG/models/category/category.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 
-import '../resource_map.dart';
+import '../config/resource_map.dart';
 
 class AdaptiveText extends StatelessWidget {
   final String data;

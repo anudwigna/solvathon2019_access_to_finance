@@ -9,8 +9,8 @@ import 'package:nepali_utils/nepali_utils.dart';
 import 'package:MunshiG/models/account/account.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/account_service.dart';
-import '../globals.dart';
-import '../configuration.dart';
+import '../config/globals.dart';
+import '../config/configuration.dart';
 
 class AccountPage extends StatefulWidget {
   @override

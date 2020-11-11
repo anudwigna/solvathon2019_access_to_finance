@@ -1,14 +1,15 @@
+import 'package:MunshiG/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/homepage.dart';
 import 'package:MunshiG/screens/setting.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/preference_service.dart';
-import '../configuration.dart';
-import '../globals.dart';
+import '../config/configuration.dart';
+import '../config/globals.dart';
 import 'adaptive_text.dart';
 
 class MyDrawer extends StatefulWidget {
@@ -101,8 +102,8 @@ class _MyDrawerState extends State<MyDrawer> {
                       setState(() {});
                       Navigator.pushNamedAndRemoveUntil(
                         context,
-                        '/home',
-                        ModalRoute.withName('/home'),
+                        home,
+                        ModalRoute.withName(home),
                       );
                     }
                   }),
@@ -123,8 +124,8 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/home',
-                ModalRoute.withName('/home'),
+                home,
+                ModalRoute.withName(home),
               ),
             ),
             ListTile(
@@ -141,8 +142,8 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/profilepage',
-                ModalRoute.withName('/home'),
+                profilePage,
+                ModalRoute.withName(home),
               ),
             ),
             ListTile(
@@ -158,9 +159,24 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/category',
-                ModalRoute.withName('/home'),
+                category,
+                ModalRoute.withName(home),
               ),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                castOutflow,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Cash Inflow Projection',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context, budget, ModalRoute.withName(home),
+                  arguments: true),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -174,10 +190,8 @@ class _MyDrawerState extends State<MyDrawer> {
                 textAlign: TextAlign.left,
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/budget',
-                ModalRoute.withName('/home'),
-              ),
+                  context, budget, ModalRoute.withName(home),
+                  arguments: false),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -192,9 +206,24 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/account',
-                ModalRoute.withName('/home'),
+                account,
+                ModalRoute.withName(home),
               ),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                categories,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Report',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context, report, ModalRoute.withName(home),
+                  arguments: selectedSubSector.selectedSubSector),
             ),
             Expanded(child: Container()),
             Column(
@@ -210,12 +239,9 @@ class _MyDrawerState extends State<MyDrawer> {
                     style: _style,
                     textAlign: TextAlign.left,
                   ),
-                  onTap: () => Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => Settings(
-                                type: 1,
-                              )),
-                      (Route<dynamic> route) => false),
+                  onTap: () => Navigator.pushNamedAndRemoveUntil(
+                      context, setting, ModalRoute.withName(home),
+                      arguments: 1),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 0.0),

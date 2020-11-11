@@ -1,6 +1,7 @@
+import 'package:MunshiG/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
-import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/screens/setting.dart';
 import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
 
@@ -37,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
               globals.expenseCategories = await CategoryService().getCategories(
                   globals.selectedSubSector, CategoryType.EXPENSE);
               await Future.delayed(Duration(seconds: 2));
-              Navigator.pushReplacementNamed(context, '/wrapper');
+              Navigator.pushReplacementNamed(context, wrapper);
             }
           },
         );

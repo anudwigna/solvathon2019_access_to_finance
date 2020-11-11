@@ -80,6 +80,7 @@ const Map<String, String> ResourceMap = {
   'are you sure you want to delete this category?':
       'के तपाई साचै यो कारोबार हटाउन चाहनुहुन्छ ?',
   'cash outflow projection': 'नगद बाहिरिने प्रक्षेपण',
+  'cash inflow projection': 'नगद भित्रीने प्रक्षेपण',
   'cash in': 'नगद भित्रीएको',
   'cash out': 'नगद बाहिरिएको',
   'gender': 'लिङ्ग',
@@ -92,4 +93,5 @@ const Map<String, String> ResourceMap = {
   'last name': 'थर',
   'phone number': 'फोन नम्बर',
   'date of birth': 'जन्म मिति',
+  'report': 'रिपोर्ट',
 };

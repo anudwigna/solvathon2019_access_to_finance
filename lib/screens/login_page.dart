@@ -1,9 +1,10 @@
+import 'package:MunshiG/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 
-import '../configuration.dart';
+import '../config/configuration.dart';
 
 import '../providers/preference_provider.dart';
 
@@ -290,8 +291,7 @@ class _LoginPageState extends State<LoginPage> {
                     color: Colors.black,
                   ),
                 ),
-                onPressed: () =>
-                    Navigator.pushReplacementNamed(context, '/home'),
+                onPressed: () => Navigator.pushReplacementNamed(context, home),
               ),
             ],
           );

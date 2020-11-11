@@ -112,4 +112,19 @@ class BudgetService {
     );
     await dbStore.store.delete(dbStore.database, finder: finder);
   }
+
+  Future<List<Budget>> getTotalBudgetByDate(
+      String subSector, int month, int year) async {
+    var dbStore = await getDatabaseAndStore(subSector);
+    Finder finder = Finder(
+      filter: Filter.and(
+          [Filter.equals('month', month), Filter.equals('year', year)]),
+    );
+    var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
+
+    if (snapshot.isEmpty) {
+      return [];
+    }
+    return snapshot.map((e) => Budget.fromJson(e.value)).toList();
+  }
 }

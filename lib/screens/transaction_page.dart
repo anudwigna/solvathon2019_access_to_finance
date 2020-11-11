@@ -12,7 +12,7 @@ import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/icons/vector_icons.dart';
 import 'package:MunshiG/models/account/account.dart';
-import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/models/budget/budget.dart';
 import 'package:MunshiG/models/category/category.dart';
 import 'package:MunshiG/models/transaction/transaction.dart';
@@ -21,8 +21,8 @@ import 'package:MunshiG/services/account_service.dart';
 import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
-import '../configuration.dart';
-import '../globals.dart';
+import '../config/configuration.dart';
+import '../config/globals.dart';
 import '../providers/preference_provider.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -652,7 +652,7 @@ class _TransactionPageState extends State<TransactionPage> {
       } else if (_selectedAccount == null) {
         _showMessage('Please select account.');
       } else {
-        var oldBudget;
+        Budget oldBudget;
         int _spent;
         int _total;
         if (widget.transactionType == 1) {
@@ -690,6 +690,24 @@ class _TransactionPageState extends State<TransactionPage> {
             await _updateTransactionAndAccount(widget.transaction != null);
           }
         } else {
+          oldBudget = await BudgetService().getBudget(
+              selectedSubSector,
+              _selectedCategoryId,
+              _selectedDateTime.month,
+              _selectedDateTime.year);
+          _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
+          _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
+          _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
+          await BudgetService().updateBudget(
+            selectedSubSector,
+            Budget(
+              categoryId: _selectedCategoryId,
+              month: _selectedDateTime.month,
+              spent: '$_spent',
+              year: _selectedDateTime.year,
+              total: oldBudget.total,
+            ),
+          );
           await _updateTransactionAndAccount(widget.transaction != null);
         }
         String imageDir;
@@ -758,6 +776,28 @@ class _TransactionPageState extends State<TransactionPage> {
           await _updateTransactionAndAccount(widget.transaction != null);
         }
       } else {
+        oldBudget = await BudgetService().getBudget(
+            selectedSubSector,
+            widget.transaction.categoryId,
+            _selectedDateTime.month,
+            _selectedDateTime.year);
+        _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
+        int checkExpense = (int.tryParse(widget.transaction.amount) ?? 0) -
+            (int.tryParse(_amountController.text ?? '0') ?? 0);
+        _spent -= checkExpense;
+        _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
+
+        await BudgetService().updateBudget(
+          selectedSubSector,
+          Budget(
+            categoryId: widget.transaction.categoryId,
+            month: _selectedDateTime.month,
+            spent: '$_spent',
+            year: _selectedDateTime.year,
+            total: oldBudget.total,
+          ),
+        );
+
         await _updateTransactionAndAccount(widget.transaction != null);
       }
       Navigator.pop(context, true);

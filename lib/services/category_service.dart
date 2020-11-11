@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:MunshiG/globals.dart' as globals;
+import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/models/category/category.dart';
 import 'package:MunshiG/models/database_and_store.dart';
 import 'package:MunshiG/services/budget_service.dart';
@@ -36,6 +36,15 @@ class CategoryService {
     var dbStore = await getDatabaseAndStore(subSector, type);
     var snapshot = await dbStore.store.find(dbStore.database);
     return snapshot.map((record) => Category.fromJson(record.value)).toList();
+  }
+
+  Future<List<int>> getCategoriesID(String subSector, CategoryType type) async {
+    var dbStore = await getDatabaseAndStore(subSector, type);
+    var snapshot = await dbStore.store.find(dbStore.database);
+
+    return snapshot
+        .map((record) => int.tryParse(record.value['id'].toString() ?? 0.0))
+        .toList();
   }
 
   Future<String> _getDbPath(String dbName) async {

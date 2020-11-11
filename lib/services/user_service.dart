@@ -39,4 +39,8 @@ class UserService {
     var snapshot = await dbStore.store.update(dbStore.database, user.toJson(),
         finder: Finder(filter: Filter.equals('phonenumber', user.phonenumber)));
   }
+
+  Future<void> getAllDatabase() async {
+    var db = await getDatabaseAndStore();
+  }
 }
