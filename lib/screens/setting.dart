@@ -132,7 +132,7 @@ class _SettingsState extends State<Settings> {
                                       SizedBox(
                                         height: 8,
                                       ),
-                                      Text(
+                                      AdaptiveText(
                                         snapshot.data[(index)],
                                         style: TextStyle(
                                           color: (_subSectorsData.contains(

@@ -36,7 +36,8 @@ class _MyDrawerState extends State<MyDrawer> {
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Padding(
         padding: MediaQuery.of(context).viewPadding,
-        child: Column(
+        child: ListView(
+          physics: BouncingScrollPhysics(),
           children: <Widget>[
             SizedBox(
               height: 15,
@@ -225,7 +226,23 @@ class _MyDrawerState extends State<MyDrawer> {
                   context, report, ModalRoute.withName(home),
                   arguments: selectedSubSector.selectedSubSector),
             ),
-            Expanded(child: Container()),
+            // ListTile(
+            //   contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+            //   leading: SvgPicture.string(
+            //     categories,
+            //     allowDrawingOutsideViewBox: true,
+            //   ),
+            //   title: AdaptiveText(
+            //     'BackUp',
+            //     style: _style,
+            //     textAlign: TextAlign.left,
+            //   ),
+            //   onTap: () => Navigator.pushNamedAndRemoveUntil(
+            //     context,
+            //     backup,
+            //     ModalRoute.withName(home),
+            //   ),
+            // ),
             Column(
               children: <Widget>[
                 ListTile(

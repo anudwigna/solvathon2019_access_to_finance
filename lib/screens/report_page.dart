@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:MunshiG/components/date_selector.dart';
 import 'package:MunshiG/components/infocard.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
@@ -30,39 +31,135 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage>
     with SingleTickerProviderStateMixin {
   List<ExportDataModel> exportDataModel = [];
-  TabController _tabController;
-  int _currentYear = NepaliDateTime.now().year;
-  int _currentMonth = NepaliDateTime.now().month;
-  final int noOfmonths = 132;
   Lang language;
   String selectedSubSector;
   var _scaffoldKey = GlobalKey<ScaffoldState>();
-  var _dateResolver = <NepaliDateTime>[];
+
   @override
   void initState() {
     super.initState();
-    initializeDateResolver();
     selectedSubSector = widget.selectedSubSector ?? globals.selectedSubSector;
-    generateReport();
-    _tabController =
-        TabController(length: noOfmonths ~/ 12, vsync: this, initialIndex: 0);
   }
 
-  initializeDateResolver() {
-    // int _year = _currentYear;
-    // int _firstMonth;
-    // bool _incrementer;
-    int initYear = _currentYear;
+  List<NepaliDateTime> initializeDateResolver(
+      int fromyear, int frommonth, int toyear, int tomonth) {
+    List<NepaliDateTime> _dateResolver = [];
+    int noOfMonths = ((NepaliDateTime(toyear, tomonth)
+            .difference(NepaliDateTime(fromyear, frommonth))
+            .inDays) ~/
+        30);
+    print(noOfMonths);
+    int initYear = fromyear;
     int indexYear = initYear;
-    for (int i = 1; i <= noOfmonths; i++) {
+    for (int i = frommonth; i <= (noOfMonths + frommonth); i++) {
       _dateResolver.add(NepaliDateTime(indexYear, (i % 12 == 0) ? 12 : i % 12));
       if (i % 12 == 0) {
         indexYear++;
       }
     }
+    return _dateResolver;
   }
 
-  generateReport() {
+  NepaliDateTime fromDate =
+      NepaliDateTime(NepaliDateTime.now().year, NepaliDateTime.now().month);
+  NepaliDateTime toDate =
+      NepaliDateTime(NepaliDateTime.now().year, NepaliDateTime.now().month + 1);
+  Widget getSearchWidget() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      child: Material(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 6,
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'From'.toUpperCase(),
+                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                          ),
+                          DateSelector(
+                            onDateChanged: (value) {
+                              setState(() {
+                                fromDate = value;
+                              });
+                            },
+                            currentDate: fromDate,
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'To'.toUpperCase(),
+                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                          ),
+                          DateSelector(
+                            initialDateYear: fromDate.year,
+                            initialMonth: fromDate.month,
+                            currentDate: toDate,
+                            onDateChanged: (value) {
+                              setState(() {
+                                toDate = value;
+                              });
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 15),
+                child: RaisedButton(
+                  color: Configuration().appColor,
+                  onPressed: () {
+                    if (toDate.difference(fromDate).isNegative) {
+                      _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content:
+                              Text('To date cannot be behind than From date')));
+                      return;
+                    }
+                    generateReport(fromDate.year, fromDate.month, toDate.year,
+                        toDate.month);
+                  },
+                  child: Container(
+                    width: double.maxFinite,
+                    child: Center(
+                      child: Text(
+                        'Search',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  generateReport(int formyear, int fromtmonth, int toyear, int tomonth) {
+    exportDataModel?.clear();
+    groupedData?.clear();
     Future.wait([
       CategoryService()
           .getCategoriesID(selectedSubSector, CategoryType.EXPENSE),
@@ -70,6 +167,8 @@ class _ReportPageState extends State<ReportPage>
     ]).then((value) async {
       exCat = value[0];
       incomeCat = value[1];
+      final _dateResolver =
+          initializeDateResolver(formyear, fromtmonth, toyear, tomonth);
       for (int i = 0; i < _dateResolver.length; i++) {
         final e = _dateResolver[i];
         final value = await BudgetService()
@@ -90,10 +189,9 @@ class _ReportPageState extends State<ReportPage>
               outflow: outflow,
               inflowMINUSoutflow: (inflow - outflow)),
         );
-
-        groupedData = exportDataModel.groupBy((e) => e.date.split("'").last);
-        setState(() {});
       }
+      groupedData = exportDataModel.groupBy((e) => e.date.split("'").last);
+      setState(() {});
     });
   }
 
@@ -107,101 +205,81 @@ class _ReportPageState extends State<ReportPage>
         builder: (context, preferenceProvider, _) {
       language = preferenceProvider.language;
       return Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Configuration().appColor,
-        drawer: MyDrawer(),
-        appBar: AppBar(
-          title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                AdaptiveText('Report'),
-                Flexible(child: Text(' (' + selectedSubSector.toString() + ')'))
-              ]),
-          bottom: TabBar(
-            controller: _tabController,
-            indicator: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Configuration().incomeColor,
-            ),
-            isScrollable: true,
-            tabs: [
-              for (int index = 0; index < (noOfmonths ~/ 12); index++)
-                Tab(
-                  child: Text(NepaliDateFormat(
-                          "yyyy",
-                          language == Lang.EN
-                              ? Language.english
-                              : Language.nepali)
-                      .format(
-                    NepaliDateTime(
-                      _dateResolver[index * 12].year,
-                      _dateResolver[index * 12].month,
-                    ),
-                  )),
-                )
-            ],
-          ),
-        ),
-        floatingActionButton: Material(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          color: Colors.yellow[800],
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            splashColor: Colors.grey,
-            hoverColor: Colors.grey,
-            // highlightColor: Colors.grey,
-            onTap: _exportDataToExcel,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+          key: _scaffoldKey,
+          backgroundColor: Configuration().appColor,
+          drawer: MyDrawer(),
+          appBar: AppBar(
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  RotatedBox(
-                    quarterTurns: 1,
-                    child: Icon(
-                      Icons.import_export,
-                      size: 30,
+                  AdaptiveText('Report'),
+                  Flexible(
+                      child: Text(' (' + selectedSubSector.toString() + ')'))
+                ]),
+          ),
+          floatingActionButton: exportDataModel.isEmpty
+              ? Container(
+                  height: 1,
+                  width: 1,
+                )
+              : Material(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  color: Colors.yellow[800],
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    splashColor: Colors.grey,
+                    hoverColor: Colors.grey,
+                    // highlightColor: Colors.grey,
+                    onTap: _exportDataToExcel,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          RotatedBox(
+                            quarterTurns: 1,
+                            child: Icon(
+                              Icons.import_export,
+                              size: 30,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 6,
+                          ),
+                          Text(
+                            'Export Report',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    width: 6,
-                  ),
-                  Text(
-                    'Export Report',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
+                ),
+          body: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              children: <Widget>[
+                getSearchWidget(),
+                SizedBox(
+                  height: 15,
+                ),
+                ListView.separated(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) => InfoCard(
+                          groupedData: exportDataModel[index],
+                        ),
+                    separatorBuilder: (context, index) => SizedBox(
+                          height: 0,
+                        ),
+                    itemCount: exportDataModel.length)
+              ],
             ),
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(50.0),
-                topRight: Radius.circular(50.0),
-              ),
-            ),
-            padding: EdgeInsets.only(top: 30, left: 0),
-            child: exportDataModel.isEmpty
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : TabBarView(controller: _tabController, children: <Widget>[
-                    for (int i = 0; i < groupedData.keys.length; i++)
-                      GraphPlot(
-                        groupedData: groupedData[groupedData.keys.toList()[i]],
-                        titleYear: groupedData.keys.toList()[i],
-                      )
-                  ]),
-          ),
-        ),
-      );
+          ));
     });
   }
 
@@ -248,7 +326,6 @@ class _ReportPageState extends State<ReportPage>
 
   @override
   void dispose() {
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -329,7 +406,7 @@ class _ReportPageState extends State<ReportPage>
       Directory directory = await getExternalStorageDirectory();
       print(directory);
       String finalPath = directory.path +
-          "/files/" +
+          "/temp/" +
           selectedSubSector +
           "ProjectionSheet.xlsx";
       File(finalPath)

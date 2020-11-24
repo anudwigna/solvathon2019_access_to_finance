@@ -4,6 +4,7 @@ import 'package:MunshiG/screens/account_page.dart';
 import 'package:MunshiG/screens/budget_page.dart';
 import 'package:MunshiG/screens/category_page.dart';
 import 'package:MunshiG/screens/homepage.dart';
+import 'package:MunshiG/screens/one.dart';
 import 'package:MunshiG/screens/report_page.dart';
 import 'package:MunshiG/screens/setting.dart';
 import 'package:MunshiG/screens/userProfilepage.dart';
@@ -31,6 +32,11 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case category:
       {
         builder = (BuildContext _) => CategoryPage();
+        break;
+      }
+    case backup:
+      {
+        builder = (BuildContext _) => BackUpAndRestore();
         break;
       }
     case budget:

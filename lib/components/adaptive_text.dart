@@ -10,6 +10,7 @@ class AdaptiveText extends StatelessWidget {
   final int maxLines;
   final TextOverflow overflow;
   final bool softWrap;
+  final bool isProviderEnabled;
   final TextStyle style;
   final TextAlign textAlign;
   final TextDirection textDirection;
@@ -19,6 +20,7 @@ class AdaptiveText extends StatelessWidget {
   AdaptiveText(
     this.data, {
     Key key,
+    this.isProviderEnabled,
     this.maxLines,
     this.overflow,
     this.softWrap,

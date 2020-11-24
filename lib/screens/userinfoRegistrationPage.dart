@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,6 +52,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
   @override
   void initState() {
     super.initState();
+    print(language);
     if (widget.userData != null) {
       addressController.text = widget.userData?.address ?? '';
       dateTime = widget.userData?.dob ?? null;
@@ -72,6 +74,36 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Configuration().appColor.withOpacity(0.7),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     final callback = await checkPermission(
+      //       _scaffoldKey,
+      //     );
+      //     if (!callback) return;
+      //     Directory directory = Directory('/storage/emulated/0/Download/');
+      //     print(File(directory.path + 'backup.zip').existsSync());
+      //     Directory newDir = await getApplicationDocumentsDirectory();
+      //     final bytes = File(directory.path + 'backup.zip').readAsBytesSync();
+      //     final archive = ZipDecoder().decodeBytes(bytes);
+      //     for (final file in archive) {
+      //       final filename = file.name;
+      //       if (file.isFile) {
+      //         final data = file.content as List<int>;
+      //         File(newDir.path + '/' + filename)
+      //           ..createSync(recursive: true)
+      //           ..writeAsBytesSync(data);
+      //       }
+      //     }
+      //     showDialog(
+      //       context: context,
+      //       barrierDismissible: false,
+      //       builder: (context) => Dialog(
+      //         child: AdaptiveText('Please restart your app'),
+      //       ),
+      //     );
+      //   },
+      //   child: Icon(Icons.import_contacts),
+      // ),
       appBar: AppBar(
         elevation: 10,
         backgroundColor: Configuration().appColor,
@@ -86,7 +118,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                   if (phoneNumberController.text.length < 10) {
                     _scaffoldKey.currentState.removeCurrentSnackBar();
                     _scaffoldKey.currentState.showSnackBar(SnackBar(
-                        content: Text(
+                        content: AdaptiveText(
                             'Valid Phone Number must be added to Continue')));
                   } else {
                     addNewUser(User(phonenumber: phoneNumberController.text));
@@ -94,7 +126,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(
+                  child: AdaptiveText(
                     'Skip',
                     style: TextStyle(fontSize: 16),
                   ),
@@ -153,7 +185,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text(
+                                    AdaptiveText(
                                       'Add Your Photo\nHere',
                                       style: TextStyle(
                                           fontSize: 16, color: Colors.black),
@@ -297,7 +329,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                                     DropdownMenuItem<String>(
                                                         value: e,
                                                         child: Container(
-                                                            child: Text(
+                                                            child: AdaptiveText(
                                                           e,
                                                           style: TextStyle(
                                                               color:
@@ -373,7 +405,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     _scaffoldKey.currentState
                                         .removeCurrentSnackBar();
                                     _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                        content: Text(
+                                        content: AdaptiveText(
                                             'Error, Image cannot be uploaded')));
                                     return;
                                   }
@@ -396,7 +428,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 }
                               }
                             },
-                            child: Text(
+                            child: AdaptiveText(
                               'Save',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -433,7 +465,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
         PopupMenuItem(
           value: 0,
           child: ListTile(
-            title: Text(
+            title: AdaptiveText(
               'B.S Date Picker',
               style: TextStyle(
                 color: Colors.black,
@@ -445,7 +477,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
         PopupMenuItem(
           value: 1,
           child: ListTile(
-            title: Text(
+            title: AdaptiveText(
               'A.D Date Picker',
               style: TextStyle(
                 color: Colors.black,

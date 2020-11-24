@@ -40,11 +40,11 @@ class InfoCard extends StatelessWidget {
             title: Row(
               children: <Widget>[
                 Text(
-                  'Month: ',
+                  'Date: ',
                   style: nameTextStyle,
                 ),
                 Text(
-                  groupedData.date.split("'").first,
+                  groupedData.date,
                   style: textStyle,
                 ),
               ],

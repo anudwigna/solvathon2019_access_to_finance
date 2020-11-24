@@ -5,13 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
-import 'package:MunshiG/screens/account_page.dart';
-import 'package:MunshiG/screens/budget_page.dart';
-import 'package:MunshiG/screens/category_page.dart';
 import 'package:MunshiG/screens/homepage.dart';
 
 import 'package:MunshiG/screens/splashscreen.dart';
-import 'package:MunshiG/screens/userProfilepage.dart';
 import 'package:MunshiG/services/preference_service.dart';
 
 import 'config/globals.dart' as globals;
