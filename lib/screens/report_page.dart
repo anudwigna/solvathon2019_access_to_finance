@@ -364,32 +364,36 @@ class _ReportPageState extends State<ReportPage>
         switch (key) {
           case 'date':
             excel.updateCell(
-                sheet,
-                CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row),
-                value,
-                wrap: TextWrapping.WrapText);
+              sheet,
+              CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row),
+              value,
+              cellStyle: CellStyle(textWrapping: TextWrapping.WrapText),
+            );
             break;
           case 'inflow':
             excel.updateCell(
-                sheet,
-                CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row),
-                value,
-                wrap: TextWrapping.WrapText);
+              sheet,
+              CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row),
+              value,
+              cellStyle: CellStyle(textWrapping: TextWrapping.WrapText),
+            );
             break;
           case 'outflow':
             excel.updateCell(
-                sheet,
-                CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row),
-                value,
-                wrap: TextWrapping.WrapText);
+              sheet,
+              CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row),
+              value,
+              cellStyle: CellStyle(textWrapping: TextWrapping.WrapText),
+            );
 
             break;
           case 'inflowMINUSoutflow':
             excel.updateCell(
-                sheet,
-                CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row),
-                value,
-                wrap: TextWrapping.WrapText);
+              sheet,
+              CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row),
+              value,
+              cellStyle: CellStyle(textWrapping: TextWrapping.WrapText),
+            );
             break;
           default:
         }
