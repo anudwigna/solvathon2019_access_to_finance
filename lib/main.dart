@@ -29,13 +29,21 @@ class MunshiG extends StatelessWidget {
         title: 'MunshiG',
         theme: ThemeData(
           brightness: Brightness.dark,
-          primarySwatch: MaterialColor(0xffffffff, {}),
+          // primarySwatch: MaterialColor(0xffffffff, {}),
           appBarTheme: Theme.of(context).appBarTheme.copyWith(
                 color: Colors.transparent,
                 elevation: 0,
               ),
           scaffoldBackgroundColor: Colors.transparent,
           canvasColor: Colors.white,
+          buttonTheme: ButtonThemeData(
+              minWidth: double.maxFinite,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              buttonColor: Configuration().incomeColor,
+              height: 52,
+              textTheme: ButtonTextTheme.normal),
         ),
         routes: {
           '/': (context) => SplashScreen(),
@@ -61,13 +69,21 @@ class _WrapperPageState extends State<WrapperPage> {
         title: 'MunshiG',
         theme: ThemeData(
           brightness: Brightness.dark,
-          primarySwatch: MaterialColor(0xffffffff, {}),
+          // primarySwatch: MaterialColor(0xffffffff, {}),
           appBarTheme: Theme.of(context).appBarTheme.copyWith(
                 color: Colors.transparent,
                 elevation: 0,
               ),
           scaffoldBackgroundColor: Colors.transparent,
           canvasColor: Configuration().appColor,
+          buttonTheme: ButtonThemeData(
+              minWidth: double.maxFinite,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              buttonColor: Configuration().incomeColor,
+              height: 52,
+              textTheme: ButtonTextTheme.normal),
         ),
         onGenerateRoute: onGenerateRoute,
         routes: {

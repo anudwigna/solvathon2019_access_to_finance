@@ -67,31 +67,33 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ],
       ),
       backgroundColor: Configuration().appColor,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(
-                left: ScreenSizeConfig.blockSizeHorizontal * 10, right: 10),
-            child: headerWidget(),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Divider(
-            color: Colors.grey.withOpacity(0.2),
-            thickness: 5,
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-                left: ScreenSizeConfig.blockSizeHorizontal * 7, right: 10),
-            child: detailsWidget(),
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(
+                  left: ScreenSizeConfig.blockSizeHorizontal * 10, right: 10),
+              child: headerWidget(),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Divider(
+              color: Colors.grey.withOpacity(0.2),
+              thickness: 5,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  left: ScreenSizeConfig.blockSizeHorizontal * 7, right: 10),
+              child: detailsWidget(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -106,13 +108,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Container(
+              // padding: const EdgeInsets.symmetric(vertical: 5),
               decoration: BoxDecoration(
                   border: Border.all(
-                      width: 10,
+                      width: 8,
                       style: BorderStyle.solid,
                       color: Colors.grey.withOpacity(0.19))),
               width: ScreenSizeConfig.blockSizeHorizontal * 40,
-              height: ScreenSizeConfig.blockSizeVertical * 32,
+              height: ScreenSizeConfig.blockSizeVertical * 30,
               child: (user?.image != null)
                   ? (Image.file(
                       File(user.image),

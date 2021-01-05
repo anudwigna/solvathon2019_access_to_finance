@@ -372,69 +372,66 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                         SizedBox(
                           height: ScreenSizeConfig.blockSizeHorizontal * 6,
                         ),
-                        Container(
-                          width: double.maxFinite,
-                          child: RaisedButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            color: Configuration().incomeColor,
-                            onPressed: () async {
-                              FocusScope.of(context)
-                                  .requestFocus(new FocusNode());
-                              if (dateTime == null) {}
-                              if (_formKey.currentState.validate()) {
-                                String imageDir;
-                                if (image != null) {
-                                  Directory dir =
-                                      await getApplicationSupportDirectory();
-                                  String ext = image.path
-                                      .split('/')
-                                      .last
-                                      .split('.')
-                                      .last;
-                                  imageDir = dir.path +
-                                      '/avatar' +
-                                      DateTime.now()
-                                          .toString()
-                                          .replaceAll(' ', '') +
-                                      "." +
-                                      ext;
-                                  try {
-                                    await image.copy(imageDir);
-                                  } catch (e) {
-                                    _scaffoldKey.currentState
-                                        .removeCurrentSnackBar();
-                                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                        content: AdaptiveText(
-                                            'Error, Image cannot be uploaded')));
-                                    return;
-                                  }
-                                }
-                                User user = User(
-                                    address: addressController.text.trim(),
-                                    dob: dateTime,
-                                    emailAddress: emailController.text.trim(),
-                                    gender: genderValue,
-                                    image: (imageDir != null) ? imageDir : null,
-                                    name: fnameController.text.trim() +
-                                        ' ' +
-                                        lnameController.text.trim(),
-                                    phonenumber: phoneNumberController.text);
-                                if (widget.userData == null) {
-                                  addNewUser(user);
-                                } else {
-                                  await UserService().updateUser(user);
-                                  Navigator.pop(context);
+                        FlatButton(
+                          // shape: RoundedRectangleBorder(
+                          //     borderRadius: BorderRadius.circular(8)),
+                          color: Configuration().incomeColor,
+                          onPressed: () async {
+                            FocusScope.of(context)
+                                .requestFocus(new FocusNode());
+                            if (dateTime == null) {}
+                            if (_formKey.currentState.validate()) {
+                              String imageDir;
+                              if (image != null) {
+                                Directory dir =
+                                    await getApplicationSupportDirectory();
+                                String ext = image.path
+                                    .split('/')
+                                    .last
+                                    .split('.')
+                                    .last;
+                                imageDir = dir.path +
+                                    '/avatar' +
+                                    DateTime.now()
+                                        .toString()
+                                        .replaceAll(' ', '') +
+                                    "." +
+                                    ext;
+                                try {
+                                  await image.copy(imageDir);
+                                } catch (e) {
+                                  _scaffoldKey.currentState
+                                      .removeCurrentSnackBar();
+                                  _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                      content: AdaptiveText(
+                                          'Error, Image cannot be uploaded')));
+                                  return;
                                 }
                               }
-                            },
-                            child: AdaptiveText(
-                              'Save',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.white),
-                            ),
+                              User user = User(
+                                  address: addressController.text.trim(),
+                                  dob: dateTime,
+                                  emailAddress: emailController.text.trim(),
+                                  gender: genderValue,
+                                  image: (imageDir != null) ? imageDir : null,
+                                  name: fnameController.text.trim() +
+                                      ' ' +
+                                      lnameController.text.trim(),
+                                  phonenumber: phoneNumberController.text);
+                              if (widget.userData == null) {
+                                addNewUser(user);
+                              } else {
+                                await UserService().updateUser(user);
+                                Navigator.pop(context);
+                              }
+                            }
+                          },
+                          child: AdaptiveText(
+                            'Save',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white),
                           ),
                         )
                       ],

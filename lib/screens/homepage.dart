@@ -218,75 +218,70 @@ class HomePageState extends State<HomePage>
                       );
                     },
                   ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Column(
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TransactionPage(
-                                  0,
-                                  selectedSubSector: selectedSubSector,
-                                ),
-                              ),
-                            ).then((onValue) {
-                              if (onValue ?? false) {
-                                updateChartData();
-                              }
-                            }),
-                            child: Column(
-                              children: <Widget>[
-                                circularComponent(true),
-                                AdaptiveText(
-                                  'Cash In',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 14,
-                                    color: const Color(0xff1e1e1e),
-                                    height: 2.0833333333333335,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                  Column(
+                    children: <Widget>[
+                      InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionPage(
+                              0,
+                              selectedSubSector: selectedSubSector,
                             ),
                           ),
-                          SizedBox(height: 10),
-                          InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TransactionPage(
-                                  1,
-                                  selectedSubSector: selectedSubSector,
-                                ),
+                        ).then((onValue) {
+                          if (onValue ?? false) {
+                            updateChartData();
+                          }
+                        }),
+                        child: Column(
+                          children: <Widget>[
+                            circularComponent(true),
+                            AdaptiveText(
+                              'Cash In',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                color: const Color(0xff1e1e1e),
+                                height: 2.0833333333333335,
                               ),
-                            ).then((onValue) {
-                              if (onValue ?? false) {
-                                updateChartData();
-                              }
-                            }),
-                            child: Column(
-                              children: <Widget>[
-                                circularComponent(false),
-                                AdaptiveText(
-                                  'Cash out',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 14,
-                                    color: const Color(0xff1e1e1e),
-                                    height: 2.0833333333333335,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 10),
+                      InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionPage(
+                              1,
+                              selectedSubSector: selectedSubSector,
+                            ),
+                          ),
+                        ).then((onValue) {
+                          if (onValue ?? false) {
+                            updateChartData();
+                          }
+                        }),
+                        child: Column(
+                          children: <Widget>[
+                            circularComponent(false),
+                            AdaptiveText(
+                              'Cash out',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 14,
+                                color: const Color(0xff1e1e1e),
+                                height: 2.0833333333333335,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(width: 20.0),
                 ],
@@ -294,19 +289,19 @@ class HomePageState extends State<HomePage>
             ),
             Text(
               language == Lang.EN
-                  ? 'Overview for the month of  ${NepaliDateFormat("MMMM").format(date)}'
+                  ? 'Overview for the month of ${NepaliDateFormat("MMMM").format(date)}'
                   : '${NepaliDateFormat("MMMM", Language.nepali).format(date)} महिनाको विस्तृत सर्वेक्षण',
               style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 16,
-                  color: const Color(0xffb2b2b2),
+                  color: Colors.black,
                   height: 1.4285714285714286,
-                  fontWeight: FontWeight.bold),
+                  fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              height: 10.0,
-            ),
+            // SizedBox(
+            //   height: 5.0,
+            // ),
             Divider(
               color: Colors.grey.withOpacity(0.5),
               thickness: 2,
@@ -336,7 +331,7 @@ class HomePageState extends State<HomePage>
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
                                   fontSize: 14,
-                                  color: const Color(0xff272b37),
+                                  color: Colors.grey,
                                   height: 1.4285714285714286,
                                 ),
                                 textAlign: TextAlign.center,

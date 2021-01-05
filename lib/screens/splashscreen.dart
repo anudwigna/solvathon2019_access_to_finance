@@ -143,7 +143,7 @@ class LanguagePreferencePage extends StatelessWidget {
               },
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 7),
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 7),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -177,7 +177,7 @@ class LanguagePreferencePage extends StatelessWidget {
                     builder: (context) => UserInfoRegistrationPage()));
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 7),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 7),
                 child: Row(
                   children: <Widget>[
                     Expanded(
