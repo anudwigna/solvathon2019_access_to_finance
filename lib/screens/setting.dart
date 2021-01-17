@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/config/routes.dart';
+import 'package:MunshiG/models/database_and_store.dart';
+import '../services/transaction_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
@@ -12,6 +14,8 @@ import 'package:MunshiG/models/account/account.dart';
 import 'package:MunshiG/services/account_service.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/preference_service.dart';
+import '../models/app_page_naming.dart';
+import '../services/activity_tracking.dart';
 
 class Settings extends StatefulWidget {
 //0=First time page , 1= Settings page from inapp
@@ -29,12 +33,34 @@ class _SettingsState extends State<Settings> {
   final Color selectedColor = Configuration().expenseColor;
   final Color unSelectedColor = Configuration().incomeColor.withOpacity(0.8);
   //Color(0xff7133BF);
+
+  @override
+  void initState() {
+    if (widget.type == 1) {
+      ActivityTracker()
+          .pageTransactionActivity(PageName.setting, action: 'Opened');
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (widget.type == 1) {
+      ActivityTracker()
+          .pageTransactionActivity(PageName.setting, action: 'Closed');
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: widget.type == 1,
-        title: AdaptiveText("Select your preferences"),
+        title: AdaptiveText(
+          "Select your preferences",
+          style: TextStyle(fontSize: 17),
+        ),
       ),
       drawer: (widget.type == 0) ? Container() : MyDrawer(),
       backgroundColor: Configuration().appColor,
@@ -79,10 +105,14 @@ class _SettingsState extends State<Settings> {
                               shrinkWrap: true,
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                      childAspectRatio: 1.35,
+                                      childAspectRatio: 1.4,
                                       mainAxisSpacing: 20,
                                       crossAxisSpacing: 10,
-                                      crossAxisCount: 2),
+                                      crossAxisCount:
+                                          MediaQuery.of(context).size.width <
+                                                  550
+                                              ? 2
+                                              : 3),
                               itemCount: snapshot.data.length,
                               itemBuilder: (context, index) {
                                 return InkWell(
@@ -110,21 +140,24 @@ class _SettingsState extends State<Settings> {
                                                       ? selectedColor
                                                       : unSelectedColor,
                                                   width: 2)),
-                                          child: Center(
-                                            child: Image.asset(
-                                              'assets/${snapshot.data[index].toString().toLowerCase()}_logo.png',
-                                              fit: BoxFit.contain,
-                                              width: ScreenSizeConfig
-                                                      .blockSizeHorizontal *
-                                                  16,
-                                              color: (_subSectorsData.contains(
-                                                          snapshot
-                                                              .data[index]) ||
-                                                      _newSelectedSubSectors
-                                                          .contains(snapshot
-                                                              .data[index]))
-                                                  ? selectedColor
-                                                  : unSelectedColor,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Center(
+                                              child: Image.asset(
+                                                'assets/${snapshot.data[index].toString().toLowerCase()}_logo.png',
+                                                // fit: BoxFit.fill,
+                                                // width: ScreenSizeConfig
+                                                //         .blockSizeHorizontal *
+                                                //     16,
+                                                color: (_subSectorsData
+                                                            .contains(snapshot
+                                                                .data[index]) ||
+                                                        _newSelectedSubSectors
+                                                            .contains(snapshot
+                                                                .data[index]))
+                                                    ? selectedColor
+                                                    : unSelectedColor,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -164,7 +197,7 @@ class _SettingsState extends State<Settings> {
                                         if (_subSectorsData
                                             .contains(snapshot.data[index])) {
                                           _key.currentState.showSnackBar(SnackBar(
-                                              content: Text(
+                                              content: AdaptiveText(
                                                   "Selected Sub Sectors cannot be removed")));
                                         } else {
                                           _newSelectedSubSectors
@@ -191,77 +224,87 @@ class _SettingsState extends State<Settings> {
                   padding: const EdgeInsets.all(14.0),
                   child: Align(
                     alignment: Alignment.bottomCenter,
-                    child: RaisedButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40)),
+                    child: FlatButton(
                       color: Configuration().incomeColor,
                       onPressed: () async {
-                        if (widget.type == 0) {
-                          if (_subSectorsData.length > 0) {
-                            showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) {
-                                  return Center(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                });
-                            PreferenceService.instance.setIsFirstStart(false);
-                            await PreferenceService.instance
-                                .setSelectedSubSector(_subSectorsData[0]);
-                            await PreferenceService.instance
-                                .setSubSectors(_subSectorsData);
-                            globals.subSectors = _subSectorsData;
-                            globals.selectedSubSector = _subSectorsData[0];
-                            Future.delayed(Duration(seconds: 1), () async {
-                              globals.incomeCategories = await CategoryService()
-                                  .getCategories(globals.selectedSubSector,
-                                      CategoryType.INCOME);
-                              globals.expenseCategories =
-                                  await CategoryService().getCategories(
-                                      globals.selectedSubSector,
-                                      CategoryType.EXPENSE);
-                            });
-                            await _loadCategories(_subSectorsData);
-                            await Future.delayed(Duration(seconds: 2));
-                            Navigator.pushNamedAndRemoveUntil(context, wrapper,
-                                (Route<dynamic> route) => false);
-                          } else {
-                            _key.currentState.showSnackBar(SnackBar(
-                              content:
-                                  Text('At least one options must be selected'),
-                              backgroundColor: Colors.red,
-                            ));
+                        // print('dsasd');
+                        // return;
+                        try {
+                          if (widget.type == 0) {
+                            if (_subSectorsData.length > 0) {
+                              showFullBodyLoader(context);
+                              await PreferenceService.instance
+                                  .setSelectedSubSector(_subSectorsData[0]);
+                              await PreferenceService.instance
+                                  .setSubSectors(_subSectorsData);
+                              globals.subSectors = _subSectorsData;
+                              globals.selectedSubSector = _subSectorsData[0];
+                              Future.delayed(Duration(seconds: 1), () async {
+                                globals.incomeCategories =
+                                    await CategoryService().getCategories(
+                                        globals.selectedSubSector,
+                                        CategoryType.INCOME);
+                                globals.expenseCategories =
+                                    await CategoryService().getCategories(
+                                        globals.selectedSubSector,
+                                        CategoryType.EXPENSE);
+                              });
+                              await _loadCategories(_subSectorsData);
+                              PreferenceService.instance.setIsFirstStart(false);
+                              await Future.delayed(Duration(seconds: 2));
+                              Navigator.pushNamedAndRemoveUntil(context,
+                                  wrapper, (Route<dynamic> route) => false);
+                            } else {
+                              _key.currentState.showSnackBar(SnackBar(
+                                content: AdaptiveText(
+                                  'At least one options must be selected',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ));
+                            }
+                          } else if (widget.type == 1) {
+                            _key.currentState.removeCurrentSnackBar();
+                            if (_newSelectedSubSectors.length > 0) {
+                              showFullBodyLoader(context);
+                              globals.subSectors.addAll(_newSelectedSubSectors);
+                              await PreferenceService.instance
+                                  .setSubSectors(globals.subSectors);
+                              await _loadCategories(_newSelectedSubSectors);
+                              _newSelectedSubSectors.clear();
+                              Navigator.of(context, rootNavigator: true).pop();
+                              _key.currentState.showSnackBar(SnackBar(
+                                content: AdaptiveText(
+                                  'New Preference has been added',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.green,
+                              ));
+                            } else {
+                              _key.currentState.showSnackBar(SnackBar(
+                                content: AdaptiveText(
+                                  'No changes has been made',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ));
+                            }
                           }
-                        } else if (widget.type == 1) {
-                          _key.currentState.removeCurrentSnackBar();
-                          if (_newSelectedSubSectors.length > 0) {
-                            globals.subSectors.addAll(_newSelectedSubSectors);
-                            await PreferenceService.instance
-                                .setSubSectors(globals.subSectors);
-                            await _loadCategories(_newSelectedSubSectors);
-                            _newSelectedSubSectors.clear();
-                            _key.currentState.showSnackBar(SnackBar(
-                              content:
-                                  AdaptiveText('New Preference has been added'),
-                              backgroundColor: Colors.green,
-                            ));
-                          } else {
-                            _key.currentState.showSnackBar(SnackBar(
-                              content: AdaptiveText('No Changes has been made'),
-                              backgroundColor: Colors.red,
-                            ));
-                          }
+                        } catch (e) {
+                          print(e);
+                          Navigator.of(context, rootNavigator: true).pop();
+                          _key.currentState.showSnackBar(SnackBar(
+                            content: AdaptiveText(
+                              'Error Creating Preferences, Please try Again',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                          ));
                         }
                       },
-                      child: Container(
-                        width: double.maxFinite,
-                        color: Colors.transparent,
-                        alignment: Alignment.center,
-                        child: AdaptiveText(
-                          'Submit',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                      child: AdaptiveText(
+                        'Submit',
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -282,35 +325,36 @@ class _SettingsState extends State<Settings> {
   }
 
   Future<void> _loadCategories(List<dynamic> _subSectors) async {
-    // for (String _subSector in _subSectors) {
-    for (int i = 0; i < _subSectors.length; i++) {
-      String _subSector = _subSectors[i];
-      var incomeDbStore = await CategoryService()
-          .getDatabaseAndStore(_subSector, CategoryType.INCOME);
-      var expenseDbStore = await CategoryService()
-          .getDatabaseAndStore(_subSector, CategoryType.EXPENSE);
-      var _incomeCategories = await CategoryService()
-          .getStockCategories(_subSector, CategoryType.INCOME);
-      var _expenseCategories = await CategoryService()
-          .getStockCategories(_subSector, CategoryType.EXPENSE);
-      _incomeCategories.forEach(
-        (category) async {
+    final db = await TransactionService().getDatabaseAndStore(_subSectors[0]);
+    await db.database.transaction((transaction) async {
+      for (int i = 0; i < _subSectors.length; i++) {
+        String _subSector = _subSectors[i];
+        var incomeDbStore = await CategoryService()
+            .getDatabaseAndStore(_subSector, CategoryType.INCOME);
+        var expenseDbStore = await CategoryService()
+            .getDatabaseAndStore(_subSector, CategoryType.EXPENSE);
+        var _incomeCategories = await CategoryService()
+            .getStockCategories(_subSector, CategoryType.INCOME);
+        var _expenseCategories = await CategoryService()
+            .getStockCategories(_subSector, CategoryType.EXPENSE);
+        for (int i = 0; i < _incomeCategories.length; i++) {
+          final category = _incomeCategories[i];
           await incomeDbStore.store.record(category.id).put(
                 incomeDbStore.database,
                 category.toJson(),
               );
-        },
-      );
-
-      _expenseCategories.forEach(
-        (category) async {
+        }
+        for (int i = 0; i < _expenseCategories.length; i++) {
+          final category = _expenseCategories[i];
           await expenseDbStore.store.record(category.id).put(
                 expenseDbStore.database,
                 category.toJson(),
               );
-        },
-      );
-    }
+        }
+      }
+    }).catchError((onError) {
+      throw (onError);
+    });
 
     if (widget.type == 0) {
       // globals.selectedSubSector = _subSectors[0];
@@ -332,13 +376,29 @@ class _SettingsState extends State<Settings> {
       );
       if ((!ll) ?? false)
         await AccountService().addAccount(
-          Account(
-            name: 'Cash',
-            type: 2,
-            balance: '0',
-            transactionIds: [],
-          ),
-        );
+            Account(
+              name: 'Cash',
+              type: 2,
+              balance: '0',
+              transactionIds: [],
+            ),
+            true);
     }
   }
+}
+
+showFullBodyLoader(BuildContext context) {
+  showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return WillPopScope(
+          onWillPop: () async {
+            return false;
+          },
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      });
 }

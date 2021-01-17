@@ -12,6 +12,8 @@ import 'package:MunshiG/services/preference_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
+import '../services/activity_tracking.dart';
+import '../models/app_page_naming.dart';
 
 enum CategoryType { INCOME, EXPENSE }
 
@@ -73,6 +75,7 @@ class CategoryService {
       'id': isStockCategory ? category.id : currentIndex,
       'en': category.en,
       'np': category.np,
+      'categoryHeadingId': category.categoryHeadingId,
       'iconName': category.iconName,
     });
     type == CategoryType.EXPENSE
@@ -85,19 +88,25 @@ class CategoryService {
             .setCurrentIncomeCategoryIndex(currentIndex + 1);
   }
 
-  Future deleteCategory(
-      String subSector, int categoryId, CategoryType type) async {
+  Future deleteCategory(String subSector, int categoryId, CategoryType type,
+      bool isAutomated) async {
     var dbStore = await getDatabaseAndStore(subSector, type);
     Finder finder = Finder(filter: Filter.equals('id', categoryId));
     await TransactionService()
         .deleteAllTransactionsForCategory(subSector, categoryId);
     await BudgetService().deleteBudgetsForCategory(subSector, categoryId);
-    await dbStore.store.delete(dbStore.database, finder: finder);
+    int v = await dbStore.store.delete(dbStore.database, finder: finder);
     if (type == CategoryType.EXPENSE) {
       globals.expenseCategories = await getCategories(subSector, type);
     } else {
       globals.incomeCategories = await getCategories(subSector, type);
     }
+    if (!(isAutomated ?? true))
+      ActivityTracker().otherActivityOnPage(
+          PageName.categories,
+          'Delete ${type.toString()} Category For $subSector',
+          'Delete',
+          'FlatButton');
   }
 
   Future refreshCategories(String subSector, List<Category> categories,
@@ -123,5 +132,89 @@ class CategoryService {
           (category) => Category.fromJson(category),
         )
         .toList();
+  }
+
+  Future<void> changeNepaliCategoryName(String oldCategoryName,
+      String nepaliCatgeoryName, String subSector, CategoryType type) async {
+    var dbStore = await getDatabaseAndStore(subSector, type);
+    Finder finder = Finder(filter: Filter.equals('en', oldCategoryName));
+    var snapshot =
+        await dbStore.store.findFirst(dbStore.database, finder: finder);
+    if (snapshot == null) return;
+    final Category categoryService = Category(
+        id: snapshot.value['id'],
+        en: snapshot.value['en'],
+        categoryHeadingId: snapshot.value['categoryHeadingId'],
+        iconName: snapshot.value['iconName'],
+        np: nepaliCatgeoryName);
+    await dbStore.store
+        .update(dbStore.database, categoryService.toJson(), finder: finder);
+    await dbStore.store.findFirst(dbStore.database, finder: finder);
+  }
+
+  Future addUpdatedCategoryIfNotExists(String subSector, Category category,
+      {@required CategoryType type, bool isStockCategory = false}) async {
+    var dbStore = await getDatabaseAndStore(subSector, type);
+    int isDatabasePopulated =
+        (await dbStore.store.find(dbStore.database)).length;
+    if (isDatabasePopulated < 1) {
+      print('database not poulated $subSector' + category.en);
+      return;
+    }
+    print('database populated $subSector');
+    int currentIndex = type == CategoryType.EXPENSE
+        ? await PreferenceService.instance.getCurrentExpenseCategoryIndex()
+        : await PreferenceService.instance.getCurrentIncomeCategoryIndex();
+
+    Filter filter = Filter.and([
+      Filter.equals('categoryHeadingId', category.categoryHeadingId),
+      Filter.equals('en', category.en),
+      Filter.equals('np', category.np),
+    ]);
+    final checkExists =
+        await dbStore.store.count(dbStore.database, filter: filter);
+    if (checkExists > 0) return;
+    await dbStore.store.add(dbStore.database, {
+      'id': isStockCategory ? category.id : currentIndex,
+      'en': category.en,
+      'np': category.np,
+      'categoryHeadingId': category.categoryHeadingId,
+      'iconName': category.iconName,
+    });
+    type == CategoryType.EXPENSE
+        ? globals.expenseCategories.add(category)
+        : globals.incomeCategories.add(category);
+    type == CategoryType.EXPENSE
+        ? await PreferenceService.instance
+            .setCurrentExpenseCategoryIndex(currentIndex + 1)
+        : await PreferenceService.instance
+            .setCurrentIncomeCategoryIndex(currentIndex + 1);
+  }
+
+  Future<void> changeCategoryName(
+    String oldCategoryName,
+    String newCategoryName,
+    String subSector,
+    CategoryType type, {
+    String nepaliCatgeoryName,
+  }) async {
+    var dbStore = await getDatabaseAndStore(subSector, type);
+    Finder finder = Finder(filter: Filter.equals('en', oldCategoryName));
+    var snapshot =
+        await dbStore.store.findFirst(dbStore.database, finder: finder);
+    if (snapshot == null) return;
+    final Category categoryService = Category(
+        id: snapshot.value['id'],
+        en: newCategoryName,
+        categoryHeadingId: snapshot.value['categoryHeadingId'],
+        iconName: snapshot.value['iconName'],
+        np: nepaliCatgeoryName ?? snapshot.value['np']);
+    await dbStore.store
+        .update(dbStore.database, categoryService.toJson(), finder: finder);
+    await dbStore.store.findFirst(dbStore.database, finder: finder);
+  }
+  Future<void>closeDatabase(String subsector) async {
+    final db = await getDatabaseAndStore(subsector,CategoryType.INCOME);
+    await db.database.close();
   }
 }

@@ -10,6 +10,7 @@ import 'package:MunshiG/screens/setting.dart';
 import 'package:MunshiG/screens/userProfilepage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../screens/backup_page.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
   WidgetBuilder builder;
@@ -36,7 +37,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       }
     case backup:
       {
-        builder = (BuildContext _) => BackUpAndRestore();
+        builder = (BuildContext _) => BackUpPage();
         break;
       }
     case budget:

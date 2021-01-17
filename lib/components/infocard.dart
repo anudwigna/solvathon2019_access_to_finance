@@ -1,70 +1,72 @@
 import 'package:MunshiG/config/configuration.dart';
+import 'package:MunshiG/config/globals.dart';
 import 'package:MunshiG/models/exportmodel.dart';
-
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import '../components/adaptive_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nepali_utils/nepali_utils.dart';
 
 class InfoCard extends StatelessWidget {
-  final ExportDataModel groupedData;
+  final ExportDataModel budgetData;
+  final ExportDataModel transactionData;
+
   final TextStyle textStyle = TextStyle(
     color: Configuration().incomeColor,
     fontSize: 17,
   );
   final TextStyle nameTextStyle = TextStyle(
-    color: Configuration().incomeColor,
-    fontWeight: FontWeight.bold,
+    color: Colors.grey,
+    // fontWeight: FontWeight.bold,
     fontSize: 18,
   );
 
-  InfoCard({Key key, this.groupedData}) : super(key: key);
-
-  Widget verticalDiv() {
-    return Container(
-      color: Colors.blue,
-      height: 28,
-      width: 2,
-    );
-  }
+  InfoCard({Key key, this.budgetData, this.transactionData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Material(
         elevation: 8,
         color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
-          padding: const EdgeInsets.all(5.0),
+          padding: const EdgeInsets.symmetric(vertical: 15),
           child: ListTile(
             title: Row(
               children: <Widget>[
                 Text(
-                  'Date: ',
-                  style: nameTextStyle,
-                ),
-                Text(
-                  groupedData.date,
-                  style: textStyle,
+                  budgetData.date.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
             subtitle: Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Expanded(
-                        child: subtitleInfo(
-                            'cash inflow', groupedData.inflow.toString() ?? ''),
+                        child: subtitleInfo('projected', budgetData),
                       ),
-                      verticalDiv(),
-                      Expanded(
-                          child: subtitleInfo(
-                              'cash OutFlow', groupedData.outflow.toString())),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      // verticalDiv(),
+                      Expanded(child: subtitleInfo('real', transactionData)),
                     ],
                   )
                 ],
@@ -76,23 +78,69 @@ class InfoCard extends StatelessWidget {
     );
   }
 
-  Widget subtitleInfo(String title, String value) {
+  Widget subtitleInfo(String title, ExportDataModel value) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        AdaptiveText(
           title.toUpperCase(),
-          textAlign: TextAlign.center,
           style: TextStyle(
-              fontSize: 15, color: Colors.grey, fontWeight: FontWeight.bold),
+              fontSize: 15, color: Colors.black, fontWeight: FontWeight.w500),
         ),
         SizedBox(
-          height: 2,
+          height: 5,
         ),
-        Text(
-          value,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: Colors.grey),
+        getRowValue(
+          svgImageName: 'arrow_right',
+          value: value.inflow,
         ),
+        getRowValue(
+          svgImageName: 'arrow_left',
+          value: value.outflow,
+        ),
+        getRowValue(
+            svgImageName: 'monthly_surplus',
+            value: value.inflowMINUSoutflow,
+            valueColor: Colors.green),
+        getRowValue(
+            svgImageName: 'cumulative_surplus',
+            value: value.cf,
+            valueColor: Colors.green),
+      ],
+    );
+  }
+
+  getRowValue({
+    String svgImageName,
+    double value,
+    Color valueColor = Colors.black,
+  }) {
+    return Row(
+      children: [
+        if (svgImageName != null)
+          SvgPicture.asset('assets/images/$svgImageName.svg',
+              width: 18, color: Colors.black),
+        SizedBox(
+          width: 4,
+        ),
+        Flexible(
+          child: Text(
+            (value.isNegative ? '(' : '') +
+                NepaliNumberFormat(
+                        decimalDigits: 0,
+                        language: (language == 'en')
+                            ? Language.english
+                            : Language.nepali)
+                    .format((value.abs())) +
+                (value.isNegative ? ')' : ''),
+            style: TextStyle(
+                fontSize: 18,
+                color:
+                    value.isNegative ? Colors.red : valueColor ?? Colors.black,
+                fontWeight: FontWeight.w500),
+          ),
+        )
       ],
     );
   }

@@ -9,6 +9,8 @@ import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/preference_service.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
+import '../services/activity_tracking.dart';
+import '../models/app_page_naming.dart';
 
 class TransactionService {
   TransactionService._();
@@ -98,7 +100,7 @@ class TransactionService {
   ///
   /// Adds new transaction record if record doesn't exist. Returns TransactionId.
   Future<int> updateTransaction(
-      String subSector, t.Transaction transaction) async {
+      String subSector, t.Transaction transaction, bool isAutomated) async {
     int transactionId;
     var dbStore = await getDatabaseAndStore(subSector);
     Filter checkRecord = Filter.equals(
@@ -134,10 +136,21 @@ class TransactionService {
       await PreferenceService.instance
           .setCurrentTransactionIndex(currentIndex + 1);
     }
+    if (!(isAutomated ?? true))
+      ActivityTracker().otherActivityOnPage(
+          (transaction.transactionType == 0
+              ? PageName.addCashIn
+              : PageName.addCashOut),
+          (recordFound ? 'Update' : 'Add') +
+              (transaction.transactionType == 0 ? 'Income' : 'Expense') +
+              ' Transaction $subSector, ${transaction.name}, ${transaction.timestamp}',
+          'Submit',
+          'FlatButton');
     return transactionId;
   }
 
-  Future deleteTransaction(String subSector, t.Transaction transaction) async {
+  Future deleteTransaction(
+      String subSector, t.Transaction transaction, bool isAutomated) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.equals(
@@ -153,41 +166,51 @@ class TransactionService {
       int newBalance =
           int.parse(_associatedAccount.balance) - int.parse(transaction.amount);
       await AccountService().updateAccount(
-        Account(
-          name: _associatedAccount.name,
-          type: _associatedAccount.type,
-          transactionIds: _associatedAccount.transactionIds,
-          balance: '$newBalance',
-        ),
-      );
+          Account(
+            name: _associatedAccount.name,
+            type: _associatedAccount.type,
+            transactionIds: _associatedAccount.transactionIds,
+            balance: '$newBalance',
+          ),
+          true);
     } else {
       int newBalance =
           int.parse(_associatedAccount.balance) + int.parse(transaction.amount);
       await AccountService().updateAccount(
-        Account(
-          name: _associatedAccount.name,
-          type: _associatedAccount.type,
-          transactionIds: _associatedAccount.transactionIds,
-          balance: '$newBalance',
-        ),
-      );
+          Account(
+            name: _associatedAccount.name,
+            type: _associatedAccount.type,
+            transactionIds: _associatedAccount.transactionIds,
+            balance: '$newBalance',
+          ),
+          true);
     }
     if (transaction.transactionType == 1) {
       Budget budget = await BudgetService().getBudget(subSector,
           transaction.categoryId, transaction.month, transaction.year);
       int newSpent = int.parse(budget.spent) - int.parse(transaction.amount);
       await BudgetService().updateBudget(
-        subSector,
-        Budget(
-          categoryId: budget.categoryId,
-          month: budget.month,
-          spent: '$newSpent',
-          total: budget.total,
-          year: budget.year,
-        ),
-      );
+          subSector,
+          Budget(
+            categoryId: budget.categoryId,
+            month: budget.month,
+            spent: '$newSpent',
+            total: budget.total,
+            year: budget.year,
+          ),
+          true);
     }
     await dbStore.store.delete(dbStore.database, finder: finder);
+    if (!(isAutomated ?? true))
+      ActivityTracker().otherActivityOnPage(
+          (transaction.transactionType == 0
+              ? PageName.addCashIn
+              : PageName.addCashOut),
+          'Delete' +
+              (transaction.transactionType == 0 ? 'Income' : 'Expense') +
+              ' Transaction $subSector, ${transaction.name}, ${transaction.timestamp}',
+          'Delete',
+          'FlatButton');
   }
 
   Future deleteAllTransactionsForCategory(
@@ -200,5 +223,10 @@ class TransactionService {
       ),
     );
     await dbStore.store.delete(dbStore.database, finder: finder);
+  }
+
+  Future<void>closeDatabase(String subsector) async {
+    final db = await getDatabaseAndStore(subsector);
+    await db.database.close();
   }
 }

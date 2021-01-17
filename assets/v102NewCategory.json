@@ -1,0 +1,76 @@
+{
+  "categories": {
+    "goat": {
+      "income": [
+        {
+          "id": 125,
+          "en": "Capital Investment",
+          "np": "पुंजी लगानी",
+          "iconName": "hornbill",
+          "categoryHeadingId": 101
+        },
+        {
+          "id": 126,
+          "en": "Loan",
+          "np": "ऋण",
+          "iconName": "hornbill",
+          "categoryHeadingId": 102
+        }
+      ]
+    },
+    "poultry": {
+      "income": [
+        {
+          "id": 125,
+          "en": "Capital Investment",
+          "np": "पुंजी लगानी",
+          "iconName": "hornbill",
+          "categoryHeadingId": 101
+        },
+        {
+          "id": 126,
+          "en": "Loan",
+          "np": "ऋण",
+          "iconName": "hornbill",
+          "categoryHeadingId": 102
+        }
+      ]
+    },
+    "vegetable": {
+      "income": [
+        {
+          "id": 125,
+          "en": "Capital Investment",
+          "np": "पुंजी लगानी",
+          "iconName": "hornbill",
+          "categoryHeadingId": 101
+        },
+        {
+          "id": 126,
+          "en": "Loan",
+          "np": "ऋण",
+          "iconName": "hornbill",
+          "categoryHeadingId": 102
+        }
+      ]
+    },
+    "seed": {
+      "income": [
+        {
+          "id": 113,
+          "en": "Capital Investment",
+          "np": "पुंजी लगानी",
+          "iconName": "hornbill",
+          "categoryHeadingId": 101
+        },
+        {
+          "id": 114,
+          "en": "Loan",
+          "np": "ऋण",
+          "iconName": "hornbill",
+          "categoryHeadingId": 102
+        }
+      ]
+    }
+  }
+}

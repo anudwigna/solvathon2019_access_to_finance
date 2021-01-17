@@ -8,11 +8,13 @@ class DateSelector extends StatefulWidget {
   final int initialDateYear;
   final int initialMonth;
   final NepaliDateTime currentDate;
+  final Color textColor;
 
   const DateSelector({
     @required this.onDateChanged,
     this.currentDate,
     this.initialDateYear,
+    this.textColor,
     this.initialMonth,
   });
 
@@ -26,9 +28,7 @@ class _DateSelectorState extends State<DateSelector> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
     _selectedDateTime = widget.currentDate;
   }
 
@@ -67,17 +67,17 @@ class _DateSelectorState extends State<DateSelector> {
             isDense: true,
             contentPadding: EdgeInsets.symmetric(
               vertical: 4.0,
-              horizontal: 5.0,
+              horizontal: 0.0,
             ),
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
         child: Text(
           NepaliDateFormat("MMMM, y").format(_selectedDateTime),
           style: TextStyle(
-              color: Colors.grey, fontSize: 15, fontWeight: FontWeight.bold),
-          // textAlign: TextAlign.center,
+              color: widget.textColor ?? Colors.grey,
+              fontSize: 15,
+              fontWeight: FontWeight.bold),
         ),
-        // trailing: Icon(Icons.event),
       ),
     );
   }

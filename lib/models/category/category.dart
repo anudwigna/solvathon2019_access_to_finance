@@ -8,13 +8,9 @@ class Category {
   String en;
   String np;
   String iconName;
+  int categoryHeadingId;
 
-  Category({
-    this.id,
-    this.en,
-    this.np,
-    this.iconName,
-  });
+  Category({this.id, this.en, this.np, this.iconName, this.categoryHeadingId});
 
   factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);

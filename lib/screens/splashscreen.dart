@@ -46,9 +46,6 @@ class _SplashScreenState extends State<SplashScreen> {
           },
         );
       } else {
-        // await PreferenceService.instance.setLanguage('en');
-        // globals.language = 'en';
-
         await Future.delayed(Duration(seconds: 1));
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => LanguagePreferencePage()));
@@ -117,14 +114,14 @@ class LanguagePreferencePage extends StatelessWidget {
           children: <Widget>[
             Text(
               'Choose Your Language',
-              style: TextStyle(color: Colors.white, fontSize: 19),
+              style: TextStyle(color: Colors.white, fontSize: 17),
             ),
             SizedBox(
               height: 3,
             ),
             Text(
               'भाषा छान्नुहोस्',
-              style: TextStyle(color: Colors.white, fontSize: 20),
+              style: TextStyle(color: Colors.white, fontSize: 18),
             ),
             SizedBox(
               height: 40,
@@ -148,7 +145,7 @@ class LanguagePreferencePage extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                         child: Text(
-                      'Nepali',
+                      'नेपाली',
                       style: TextStyle(fontSize: 16),
                     )),
                     Image.asset(

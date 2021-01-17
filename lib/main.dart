@@ -6,10 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/homepage.dart';
-
 import 'package:MunshiG/screens/splashscreen.dart';
 import 'package:MunshiG/services/preference_service.dart';
-
 import 'config/globals.dart' as globals;
 
 void main() async {
@@ -27,24 +25,7 @@ class MunshiG extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MunshiG',
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          // primarySwatch: MaterialColor(0xffffffff, {}),
-          appBarTheme: Theme.of(context).appBarTheme.copyWith(
-                color: Colors.transparent,
-                elevation: 0,
-              ),
-          scaffoldBackgroundColor: Colors.transparent,
-          canvasColor: Colors.white,
-          buttonTheme: ButtonThemeData(
-              minWidth: double.maxFinite,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              buttonColor: Configuration().incomeColor,
-              height: 52,
-              textTheme: ButtonTextTheme.normal),
-        ),
+        theme: themeData,
         routes: {
           '/': (context) => SplashScreen(),
           wrapper: (context) => WrapperPage(),
@@ -53,6 +34,34 @@ class MunshiG extends StatelessWidget {
     );
   }
 }
+
+final ThemeData themeData = ThemeData(
+  fontFamily: 'Poppins',
+  brightness: Brightness.dark,
+  appBarTheme: AppBarTheme(
+    color: Colors.transparent,
+    elevation: 0,
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    errorStyle: TextStyle(fontSize: 12.0, color: Colors.red),
+  ),
+  scaffoldBackgroundColor: Colors.transparent,
+  canvasColor: Colors.white,
+  buttonColor: Configuration().incomeColor,
+  tabBarTheme: TabBarTheme(
+      indicator: BoxDecoration(
+    borderRadius: BorderRadius.circular(18),
+    color: Configuration().incomeColor,
+  )),
+  buttonTheme: ButtonThemeData(
+      minWidth: double.maxFinite,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      buttonColor: Configuration().incomeColor,
+      height: 52,
+      textTheme: ButtonTextTheme.normal),
+);
 
 class WrapperPage extends StatefulWidget {
   @override
@@ -67,24 +76,7 @@ class _WrapperPageState extends State<WrapperPage> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MunshiG',
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          // primarySwatch: MaterialColor(0xffffffff, {}),
-          appBarTheme: Theme.of(context).appBarTheme.copyWith(
-                color: Colors.transparent,
-                elevation: 0,
-              ),
-          scaffoldBackgroundColor: Colors.transparent,
-          canvasColor: Configuration().appColor,
-          buttonTheme: ButtonThemeData(
-              minWidth: double.maxFinite,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              buttonColor: Configuration().incomeColor,
-              height: 52,
-              textTheme: ButtonTextTheme.normal),
-        ),
+        theme: themeData,
         onGenerateRoute: onGenerateRoute,
         routes: {
           '/': (context) => HomePage(),

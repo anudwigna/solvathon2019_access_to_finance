@@ -1,6 +1,7 @@
 import 'dart:io';
-
+import '../providers/preference_provider.dart';
 import 'package:archive/archive.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +18,8 @@ import 'package:MunshiG/config/globals.dart';
 import 'package:MunshiG/models/user/user.dart';
 import 'package:MunshiG/screens/setting.dart';
 import 'package:MunshiG/services/user_service.dart';
+import '../services/activity_tracking.dart';
+import '../models/app_page_naming.dart';
 
 class UserInfoRegistrationPage extends StatefulWidget {
   final User userData;
@@ -43,17 +46,18 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
   OutlineInputBorder border = OutlineInputBorder(
       gapPadding: 0,
       borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.black, width: 1.5));
+      borderSide: BorderSide(color: Colors.grey, width: 1.5));
   TextStyle hintTextStyle = TextStyle(
       color: Colors.grey[700], fontSize: 14, fontWeight: FontWeight.w500);
   TextStyle titleStyle =
-      TextStyle(color: Colors.black, fontWeight: FontWeight.bold);
-
+      TextStyle(color: Colors.black, fontWeight: FontWeight.w400);
+  Lang language;
   @override
   void initState() {
     super.initState();
-    print(language);
     if (widget.userData != null) {
+      ActivityTracker()
+          .pageTransactionActivity(PageName.createProfile, action: 'Opened');
       addressController.text = widget.userData?.address ?? '';
       dateTime = widget.userData?.dob ?? null;
       emailController.text = widget.userData?.emailAddress ?? '';
@@ -70,7 +74,17 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
   }
 
   @override
+  void dispose() {
+    if (widget.userData != null) {
+      ActivityTracker()
+          .pageTransactionActivity(PageName.createProfile, action: 'Closed');
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    language = Provider.of<PreferenceProvider>(context).language;
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Configuration().appColor.withOpacity(0.7),
@@ -107,7 +121,10 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
       appBar: AppBar(
         elevation: 10,
         backgroundColor: Configuration().appColor,
-        title: AdaptiveText('Create Account'),
+        title: AdaptiveText(
+          'Create Account',
+          style: TextStyle(fontSize: 17),
+        ),
         centerTitle: true,
         actions: <Widget>[
           if (widget.userData == null)
@@ -145,6 +162,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                 shadowColor: Colors.black,
                 child: InkWell(
                     onTap: () async {
+                      FocusScope.of(context).requestFocus(new FocusNode());
                       bool callback = await checkPermission(_scaffoldKey);
                       if (!callback) {
                         return;
@@ -217,7 +235,9 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                               hintText: 'John',
                               title: 'First Name',
                               validator: (value) => value.trim.call().isEmpty
-                                  ? "First Name Required"
+                                  ? language == Lang.EN
+                                      ? "First Name Required"
+                                      : 'पहिलो नाम आवाश्यक छ'
                                   : null,
                             )),
                             SizedBox(
@@ -229,13 +249,15 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     hintText: 'Doe',
                                     validator: (value) =>
                                         value.trim.call().isEmpty
-                                            ? "First Name Required"
+                                            ? language == Lang.EN
+                                                ? "Last Name Required"
+                                                : 'थरआवाश्यक छ'
                                             : null,
                                     controller: lnameController)),
                           ],
                         ),
                         SizedBox(
-                          height: ScreenSizeConfig.blockSizeHorizontal * 4.5,
+                          height: 15,
                         ),
                         bodyField(
                             controller: phoneNumberController,
@@ -248,7 +270,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 ? "Invalid Phone Number"
                                 : null),
                         SizedBox(
-                          height: ScreenSizeConfig.blockSizeHorizontal * 4.5,
+                          height: 15,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -263,9 +285,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     style: titleStyle,
                                   ),
                                   SizedBox(
-                                    height:
-                                        ScreenSizeConfig.blockSizeHorizontal *
-                                            2,
+                                    height: 5,
                                   ),
                                   dateField()
                                 ],
@@ -284,65 +304,55 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     style: titleStyle,
                                   ),
                                   SizedBox(
-                                    height:
-                                        ScreenSizeConfig.blockSizeHorizontal *
-                                            2,
+                                    height: 5,
                                   ),
-                                  InputDecorator(
-                                    decoration: InputDecoration(
-                                        border: border,
-                                        enabledBorder: border,
-                                        disabledBorder: border,
-                                        focusedBorder: border,
-                                        errorBorder: OutlineInputBorder(
-                                            gapPadding: 0,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            borderSide: BorderSide(
-                                                color: Colors.red, width: 1.5)),
-                                        contentPadding:
-                                            const EdgeInsets.all(0)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10.0, right: 5),
-                                      child: Theme(
-                                        data:
-                                            ThemeData(cardColor: Colors.white),
-                                        child: DropdownButtonFormField<String>(
-                                            isExpanded: false,
-                                            validator: (value) {
-                                              return value != null
-                                                  ? null
-                                                  : 'Gender Required';
-                                            },
-                                            value: genderValue,
-                                            decoration: InputDecoration(
-                                              hintText: 'Gender',
-                                              hintStyle: hintTextStyle,
-                                              border: InputBorder.none,
-                                              disabledBorder: InputBorder.none,
-                                              enabledBorder: InputBorder.none,
-                                              focusedBorder: InputBorder.none,
-                                            ),
-                                            items: genders
-                                                .map((e) =>
-                                                    DropdownMenuItem<String>(
-                                                        value: e,
-                                                        child: Container(
-                                                            child: AdaptiveText(
-                                                          e,
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.black),
-                                                        ))))
-                                                .toList(),
-                                            onChanged: (value) {
-                                              setState(() {
-                                                genderValue = value;
-                                              });
-                                            }),
-                                      ),
-                                    ),
+                                  Theme(
+                                    data: ThemeData(cardColor: Colors.white),
+                                    child: DropdownButtonFormField<String>(
+                                        onTap: () {
+                                          FocusScope.of(context)
+                                              .requestFocus(new FocusNode());
+                                        },
+                                        isExpanded: true,
+                                        validator: (value) =>
+                                            genderValue == null ? '' : null,
+                                        hint: Text('Gender'),
+                                        decoration: InputDecoration(
+                                          hintText: '',
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  12, 12, 12, 13),
+                                          isDense: true,
+                                          border: border,
+                                          errorBorder: OutlineInputBorder(
+                                              gapPadding: 0,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              borderSide: BorderSide(
+                                                  color: Colors.red,
+                                                  width: 1.5)),
+                                          enabledBorder: border,
+                                          disabledBorder: border,
+                                          focusedBorder: border,
+                                        ),
+                                        value: genderValue,
+                                        items: genders
+                                            .map(
+                                                (e) => DropdownMenuItem<String>(
+                                                    value: e,
+                                                    child: Container(
+                                                        child: AdaptiveText(
+                                                      e,
+                                                      style: TextStyle(
+                                                          color: const Color(
+                                                              0xff272b37)),
+                                                    ))))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            genderValue = value;
+                                          });
+                                        }),
                                   ),
                                 ],
                               ),
@@ -350,7 +360,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                           ],
                         ),
                         SizedBox(
-                          height: ScreenSizeConfig.blockSizeHorizontal * 4.5,
+                          height: 15,
                         ),
                         bodyField(
                             controller: addressController,
@@ -360,7 +370,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 ? "Address Required"
                                 : null),
                         SizedBox(
-                          height: ScreenSizeConfig.blockSizeHorizontal * 4.5,
+                          height: 15,
                         ),
                         bodyField(
                             controller: emailController,
@@ -370,35 +380,22 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 ? "Email Address Required"
                                 : null),
                         SizedBox(
-                          height: ScreenSizeConfig.blockSizeHorizontal * 6,
+                          height: 15,
                         ),
                         FlatButton(
-                          // shape: RoundedRectangleBorder(
-                          //     borderRadius: BorderRadius.circular(8)),
                           color: Configuration().incomeColor,
                           onPressed: () async {
                             FocusScope.of(context)
                                 .requestFocus(new FocusNode());
-                            if (dateTime == null) {}
                             if (_formKey.currentState.validate()) {
                               String imageDir;
                               if (image != null) {
-                                Directory dir =
-                                    await getApplicationSupportDirectory();
-                                String ext = image.path
-                                    .split('/')
-                                    .last
-                                    .split('.')
-                                    .last;
-                                imageDir = dir.path +
-                                    '/avatar' +
-                                    DateTime.now()
-                                        .toString()
-                                        .replaceAll(' ', '') +
-                                    "." +
-                                    ext;
                                 try {
-                                  await image.copy(imageDir);
+                                  imageDir = (await Configuration().saveImage(
+                                          image,
+                                          'avatar',
+                                          DateTime.now().toIso8601String()))
+                                      .path;
                                 } catch (e) {
                                   _scaffoldKey.currentState
                                       .removeCurrentSnackBar();
@@ -409,9 +406,13 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 }
                               }
                               User user = User(
-                                  address: addressController.text.trim(),
+                                  address: addressController.text.isEmpty
+                                      ? null
+                                      : addressController.text,
                                   dob: dateTime,
-                                  emailAddress: emailController.text.trim(),
+                                  emailAddress: emailController.text.isEmpty
+                                      ? null
+                                      : emailController.text,
                                   gender: genderValue,
                                   image: (imageDir != null) ? imageDir : null,
                                   name: fnameController.text.trim() +
@@ -421,7 +422,13 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                               if (widget.userData == null) {
                                 addNewUser(user);
                               } else {
-                                await UserService().updateUser(user);
+                                if ((widget.userData.image ?? '').isNotEmpty) {
+                                  try {
+                                    File(widget.userData.image).delete();
+                                  } catch (e) {}
+                                }
+                                await UserService()
+                                    .updateUser(user, widget.userData == null);
                                 Navigator.pop(context);
                               }
                             }
@@ -484,7 +491,11 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
           ),
         ),
       ],
+      onCanceled: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
       onSelected: (id) async {
+        FocusScope.of(context).requestFocus(new FocusNode());
         DateTime date = DateTime(1910);
         popId = id;
         if (id == 0) {
@@ -509,8 +520,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
         setState(() {});
       },
       child: TextFormField(
-        validator: (value) =>
-            dateTime == null ? 'Date of Birth Required' : null,
+        validator: (value) => dateTime == null ? '' : null,
         enabled: false,
         decoration: InputDecoration(
           errorStyle: TextStyle(color: Colors.red),
@@ -562,7 +572,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
           style: titleStyle,
         ),
         SizedBox(
-          height: ScreenSizeConfig.blockSizeHorizontal * 2,
+          height: 5,
         ),
         TextFormField(
           enabled: (maxlength == null) ||
@@ -590,10 +600,13 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
             ),
             errorStyle: TextStyle(color: Colors.red),
             prefixStyle: TextStyle(color: Colors.grey),
-            hintStyle: hintTextStyle,
             contentPadding: EdgeInsets.symmetric(horizontal: 8),
             hintText: hintText,
             border: border,
+            errorBorder: OutlineInputBorder(
+                gapPadding: 0,
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.red, width: 1.5)),
             enabledBorder: border,
             disabledBorder: border,
             focusedBorder: border,
