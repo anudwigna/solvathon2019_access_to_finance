@@ -1,5 +1,8 @@
+import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
 
 class DateSelector extends StatefulWidget {
   final ValueChanged<NepaliDateTime> onDateChanged;
@@ -34,6 +37,7 @@ class _DateSelectorState extends State<DateSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final language = Provider.of<PreferenceProvider>(context).language;
     return InkWell(
       onTap: () async {
         NepaliDateTime date;
@@ -63,7 +67,7 @@ class _DateSelectorState extends State<DateSelector> {
       },
       child: InputDecorator(
         decoration: InputDecoration(
-            hasFloatingPlaceholder: true,
+            floatingLabelBehavior: FloatingLabelBehavior.always,
             isDense: true,
             contentPadding: EdgeInsets.symmetric(
               vertical: 4.0,
@@ -72,7 +76,11 @@ class _DateSelectorState extends State<DateSelector> {
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
         child: Text(
-          NepaliDateFormat("MMMM, y").format(_selectedDateTime),
+          NepaliDateFormat("MMMM, y",
+                  language == Lang.EN ? Language.english : Language.nepali)
+              .format(
+            _selectedDateTime,
+          ),
           style: TextStyle(
               color: widget.textColor ?? Colors.grey,
               fontSize: 15,

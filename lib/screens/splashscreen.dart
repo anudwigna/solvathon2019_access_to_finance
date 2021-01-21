@@ -1,16 +1,14 @@
-import 'package:MunshiG/components/adaptive_text.dart';
-import 'package:MunshiG/config/routes.dart';
-import 'package:MunshiG/providers/preference_provider.dart';
-import 'package:flutter/material.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/config/globals.dart' as globals;
+import 'package:MunshiG/config/routes.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/setting.dart';
 import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
-import 'package:provider/provider.dart';
-import '../config/resource_map.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/preference_service.dart';
+import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -85,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           : '',
                       maxLines: 1,
                       style: TextStyle(
-                        fontFamily: 'Poppins',
+                        fontFamily: 'SourceSansPro',
                         fontSize: 14,
                         color: const Color(0xffffffff),
                       ),

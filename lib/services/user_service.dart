@@ -41,7 +41,6 @@ class UserService {
     await dbStore.store.update(dbStore.database, user.toJson(),
         finder: Finder(filter: Filter.equals('phonenumber', user.phonenumber)));
     if (!(isAutomated ?? true)) {
-   
       ActivityTracker().otherActivityOnPage(
           PageName.createProfile, 'Update User', 'Save', 'FlatButton');
     }
@@ -54,7 +53,6 @@ class UserService {
       if (d == null) return false;
       if (d.value['name'] != null &&
           d.value['gender'] != null &&
-          d.value['emailAddress'] != null &&
           d.value['phonenumber'] != null &&
           d.value['address'] != null) return true;
       return false;

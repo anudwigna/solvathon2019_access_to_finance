@@ -1,29 +1,28 @@
-import 'package:MunshiG/components/extra_componenets.dart';
-import 'package:MunshiG/config/routes.dart';
-import 'package:MunshiG/icons/glyph_map.dart';
-import 'package:MunshiG/models/app_page_naming.dart';
-import 'package:MunshiG/services/preference_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:nepali_utils/nepali_utils.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
-import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/components/extra_componenets.dart';
+import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/config/globals.dart';
+import 'package:MunshiG/config/routes.dart';
 import 'package:MunshiG/icons/vector_icons.dart';
+import 'package:MunshiG/models/app_page_naming.dart';
 import 'package:MunshiG/models/transaction/transaction.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/transaction_page.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
-import '../services/app_page.dart';
+
 import '../config/configuration.dart';
 import '../config/globals.dart';
-import '../services/versionChanges.dart';
 import '../services/activity_tracking.dart';
+import '../services/app_page.dart';
+import '../services/versionChanges.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -175,7 +174,12 @@ class HomePageState extends State<HomePage>
                   language == Lang.EN
                       ? Tab(
                           child: Text(
-                            NepaliDateFormat("MMMM ''yy").format(
+                            NepaliDateFormat(
+                                    "MMMM ''yy",
+                                    language == Lang.EN
+                                        ? Language.english
+                                        : Language.nepali)
+                                .format(
                               NepaliDateTime(
                                 _dateResolver[index].year,
                                 _dateResolver[index].month,
@@ -185,7 +189,11 @@ class HomePageState extends State<HomePage>
                         )
                       : Tab(
                           child: Text(
-                            NepaliDateFormat("MMMM ''yy", Language.nepali)
+                            NepaliDateFormat(
+                                    "MMMM ''yy",
+                                    language == Lang.EN
+                                        ? Language.english
+                                        : Language.nepali)
                                 .format(
                               NepaliDateTime(_dateResolver[index].year,
                                   _dateResolver[index].month),
@@ -438,12 +446,7 @@ class HomePageState extends State<HomePage>
           ),
         ),
         Text(
-          NepaliNumberFormat(
-                  decimalDigits: 0,
-                  language: (language == Lang.EN)
-                      ? Language.english
-                      : Language.nepali)
-              .format(income ?? 0),
+          nepaliNumberFormatter(income ?? 0),
           style: TextStyle(
               color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
@@ -455,12 +458,7 @@ class HomePageState extends State<HomePage>
           ),
         ),
         Text(
-          NepaliNumberFormat(
-                  decimalDigits: 0,
-                  language: (language == Lang.EN)
-                      ? Language.english
-                      : Language.nepali)
-              .format(expense ?? 0),
+          nepaliNumberFormatter(expense ?? 0),
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -614,11 +612,7 @@ class _TransactionListState extends State<TransactionList> {
           ),
           SizedBox(width: 5.0),
           Text(
-            NepaliNumberFormat(
-                    decimalDigits: 0,
-                    language:
-                        (language == 'en') ? Language.english : Language.nepali)
-                .format<double>(amount),
+            nepaliNumberFormatter(amount),
             style: TextStyle(
               fontSize: 15.0,
               color: Colors.black,
@@ -691,11 +685,8 @@ class _TransactionListState extends State<TransactionList> {
                             style: TextStyle(color: Colors.black),
                           ),
                           trailing: Text(
-                            NepaliNumberFormat(
-                                    language: (language == 'en')
-                                        ? Language.english
-                                        : Language.nepali)
-                                .format(dailyTransactions[index].amount),
+                            nepaliNumberFormatter(double.tryParse(
+                                dailyTransactions[index].amount)),
                             style: getTextStyle(dailyTransactions[index]),
                           ),
                         );
@@ -735,11 +726,7 @@ class _TransactionListState extends State<TransactionList> {
               // SizedBox(height: 5.0),
               _detailsRow(
                 'Amount: ',
-                NepaliNumberFormat(
-                        language: (language == 'en')
-                            ? Language.english
-                            : Language.nepali)
-                    .format(transaction.amount ?? 0),
+                nepaliNumberFormatter(transaction.amount ?? 0),
               ),
             ]), onDelete: () {
       _deleteTransaction(transaction).then((value) {

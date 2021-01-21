@@ -1,23 +1,24 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/components/reorderable_list.dart' as Component;
 import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/icons/vector_icons.dart';
 import 'package:MunshiG/models/category/category.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/category_service.dart';
-import 'package:MunshiG/components/reorderable_list.dart' as Component;
-import '../components/screen_size_config.dart';
-import '../components/extra_componenets.dart';
-import '../config/configuration.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
+import '../components/extra_componenets.dart';
+import '../components/screen_size_config.dart';
+import '../config/configuration.dart';
 import '../config/globals.dart';
-import '../models/categoryHeading/categoryHeading.dart';
-import '../services/category_heading_service.dart';
-import '../screens/transaction_page.dart';
 import '../models/app_page_naming.dart';
+import '../models/categoryHeading/categoryHeading.dart';
+import '../screens/transaction_page.dart';
 import '../services/activity_tracking.dart';
+import '../services/category_heading_service.dart';
 
 class CategoryPage extends StatefulWidget {
   @override
@@ -153,9 +154,7 @@ class _CategoryPageState extends State<CategoryPage>
                           child: AdaptiveText(
                             'Cash In',
                             style: TextStyle(
-                                fontFamily: 'Source Sans Pro',
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -268,7 +267,7 @@ class _CategoryPageState extends State<CategoryPage>
                                         '',
                                         category: categories,
                                         style: TextStyle(
-                                          fontFamily: 'Poppins',
+                                          fontFamily: 'SourceSansPro',
                                           fontSize: 15,
                                           color: const Color(0xff272b37),
                                           height: 1.4285714285714286,
@@ -374,7 +373,7 @@ class _CategoryPageState extends State<CategoryPage>
                             '',
                             category: categories[i],
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                              fontFamily: 'SourceSansPro',
                               fontSize: 14,
                               color: const Color(0xff272b37),
                               height: 1.4285714285714286,
@@ -530,7 +529,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
                               AdaptiveText(
                                 'Category Heading',
                                 style: TextStyle(
-                                  fontFamily: 'Poppins',
+                                  fontFamily: 'SourceSansPro',
                                   fontSize: 16,
                                   color: const Color(0xff43425d),
                                   height: 1.5625,
@@ -614,7 +613,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
                               AdaptiveText(
                                 'Category Name',
                                 style: TextStyle(
-                                  fontFamily: 'Poppins',
+                                  fontFamily: 'SourceSansPro',
                                   fontSize: 16,
                                   color: const Color(0xff43425d),
                                   height: 1.5625,

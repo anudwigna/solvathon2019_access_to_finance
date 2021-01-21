@@ -129,7 +129,7 @@ class _BackUpPageState extends State<BackUpPage> with WidgetsBindingObserver {
                 await createBackup(subSector, language);
                 pr.hide();
                 showErrorDialog(
-                    'Data has been backup successfully', 'Success!!');
+                    'Data has been backup successfully', 'Success');
               } catch (e) {
                 pr.hide();
                 showErrorDialog(

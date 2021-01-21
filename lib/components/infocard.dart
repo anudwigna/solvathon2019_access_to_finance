@@ -1,13 +1,11 @@
 import 'package:MunshiG/config/configuration.dart';
-import 'package:MunshiG/config/globals.dart';
 import 'package:MunshiG/models/exportmodel.dart';
-import 'package:MunshiG/providers/preference_provider.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import '../components/adaptive_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:nepali_utils/nepali_utils.dart';
+
+import '../components/adaptive_text.dart';
+import '../components/extra_componenets.dart';
 
 class InfoCard extends StatelessWidget {
   final ExportDataModel budgetData;
@@ -127,12 +125,7 @@ class InfoCard extends StatelessWidget {
         Flexible(
           child: Text(
             (value.isNegative ? '(' : '') +
-                NepaliNumberFormat(
-                        decimalDigits: 0,
-                        language: (language == 'en')
-                            ? Language.english
-                            : Language.nepali)
-                    .format((value.abs())) +
+                nepaliNumberFormatter((value.abs())) +
                 (value.isNegative ? ')' : ''),
             style: TextStyle(
                 fontSize: 18,

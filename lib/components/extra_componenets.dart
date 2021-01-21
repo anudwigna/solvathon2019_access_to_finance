@@ -1,5 +1,8 @@
 import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/config/globals.dart';
 import 'package:flutter/material.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+
 import '../config/configuration.dart';
 import '../services/activity_tracking.dart';
 
@@ -34,9 +37,8 @@ Future<dynamic> showDeleteDialog(BuildContext context,
                   child: Column(
                     children: <Widget>[
                       AdaptiveText(
-                        title ?? 'Attention!!',
+                        title ?? 'Attention',
                         style: TextStyle(
-                          fontFamily: 'Poppins',
                           fontSize: 20,
                           color: const Color(0xfffc717f),
                           fontWeight: FontWeight.w700,
@@ -50,7 +52,6 @@ Future<dynamic> showDeleteDialog(BuildContext context,
                         description ?? '',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: 'Poppins',
                           fontSize: 16,
                           color: Colors.grey,
                           height: 1.5625,
@@ -136,7 +137,6 @@ Future<dynamic> detailDialog(BuildContext context,
         title: AdaptiveText(
           title ?? 'Detail',
           style: TextStyle(
-            fontFamily: 'Poppins',
             fontSize: 20,
             color: Configuration().deleteColor,
             fontWeight: FontWeight.w700,
@@ -270,4 +270,15 @@ Future<dynamic> showFormDialog(BuildContext context,
       );
     },
   );
+}
+
+String nepaliNumberFormatter(dynamic value, {double decimalDigits}) {
+  // print()
+  return NepaliNumberFormat(
+          decimalDigits: decimalDigits ?? 0,
+          language: language == 'en' ? Language.english : Language.nepali)
+      .format((value ?? 0).toString());
+  // String v = NepaliUnicode.convert(data);
+  // print(v);
+  // return v;
 }

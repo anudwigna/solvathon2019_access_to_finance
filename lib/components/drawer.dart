@@ -1,17 +1,16 @@
+import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/config/routes.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/screens/homepage.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:MunshiG/config/globals.dart' as globals;
-import 'package:MunshiG/providers/preference_provider.dart';
-import 'package:MunshiG/screens/homepage.dart';
-import 'package:MunshiG/screens/setting.dart';
-import 'package:MunshiG/services/category_service.dart';
-import 'package:MunshiG/services/preference_service.dart';
+
 import '../config/configuration.dart';
 import '../config/globals.dart';
 import 'adaptive_text.dart';
-import '../icons/vector_icons.dart';
 
 class MyDrawer extends StatefulWidget {
   final HomePageState homePageState;
@@ -23,7 +22,6 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   TextStyle _style = TextStyle(
-    fontFamily: 'Poppins',
     fontSize: 16,
     color: const Color(0xff1e1e1e),
   );
@@ -69,7 +67,6 @@ class _MyDrawerState extends State<MyDrawer> {
                       child: AdaptiveText(
                         subSector,
                         style: TextStyle(
-                          fontFamily: 'Poppins',
                           fontSize: 15,
                           color: const Color(0xff1e1e1e),
                           fontWeight: FontWeight.w700,

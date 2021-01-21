@@ -1,13 +1,14 @@
+import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/config/routegenerator.dart';
 import 'package:MunshiG/config/routes.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/homepage.dart';
 import 'package:MunshiG/screens/splashscreen.dart';
 import 'package:MunshiG/services/preference_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
 import 'config/globals.dart' as globals;
 
 void main() async {
@@ -36,7 +37,7 @@ class MunshiG extends StatelessWidget {
 }
 
 final ThemeData themeData = ThemeData(
-  fontFamily: 'Poppins',
+  fontFamily: 'SourceSansPro',
   brightness: Brightness.dark,
   appBarTheme: AppBarTheme(
     color: Colors.transparent,
@@ -50,7 +51,7 @@ final ThemeData themeData = ThemeData(
   buttonColor: Configuration().incomeColor,
   tabBarTheme: TabBarTheme(
       indicator: BoxDecoration(
-    borderRadius: BorderRadius.circular(18),
+    borderRadius: BorderRadius.circular(100),
     color: Configuration().incomeColor,
   )),
   buttonTheme: ButtonThemeData(

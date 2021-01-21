@@ -1,18 +1,20 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/models/user/user.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
 import 'package:MunshiG/services/user_service.dart';
-import '../icons/vector_icons.dart';
-import '../config/globals.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
+
+import '../config/globals.dart';
 import '../models/app_page_naming.dart';
 import '../services/activity_tracking.dart';
 
@@ -72,8 +74,10 @@ class _UserProfilePageState extends State<UserProfilePage>
     super.dispose();
   }
 
+  Lang language;
   @override
   Widget build(BuildContext context) {
+    language = Provider.of<PreferenceProvider>(context).language;
     return Scaffold(
       drawer: MyDrawer(),
       appBar: AppBar(
@@ -153,10 +157,7 @@ class _UserProfilePageState extends State<UserProfilePage>
               width: ScreenSizeConfig.blockSizeHorizontal * 35,
               height: ScreenSizeConfig.blockSizeVertical * 25,
               child: (File(user?.image ?? '').existsSync())
-                  ? (Image.file(
-                      File(user.image),
-                      fit: BoxFit.contain
-                    ))
+                  ? (Image.file(File(user.image), fit: BoxFit.contain))
                   : Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -259,7 +260,11 @@ class _UserProfilePageState extends State<UserProfilePage>
             dobIcon,
             'Date of Birth (B.S)',
             (user?.dob != null)
-                ? (NepaliDateFormat("MMMM dd, y")
+                ? (NepaliDateFormat(
+                        "MMMM dd, y",
+                        language == Lang.EN
+                            ? Language.english
+                            : Language.nepali)
                     .format(user.dob.toNepaliDateTime()))
                 : ''),
         detailbody(

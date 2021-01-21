@@ -1,21 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
-import 'package:nepali_utils/nepali_utils.dart';
 import 'package:MunshiG/models/account/account.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/account_service.dart';
-import '../config/globals.dart';
-import '../config/configuration.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
 import '../components/extra_componenets.dart';
+import '../config/configuration.dart';
+import '../config/globals.dart';
 import '../icons/vector_icons.dart';
-import '../screens/transaction_page.dart';
-import '../services/app_page.dart';
 import '../models/app_page_naming.dart';
+import '../screens/transaction_page.dart';
 import '../services/activity_tracking.dart';
 
 class AccountPage extends StatefulWidget {
@@ -152,7 +150,6 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                     AdaptiveText(
                       'Current Balance',
                       style: TextStyle(
-                        fontFamily: 'Poppins',
                         fontSize: 20,
                         color: const Color(0xffffffff),
                         fontWeight: FontWeight.w600,
@@ -166,7 +163,6 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                         Text(
                           _formatBalanceWithComma('$_currentBalance'),
                           style: TextStyle(
-                            fontFamily: 'Poppins',
                             fontSize: 31,
                             color: const Color(0xffffffff),
                             fontWeight: FontWeight.w700,
@@ -180,7 +176,6 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                           child: AdaptiveText(
                             'NPR',
                             style: TextStyle(
-                              fontFamily: 'Poppins',
                               fontSize: 14,
                               color: const Color(0xffb182ec),
                               fontWeight: FontWeight.w700,
@@ -234,7 +229,6 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                             title: AdaptiveText(
                               _accounts[_index].name ?? '',
                               style: TextStyle(
-                                fontFamily: 'Poppins',
                                 fontSize: 16,
                                 color: const Color(0xff272b37),
                                 height: 1.4285714285714286,
@@ -244,7 +238,6 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                             subtitle: AdaptiveText(
                               _accountType(_accounts[_index].type),
                               style: TextStyle(
-                                fontFamily: 'Poppins',
                                 fontSize: 12,
                                 color: Colors.grey,
                               ),
@@ -257,7 +250,6 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                                   _formatBalanceWithComma(
                                       _accounts[_index].balance),
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
                                     fontSize: 18,
                                     color: const Color(0xff1e1e1e),
                                     fontWeight: FontWeight.w700,
@@ -310,16 +302,9 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   String _formatBalanceWithComma(String balance) {
     if (balance.contains('-')) {
       return '-' +
-          NepaliNumberFormat(
-                  language: (language == Lang.EN)
-                      ? Language.english
-                      : Language.nepali)
-              .format(double.parse(balance.substring(1)) ?? 0);
+          nepaliNumberFormatter(double.parse(balance.substring(1)) ?? 0);
     } else
-      return NepaliNumberFormat(
-              language:
-                  (language == Lang.EN) ? Language.english : Language.nepali)
-          .format(balance ?? 0);
+      return nepaliNumberFormatter(balance ?? 0);
   }
 
   String _accountType(int value) {
@@ -457,7 +442,6 @@ class __AccountDialogState extends State<_AccountDialog> {
                             AdaptiveText(
                               'Account Type',
                               style: TextStyle(
-                                fontFamily: 'Poppins',
                                 fontSize: 16,
                                 color: const Color(0xff43425d),
                                 height: 1.5625,
@@ -525,7 +509,6 @@ class __AccountDialogState extends State<_AccountDialog> {
                             AdaptiveText(
                               'Enter Account Name',
                               style: TextStyle(
-                                fontFamily: 'Poppins',
                                 fontSize: 16,
                                 color: const Color(0xff43425d),
                                 height: 1.5625,
@@ -567,7 +550,6 @@ class __AccountDialogState extends State<_AccountDialog> {
                             AdaptiveText(
                               'Enter Opening Balance',
                               style: TextStyle(
-                                fontFamily: 'Poppins',
                                 fontSize: 16,
                                 color: const Color(0xff43425d),
                                 height: 1.5625,

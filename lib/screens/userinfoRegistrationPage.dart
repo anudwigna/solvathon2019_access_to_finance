@@ -1,25 +1,25 @@
 import 'dart:io';
-import '../providers/preference_provider.dart';
-import 'package:archive/archive.dart';
-import 'package:provider/provider.dart';
+
+import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/config/configuration.dart';
+import 'package:MunshiG/config/globals.dart';
+import 'package:MunshiG/models/user/user.dart';
+import 'package:MunshiG/screens/setting.dart';
+import 'package:MunshiG/services/preference_service.dart';
+import 'package:MunshiG/services/user_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:MunshiG/services/preference_service.dart';
-import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:nepali_utils/nepali_utils.dart';
-import 'package:MunshiG/components/screen_size_config.dart';
-import 'package:MunshiG/config/configuration.dart';
-import 'package:MunshiG/config/globals.dart';
-import 'package:MunshiG/models/user/user.dart';
-import 'package:MunshiG/screens/setting.dart';
-import 'package:MunshiG/services/user_service.dart';
-import '../services/activity_tracking.dart';
+import 'package:provider/provider.dart';
+
 import '../models/app_page_naming.dart';
+import '../providers/preference_provider.dart';
+import '../services/activity_tracking.dart';
 
 class UserInfoRegistrationPage extends StatefulWidget {
   final User userData;
@@ -373,12 +373,13 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                           height: 15,
                         ),
                         bodyField(
-                            controller: emailController,
-                            hintText: 'hello@gmail.com',
-                            title: 'Email Address',
-                            validator: (value) => value.trim.call().isEmpty
-                                ? "Email Address Required"
-                                : null),
+                          controller: emailController,
+                          hintText: 'hello@gmail.com',
+                          title: 'Email Address',
+                          // validator: (value) => value.trim.call().isEmpty
+                          //     ? "Email Address Required"
+                          //     : null
+                        ),
                         SizedBox(
                           height: 15,
                         ),
@@ -538,9 +539,14 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
           hintText: (dateTime == null)
               ? 'D.O.B'
               : (popId == 0)
-                  ? NepaliDateFormat("MMMM dd, y (EEE)").format(dateTime != null
-                      ? dateTime.toNepaliDateTime()
-                      : NepaliDateTime.now())
+                  ? NepaliDateFormat(
+                          "MMMM dd, y (EEE)",
+                          language == Lang.EN
+                              ? Language.english
+                              : Language.nepali)
+                      .format(dateTime != null
+                          ? dateTime.toNepaliDateTime()
+                          : NepaliDateTime.now())
                   : DateFormat("MMMM dd, y (EEEE)")
                       .format(dateTime ?? DateTime.now()),
           border: border,

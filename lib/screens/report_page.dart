@@ -1,28 +1,27 @@
 import 'dart:io';
 
-import 'package:MunshiG/components/date_selector.dart';
-import 'package:MunshiG/components/infocard.dart';
-import 'package:MunshiG/services/transaction_service.dart';
-import 'package:excel/excel.dart';
-import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
+import 'package:MunshiG/components/date_selector.dart';
 import 'package:MunshiG/components/drawer.dart';
+import 'package:MunshiG/components/infocard.dart';
 import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/models/budget/budget.dart';
 import 'package:MunshiG/models/exportmodel.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/budget_service.dart';
-import '../config/globals.dart';
-import '../models/transaction/transaction.dart';
-import '../components/extra_componenets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:MunshiG/services/category_service.dart';
+import 'package:excel/excel.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+
+import '../components/extra_componenets.dart';
+import '../config/globals.dart';
 import '../models/app_page_naming.dart';
 import '../services/activity_tracking.dart';
 
@@ -521,11 +520,11 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
     excel.updateCell(
         sheet,
         CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 0),
-        "Inflow - Outflow");
+        "Monthly Surplus/Deficit");
     excel.updateCell(
       sheet,
       CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: 0),
-      "CF",
+      "Cumulative Surplus/Deficit",
     );
   }
 
@@ -662,7 +661,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
     Email email = Email(
         attachmentPaths: [path],
         subject: selectedSubSector + ' Projection Details',
-        recipients: ['shrestha.rishan99@gmail.com'],
+        recipients: ['info@aria.com.np'],
         isHTML: false);
     await FlutterEmailSender.send(email).then((value) {
       File(path).deleteSync();

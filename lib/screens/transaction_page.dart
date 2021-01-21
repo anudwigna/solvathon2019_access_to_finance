@@ -1,18 +1,10 @@
 import 'dart:io';
-import '../screens/account_page.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:nepali_utils/nepali_utils.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
+
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/icons/vector_icons.dart';
 import 'package:MunshiG/models/account/account.dart';
-import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/models/budget/budget.dart';
 import 'package:MunshiG/models/category/category.dart';
 import 'package:MunshiG/models/transaction/transaction.dart';
@@ -21,14 +13,23 @@ import 'package:MunshiG/services/account_service.dart';
 import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:nepali_date_picker/nepali_date_picker.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
+
 import '../config/configuration.dart';
 import '../config/globals.dart';
-import '../providers/preference_provider.dart';
-import '../screens/category_page.dart';
-import '../services/category_heading_service.dart';
-import '../models/categoryHeading/categoryHeading.dart';
 import '../models/app_page_naming.dart';
+import '../models/categoryHeading/categoryHeading.dart';
+import '../providers/preference_provider.dart';
+import '../screens/account_page.dart';
+import '../screens/category_page.dart';
 import '../services/activity_tracking.dart';
+import '../services/category_heading_service.dart';
 
 class TransactionPage extends StatefulWidget {
   //0 = Income   1 = Expense
@@ -906,7 +907,7 @@ Widget dropDownMenuBuilder(IconData leadingIcon, String title,
           maxLines: 2,
           overflow: TextOverflow.fade,
           style: TextStyle(
-            fontFamily: 'Poppins',
+            fontFamily: 'SourceSansPro',
             fontSize: 15,
             color: const Color(0xff272b37),
             height: 1.6666666666666667,

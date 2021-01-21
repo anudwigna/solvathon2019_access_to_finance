@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:nepali_utils/nepali_utils.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
 import 'package:MunshiG/icons/vector_icons.dart';
@@ -11,14 +7,19 @@ import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
+
 import '../components/extra_componenets.dart';
 import '../config/configuration.dart';
 import '../config/globals.dart';
-import '../services/category_heading_service.dart';
-import '../models/categoryHeading/categoryHeading.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../models/app_page_naming.dart';
+import '../models/categoryHeading/categoryHeading.dart';
 import '../services/activity_tracking.dart';
+import '../services/category_heading_service.dart';
 
 class BudgetPage extends StatefulWidget {
   final bool isInflowProjection;
@@ -178,7 +179,7 @@ class _BudgetPageState extends State<BudgetPage>
                 child: AdaptiveText(
                   selectedSubSector,
                   style: TextStyle(
-                    fontFamily: 'Poppins',
+                  
                     fontSize: 16,
                     color: const Color(0xff1e1e1e),
                     fontWeight: FontWeight.w700,
@@ -321,29 +322,19 @@ class _BudgetPageState extends State<BudgetPage>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
                           Text(
-                            NepaliNumberFormat(
-                                        decimalDigits: 0,
-                                        language: (language == Lang.EN)
-                                            ? Language.english
-                                            : Language.nepali)
-                                    .format(snapshot.data.spent ?? 0) +
+                            nepaliNumberFormatter(snapshot.data.spent ?? 0) +
                                 '/',
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                        
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Configuration().incomeColor,
                             ),
                           ),
                           Text(
-                            NepaliNumberFormat(
-                                    decimalDigits: 0,
-                                    language: (language == Lang.EN)
-                                        ? Language.english
-                                        : Language.nepali)
-                                .format(snapshot.data.total ?? 0),
+                            nepaliNumberFormatter(snapshot.data.total ?? 0),
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                        
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Configuration().incomeColor,
@@ -485,18 +476,18 @@ class _BudgetPageState extends State<BudgetPage>
           .spent;
       // int spent = int.tryParse(spentString ?? '0') ?? 0;
       // if (amount > spent) {
-        await BudgetService().updateBudget(
-            selectedSubSector,
-            Budget(
-              categoryId: oldBudgetData.categoryId ?? categoryId,
-              month: oldBudgetData.month ?? month,
-              year: oldBudgetData.year ?? year,
-              spent: spentString,
-              total: _budgetAmountController.text,
-            ),
-            false);
+      await BudgetService().updateBudget(
+          selectedSubSector,
+          Budget(
+            categoryId: oldBudgetData.categoryId ?? categoryId,
+            month: oldBudgetData.month ?? month,
+            year: oldBudgetData.year ?? year,
+            spent: spentString,
+            total: _budgetAmountController.text,
+          ),
+          false);
 
-        return true;
+      return true;
       // } else {
       //   _scaffoldKey.currentState.showSnackBar(
       //     SnackBar(
