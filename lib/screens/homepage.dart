@@ -544,6 +544,7 @@ class _TransactionListState extends State<TransactionList> {
           buttonColor: Colors.amber,
           primaryColor: Colors.red),
       child: ExpansionPanelList(
+          // elevation: 0,
           expansionCallback: (index, isExpanded) {
             setState(() {
               _expansionRecords[index] = !isExpanded;
