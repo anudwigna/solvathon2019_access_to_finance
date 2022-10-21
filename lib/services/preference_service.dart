@@ -13,112 +13,118 @@ class PreferenceService {
 
   Future setIsFirstStart(bool value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('IS_FIRST_START', value);
+    await prefs.set<bool>('IS_FIRST_START', value);
   }
 
   Future<bool> getIsFirstStart() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('IS_FIRST_START')) as bool? ?? true;
+    return (await prefs.get<bool?>('IS_FIRST_START')) ?? true;
+  }
+
+//
+  Future setIsUserRegistered() async {
+    var prefs = await (_init() as Future<_SembastPreference>);
+    await prefs.set<bool>('IS_USER_REGISTERED', true);
   }
 
   Future<bool> isUserRegistered() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('IS_USER_REGISTERED')) as bool? ?? false;
+    return (await prefs.get<bool?>('IS_USER_REGISTERED')) ?? false;
   }
 
-  Future setIsUserRegistered() async {
-    var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('IS_USER_REGISTERED', true);
-  }
-
+//
   Future setLanguage(String value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('LANGUAGE', value);
+    await prefs.set<String>('LANGUAGE', value);
   }
 
   Future<String?> getLanguage() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('LANGUAGE')) as String?;
+    return (await prefs.get<String?>('LANGUAGE'));
   }
 
+//
   Future setSelectedSubSector(String? value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('SUBSECTOR', value);
+    await prefs.set<String?>('SUBSECTOR', value);
   }
 
   Future<String?> getSelectedSubSector() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('SUBSECTOR')) as String?;
+    return (await prefs.get<String?>('SUBSECTOR'));
   }
 
+//
   Future setCurrentIncomeCategoryIndex(int value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('CURRENT_INCOME_CATEGORY_INDEX', value);
+    await prefs.set<int>('CURRENT_INCOME_CATEGORY_INDEX', value);
   }
 
   Future<int> getCurrentIncomeCategoryIndex() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('CURRENT_INCOME_CATEGORY_INDEX') ?? 0) as int;
+    return (await prefs.get<int?>('CURRENT_INCOME_CATEGORY_INDEX') ?? 0);
   }
 
+//
   Future setV102ChangesFlag() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('V102_CHANGES_FLAG', true);
+    await prefs.set<bool>('V102_CHANGES_FLAG', true);
   }
 
   Future<bool> getV102ChangesFlag() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await (prefs.get('V102_CHANGES_FLAG') as Future<bool>?) ?? false);
+    return (await prefs.get<bool?>('V102_CHANGES_FLAG')) ?? false;
   }
 
+//
   Future setCurrentExpenseCategoryIndex(int value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('CURRENT_EXPENSE_CATEGORY_INDEX', value);
+    await prefs.set<int>('CURRENT_EXPENSE_CATEGORY_INDEX', value);
   }
 
   Future<int> getCurrentExpenseCategoryIndex() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('CURRENT_EXPENSE_CATEGORY_INDEX') ?? 0) as int;
+    return (await prefs.get<int?>('CURRENT_EXPENSE_CATEGORY_INDEX')) ?? 0;
   }
 
   Future setCurrentTransactionIndex(int value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('CURRENT_TRANSACTION_INDEX', value);
+    await prefs.set<int>('CURRENT_TRANSACTION_INDEX', value);
   }
 
   Future<int> getCurrentTransactionIndex() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('CURRENT_TRANSACTION_INDEX') ?? 0) as int;
+    return (await prefs.get<int?>('CURRENT_TRANSACTION_INDEX')) ?? 0;
   }
 
   Future setSubSectors(List<dynamic> value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('SUBSECTORS', value);
+    await prefs.set<List<dynamic>>('SUBSECTORS', value);
   }
 
   Future<List<dynamic>> getSubSectors() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('SUBSECTORS') ?? []) as List<dynamic>;
+    return (await prefs.get<List<dynamic>?>('SUBSECTORS')) ?? [];
   }
 
   Future setPageTrackCountIndex(int value) async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('PAGE_TRACK_COUNT_INDEX', value);
+    await prefs.set<int>('PAGE_TRACK_COUNT_INDEX', value);
   }
 
   Future<int> getPageTrackCountIndex() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return (await prefs.get('PAGE_TRACK_COUNT_INDEX') ?? 0) as int;
+    return (await prefs.get<int?>('PAGE_TRACK_COUNT_INDEX')) ?? 0;
   }
 
   Future setLastBackUpDate() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    prefs.set('LAST_BACK_UP_DATE', DateTime.now().toIso8601String());
+    await prefs.set<String>('LAST_BACK_UP_DATE', DateTime.now().toIso8601String());
   }
 
   Future<String?> getLastBackUpDate() async {
     var prefs = await (_init() as Future<_SembastPreference>);
-    return await (prefs.get('LAST_BACK_UP_DATE') as Future<String?>);
+    return await prefs.get<String?>('LAST_BACK_UP_DATE');
   }
 }
 
@@ -144,7 +150,18 @@ class _SembastPreference {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future set(String key, dynamic value) async => await db.put(value, key);
+  Future set<T>(String key, T value) async {
+    final checkValue = await intMapStoreFactory.store().find(db, finder: Finder(filter: Filter.byKey(key)));
+    if (checkValue.isEmpty)
+      await intMapStoreFactory.store().add(db, {key: value});
+    else {
+      await intMapStoreFactory.store().update(db, {key: value}, finder: Finder(filter: Filter.byKey(key)));
+    }
+  }
 
-  Future<dynamic> get(String key) async => await db.get(key);
+  Future<T?> get<T>(String key) async {
+    final value = await intMapStoreFactory.store().find(db, finder: Finder(filter: Filter.byKey(key)));
+    if (value.isEmpty) return null;
+    return value.first.value[key] as T;
+  }
 }

@@ -27,8 +27,7 @@ class AppPage {
   Future<int?> getPageIdByName(String pageName) async {
     var dbStore = await getDatabaseAndStore();
     Finder finder = Finder(filter: Filter.equals('name', pageName));
-    RecordSnapshot<int?, Map<String, dynamic>>? snapshot =
-        await dbStore.store!.findFirst(dbStore.database!, finder: finder);
+    RecordSnapshot<int?, Map<String, dynamic>>? snapshot = await dbStore.store!.findFirst(dbStore.database, finder: finder);
     // print(snapshot.value);
     // print
     if (snapshot == null) return null;
@@ -39,18 +38,19 @@ class AppPage {
 
   Future addPages(int? id, String? name) async {
     var dbStore = await getDatabaseAndStore();
-    await dbStore.store!.add(dbStore.database!, {'id': id, 'name': name});
+    await dbStore.store!.add(dbStore.database, {'id': id, 'name': name});
   }
 
   Future<void> initializeAppPages() async {
     var dbStore = await getDatabaseAndStore();
-    final List<RecordSnapshot<int?, Map<String, dynamic>>> data = await dbStore.store!.find(dbStore.database!);
+    final List<RecordSnapshot<int?, Map<String, dynamic>>> data = await dbStore.store!.find(dbStore.database);
     PageName().init(data.map((e) {
       return e.value;
     }).toList());
   }
-  Future<void>closeDatabase(String subsector) async {
+
+  Future<void> closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore();
-    await db.database!.close();
+    await db.database.close();
   }
 }

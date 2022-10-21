@@ -52,13 +52,13 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         builder = (BuildContext _) => AccountPage();
         break;
       }
-    case report:
-      {
-        builder = (BuildContext _) => ReportPage(
-              selectedSubSector: settings.arguments as String?,
-            );
-        break;
-      }
+    // case report:
+    //   {
+    //     builder = (BuildContext _) => ReportPage(
+    //           selectedSubSector: settings.arguments as String?,
+    //         );
+    //     break;
+    //   }
     case wrapper:
       {
         builder = (BuildContext _) => WrapperPage();

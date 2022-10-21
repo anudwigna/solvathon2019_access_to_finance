@@ -270,7 +270,7 @@ class _SettingsState extends State<Settings> {
 
   Future<void> _loadCategories(List<dynamic> _subSectors) async {
     final db = await TransactionService().getDatabaseAndStore(_subSectors[0]);
-    await db.database!.transaction((transaction) async {
+    await db.database.transaction((transaction) async {
       for (int i = 0; i < _subSectors.length; i++) {
         String _subSector = _subSectors[i];
         var incomeDbStore = await CategoryService().getDatabaseAndStore(_subSector, CategoryType.INCOME);
@@ -280,14 +280,14 @@ class _SettingsState extends State<Settings> {
         for (int i = 0; i < _incomeCategories.length; i++) {
           final category = _incomeCategories[i];
           await incomeDbStore.store!.record(category.id).put(
-                incomeDbStore.database!,
+                incomeDbStore.database,
                 category.toJson(),
               );
         }
         for (int i = 0; i < _expenseCategories.length; i++) {
           final category = _expenseCategories[i];
           await expenseDbStore.store!.record(category.id).put(
-                expenseDbStore.database!,
+                expenseDbStore.database,
                 category.toJson(),
               );
         }

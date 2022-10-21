@@ -38,7 +38,7 @@ class TransactionService {
         Filter.equals('month', month),
       ]),
     );
-    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
     if (snapshot.isEmpty) {
       return [0, 0];
     }
@@ -62,7 +62,7 @@ class TransactionService {
     Finder finder = Finder(
       filter: Filter.and([Filter.equals('year', year), Filter.equals('month', month), Filter.equals('categoryId', categoryId)]),
     );
-    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
     if ((snapshot.length) > 0) {
       return false;
     }
@@ -78,7 +78,7 @@ class TransactionService {
       ]),
     );
 
-    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
     return snapshot.map((record) => t.Transaction.fromJson(record.value)).toList();
   }
 
@@ -92,9 +92,9 @@ class TransactionService {
       'id',
       transaction.id,
     );
-    bool recordFound = (await dbStore.store!.count(dbStore.database!, filter: checkRecord)) != 0;
+    bool recordFound = (await dbStore.store!.count(dbStore.database, filter: checkRecord)) != 0;
     if (recordFound) {
-      await dbStore.store!.update(dbStore.database!, transaction.toJson(),
+      await dbStore.store!.update(dbStore.database, transaction.toJson(),
           finder: Finder(
             filter: checkRecord,
           ));
@@ -103,7 +103,7 @@ class TransactionService {
       int currentIndex = await PreferenceService.instance.getCurrentTransactionIndex();
       transactionId = currentIndex;
       await dbStore.store!.add(
-        dbStore.database!,
+        dbStore.database,
         {
           'id': currentIndex,
           'categoryId': transaction.categoryId,
@@ -173,7 +173,7 @@ class TransactionService {
           ),
           true);
     }
-    await dbStore.store!.delete(dbStore.database!, finder: finder);
+    await dbStore.store!.delete(dbStore.database, finder: finder);
     if (!(isAutomated))
       ActivityTracker().otherActivityOnPage((transaction.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut),
           'Delete' + (transaction.transactionType == 0 ? 'Income' : 'Expense') + ' Transaction $subSector, ${transaction.name}, ${transaction.timestamp}', 'Delete', 'FlatButton');
@@ -187,11 +187,11 @@ class TransactionService {
         categoryId,
       ),
     );
-    await dbStore.store!.delete(dbStore.database!, finder: finder);
+    await dbStore.store!.delete(dbStore.database, finder: finder);
   }
 
   Future<void> closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore(subsector);
-    await db.database!.close();
+    await db.database.close();
   }
 }

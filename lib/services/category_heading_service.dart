@@ -16,30 +16,22 @@ class CategoryHeadingService {
   Future<DatabaseAndStore> getDatabaseAndStore(CategoryType type) async {
     DatabaseFactory dbFactory = databaseFactoryIo;
     return DatabaseAndStore(
-      database:
-          await dbFactory.openDatabase(await _getDbPath('categoryHeading.db')),
-      store: intMapStoreFactory.store(type == CategoryType.INCOME
-          ? 'in_categoryHeading'
-          : 'ex_categoryHeading'),
+      database: await dbFactory.openDatabase(await _getDbPath('categoryHeading.db')),
+      store: intMapStoreFactory.store(type == CategoryType.INCOME ? 'in_categoryHeading' : 'ex_categoryHeading'),
     );
   }
 
-  Future<List<CategoryHeading>> getAllCategoryHeadings(
-      CategoryType type) async {
+  Future<List<CategoryHeading>> getAllCategoryHeadings(CategoryType type) async {
     var dbStore = await getDatabaseAndStore(type);
-    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!);
-    return snapshot
-        .map((record) => CategoryHeading.fromJson(record.value))
-        .toList();
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database);
+    return snapshot.map((record) => CategoryHeading.fromJson(record.value)).toList();
   }
 
-  Future<CategoryHeading?> getCategoryHeadingById(
-      CategoryType type, int? id) async {
+  Future<CategoryHeading?> getCategoryHeadingById(CategoryType type, int? id) async {
     var dbStore = await getDatabaseAndStore(type);
     Finder finder = Finder(filter: Filter.equals('id', id));
-    RecordSnapshot<int?, Map<String, dynamic>>? snapshot =
-        await dbStore.store!.findFirst(dbStore.database!, finder: finder);
-  
+    RecordSnapshot<int?, Map<String, dynamic>>? snapshot = await dbStore.store!.findFirst(dbStore.database, finder: finder);
+
     if (snapshot == null) return null;
     return CategoryHeading.fromJson(snapshot.value);
   }
@@ -112,8 +104,7 @@ class CategoryHeadingService {
 
   Future<void> getStockCategoryHeading() async {
     //Reading categoryHeading.json file using assetBundle
-    dynamic categories =
-        jsonDecode(await rootBundle.loadString('assets/categoryHeading.json'));
+    dynamic categories = jsonDecode(await rootBundle.loadString('assets/categoryHeading.json'));
     List<dynamic> _incomeCategoriesheading = categories['income'];
     List<dynamic> _expenseCategoriesheading = categories['expense'];
     final incomeCategoryHeadings = _incomeCategoriesheading
@@ -130,7 +121,7 @@ class CategoryHeadingService {
     incomeCategoryHeadings.forEach(
       (category) async {
         await dbStore.store!.record(category.id).put(
-              dbStore.database!,
+              dbStore.database,
               category.toJson(),
             );
       },
@@ -139,14 +130,15 @@ class CategoryHeadingService {
     expenseCategoryHeadings.forEach(
       (category) async {
         await dbStore.store!.record(category.id).put(
-              dbStore.database!,
+              dbStore.database,
               category.toJson(),
             );
       },
     );
   }
-  Future<void>closeDatabase(String subsector) async {
+
+  Future<void> closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore(CategoryType.INCOME);
-    await db.database!.close();
+    await db.database.close();
   }
 }

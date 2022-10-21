@@ -30,7 +30,7 @@ class BudgetService {
     Finder finder = Finder(
       filter: Filter.and([Filter.equals('month', month), Filter.equals('categoryId', categoryId), Filter.equals('year', year)]),
     );
-    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
     if (snapshot.isEmpty) {
       return Budget();
     }
@@ -57,10 +57,10 @@ class BudgetService {
           budget.year,
         )
       ]);
-      bool recordFound = (await dbStore.store!.count(dbStore.database!, filter: checkRecord)) != 0;
+      bool recordFound = (await dbStore.store!.count(dbStore.database, filter: checkRecord)) != 0;
       if (recordFound) {
         await dbStore.store!.update(
-          dbStore.database!,
+          dbStore.database,
           budget.toJson(),
           finder: Finder(
             filter: checkRecord,
@@ -68,7 +68,7 @@ class BudgetService {
         );
       } else {
         await dbStore.store!.add(
-          dbStore.database!,
+          dbStore.database,
           budget.toJson(),
         );
       }
@@ -96,7 +96,7 @@ class BudgetService {
         )
       ]),
     );
-    await dbStore.store!.delete(dbStore.database!, finder: finder);
+    await dbStore.store!.delete(dbStore.database, finder: finder);
     if (!(isAutomated)) ActivityTracker().otherActivityOnPage('', 'Cleared Budget For CategoryId ${budget.categoryId}, ${budget.year}-${budget.month}', 'Clear', 'FlatButton');
   }
 
@@ -108,7 +108,7 @@ class BudgetService {
         categoryId,
       ),
     );
-    await dbStore.store!.delete(dbStore.database!, finder: finder);
+    await dbStore.store!.delete(dbStore.database, finder: finder);
   }
 
   Future<List<Budget>> getTotalBudgetByDate(String subSector, int month, int year) async {
@@ -116,7 +116,7 @@ class BudgetService {
     Finder finder = Finder(
       filter: Filter.and([Filter.equals('month', month), Filter.equals('year', year)]),
     );
-    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
 
     if (snapshot.isEmpty) {
       return [];
@@ -126,6 +126,6 @@ class BudgetService {
 
   Future<void> closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore(subsector);
-    await db.database!.close();
+    await db.database.close();
   }
 }

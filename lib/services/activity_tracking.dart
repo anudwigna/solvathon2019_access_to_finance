@@ -33,7 +33,7 @@ class ActivityTracker {
       PreferenceService.instance.setPageTrackCountIndex(id + 1);
       final int? pageId = getPageIdByName(pageName);
       var dbStore = await getDatabaseAndStore();
-      await dbStore.store!.add(dbStore.database!, {
+      await dbStore.store!.add(dbStore.database, {
         'id': id,
         'action': action,
         'pageId': pageId,
@@ -50,7 +50,7 @@ class ActivityTracker {
       PreferenceService.instance.setPageTrackCountIndex(id + 1);
       final int? pageId = getPageIdByName(pageName);
       var dbStore = await getDatabaseAndStore();
-      await dbStore.store!.add(dbStore.database!, {
+      await dbStore.store!.add(dbStore.database, {
         'id': id,
         'action': action,
         'pageId': pageId,
@@ -74,6 +74,6 @@ class ActivityTracker {
 
   Future<void> closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore();
-    await db.database!.close();
+    await db.database.close();
   }
 }
