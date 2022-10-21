@@ -15,8 +15,7 @@ class BudgetService {
   Future<DatabaseAndStore> getDatabaseAndStore(String subSector) async {
     DatabaseFactory dbFactory = databaseFactoryIo;
     return DatabaseAndStore(
-      database: await dbFactory.openDatabase(
-          await _getDbPath('${subSector.toLowerCase()}budget.db')),
+      database: await dbFactory.openDatabase(await _getDbPath('${subSector.toLowerCase()}budget.db')),
       store: intMapStoreFactory.store('budget'),
     );
   }
@@ -26,17 +25,12 @@ class BudgetService {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future<Budget> getBudget(
-      String subSector, int categoryId, int month, int year) async {
+  Future<Budget> getBudget(String subSector, int? categoryId, int? month, int? year) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
-      filter: Filter.and([
-        Filter.equals('month', month),
-        Filter.equals('categoryId', categoryId),
-        Filter.equals('year', year)
-      ]),
+      filter: Filter.and([Filter.equals('month', month), Filter.equals('categoryId', categoryId), Filter.equals('year', year)]),
     );
-    var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!, finder: finder);
     if (snapshot.isEmpty) {
       return Budget();
     }
@@ -46,9 +40,9 @@ class BudgetService {
   /// Updates the budget
   ///
   /// Adds new budget record if record doesn't exist.
-  Future updateBudget(String subSector, Budget budget, bool isAutomated) async {
+  Future updateBudget(String? subSector, Budget budget, bool isAutomated) async {
     if (budget.month != null && budget.categoryId != null) {
-      var dbStore = await getDatabaseAndStore(subSector);
+      var dbStore = await getDatabaseAndStore(subSector!);
       Filter checkRecord = Filter.and([
         Filter.equals(
           'month',
@@ -63,30 +57,24 @@ class BudgetService {
           budget.year,
         )
       ]);
-      bool recordFound =
-          (await dbStore.store.count(dbStore.database, filter: checkRecord)) !=
-              0;
+      bool recordFound = (await dbStore.store!.count(dbStore.database!, filter: checkRecord)) != 0;
       if (recordFound) {
-        await dbStore.store.update(
-          dbStore.database,
+        await dbStore.store!.update(
+          dbStore.database!,
           budget.toJson(),
           finder: Finder(
             filter: checkRecord,
           ),
         );
       } else {
-        await dbStore.store.add(
-          dbStore.database,
+        await dbStore.store!.add(
+          dbStore.database!,
           budget.toJson(),
         );
       }
-      if (!(isAutomated ?? true))
-        ActivityTracker().otherActivityOnPage(
-            '',
-            (recordFound ? 'Add' : 'Update') +
-                ' Budget For $subSector for CategoryId ${budget.categoryId}, ${budget.year}-${budget.month}',
-            'SetBudget',
-            'FlatButton');
+      if (!(isAutomated))
+        ActivityTracker()
+            .otherActivityOnPage('', (recordFound ? 'Add' : 'Update') + ' Budget For $subSector for CategoryId ${budget.categoryId}, ${budget.year}-${budget.month}', 'SetBudget', 'FlatButton');
     }
   }
 
@@ -108,16 +96,11 @@ class BudgetService {
         )
       ]),
     );
-    await dbStore.store.delete(dbStore.database, finder: finder);
-    if (!(isAutomated ?? true))
-      ActivityTracker().otherActivityOnPage(
-         '',
-          'Cleared Budget For CategoryId ${budget.categoryId}, ${budget.year}-${budget.month}',
-          'Clear',
-          'FlatButton');
+    await dbStore.store!.delete(dbStore.database!, finder: finder);
+    if (!(isAutomated)) ActivityTracker().otherActivityOnPage('', 'Cleared Budget For CategoryId ${budget.categoryId}, ${budget.year}-${budget.month}', 'Clear', 'FlatButton');
   }
 
-  Future deleteBudgetsForCategory(String subSector, int categoryId) async {
+  Future deleteBudgetsForCategory(String subSector, int? categoryId) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.equals(
@@ -125,25 +108,24 @@ class BudgetService {
         categoryId,
       ),
     );
-    await dbStore.store.delete(dbStore.database, finder: finder);
+    await dbStore.store!.delete(dbStore.database!, finder: finder);
   }
 
-  Future<List<Budget>> getTotalBudgetByDate(
-      String subSector, int month, int year) async {
+  Future<List<Budget>> getTotalBudgetByDate(String subSector, int month, int year) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
-      filter: Filter.and(
-          [Filter.equals('month', month), Filter.equals('year', year)]),
+      filter: Filter.and([Filter.equals('month', month), Filter.equals('year', year)]),
     );
-    var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!, finder: finder);
 
     if (snapshot.isEmpty) {
       return [];
     }
     return snapshot.map((e) => Budget.fromJson(e.value)).toList();
   }
-  Future<void>closeDatabase(String subsector) async {
+
+  Future<void> closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore(subsector);
-    await db.database.close();
+    await db.database!.close();
   }
 }

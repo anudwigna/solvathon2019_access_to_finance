@@ -23,16 +23,15 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   int _currentBalance = 0;
-  Lang language;
-  var _accounts = <Account>[];
+  Lang? language;
+  List<Account>? _accounts = <Account>[];
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
     _refreshBalance();
     WidgetsBinding.instance.addObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.account, action: 'Opened');
+    ActivityTracker().pageTransactionActivity(PageName.account, action: 'Opened');
   }
 
   @override
@@ -41,16 +40,13 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
 
     switch (state) {
       case AppLifecycleState.paused:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.account, action: 'Paused');
+        ActivityTracker().pageTransactionActivity(PageName.account, action: 'Paused');
         break;
       case AppLifecycleState.inactive:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.account, action: 'Inactive');
+        ActivityTracker().pageTransactionActivity(PageName.account, action: 'Inactive');
         break;
       case AppLifecycleState.resumed:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.account, action: 'Resumed');
+        ActivityTracker().pageTransactionActivity(PageName.account, action: 'Resumed');
         break;
       case AppLifecycleState.detached:
         break;
@@ -60,8 +56,7 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.account, action: 'Closed');
+    ActivityTracker().pageTransactionActivity(PageName.account, action: 'Closed');
     super.dispose();
   }
 
@@ -71,7 +66,7 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
             _currentBalance = 0;
             accounts.forEach(
               (account) {
-                _currentBalance += int.tryParse(account.balance) ?? 0;
+                _currentBalance += int.tryParse(account.balance!) ?? 0;
               },
             );
             setState(() {});
@@ -100,9 +95,8 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
             onPressed: () async {
               if ((await showDialog(
                     context: context,
-                    builder: (context) =>
-                        ChangeNotifierProvider<PreferenceProvider>(
-                      builder: (context) => PreferenceProvider(),
+                    builder: (context) => ChangeNotifierProvider<PreferenceProvider>(
+                      create: ((context) => PreferenceProvider()),
                       child: _AccountDialog(_accounts),
                     ),
                   )) ??
@@ -197,16 +191,16 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
               future: AccountService().getAccounts(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  if (snapshot.data.length < 0) {
+                  if (snapshot.data!.length < 0) {
                     return Container();
                   }
                   _accounts = snapshot.data;
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: _accounts.length,
+                    itemCount: _accounts!.length,
                     itemBuilder: (context, index) {
-                      int _index = _accounts.length - index - 1;
+                      int _index = _accounts!.length - index - 1;
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         child: Container(
@@ -222,12 +216,11 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                           child: ListTile(
                             leading: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: getBankAccountTypeIcon(
-                                  _accounts[_index].type),
+                              child: getBankAccountTypeIcon(_accounts![_index].type),
                               // child:
                             ),
                             title: AdaptiveText(
-                              _accounts[_index].name ?? '',
+                              _accounts![_index].name ?? '',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: const Color(0xff272b37),
@@ -236,7 +229,7 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                               textAlign: TextAlign.left,
                             ),
                             subtitle: AdaptiveText(
-                              _accountType(_accounts[_index].type),
+                              _accountType(_accounts![_index].type),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -247,8 +240,7 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
                                 Text(
-                                  _formatBalanceWithComma(
-                                      _accounts[_index].balance),
+                                  _formatBalanceWithComma(_accounts![_index].balance!),
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: const Color(0xff1e1e1e),
@@ -257,8 +249,7 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                                   textAlign: TextAlign.center,
                                 ),
                                 Theme(
-                                  data: Theme.of(context)
-                                      .copyWith(cardColor: Colors.white),
+                                  data: Theme.of(context).copyWith(cardColor: Colors.white),
                                   child: PopupMenuButton<int>(
                                     icon: Icon(
                                       Icons.more_vert,
@@ -266,7 +257,7 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                                     ),
                                     onSelected: (value) async {
                                       if (value == 1) {
-                                        _deleteDialog(_accounts[_index]);
+                                        _deleteDialog(_accounts![_index]);
                                       }
                                     },
                                     itemBuilder: (context) => [
@@ -301,13 +292,12 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
 
   String _formatBalanceWithComma(String balance) {
     if (balance.contains('-')) {
-      return '-' +
-          nepaliNumberFormatter(double.parse(balance.substring(1)) ?? 0);
+      return '-' + nepaliNumberFormatter(double.tryParse(balance.substring(1)) ?? 0);
     } else
-      return nepaliNumberFormatter(balance ?? 0);
+      return nepaliNumberFormatter(balance);
   }
 
-  String _accountType(int value) {
+  String _accountType(int? value) {
     switch (value) {
       case 0:
         return 'Person';
@@ -321,15 +311,13 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   }
 
   void _deleteDialog(Account account) {
-    showDeleteDialog(context,
-            title: 'Delete Account',
-            deleteButtonText: 'Delete', onDeletePress: () async {
+    showDeleteDialog(context, title: 'Delete Account', deleteButtonText: 'Delete', onDeletePress: () async {
       if ((account.transactionIds?.length ?? 0) == 0) {
         await AccountService().deleteAccount(account, false);
         Navigator.of(context, rootNavigator: true).pop(true);
       } else {
         Navigator.of(context, rootNavigator: true).pop(false);
-        _scaffoldKey.currentState.showSnackBar(
+        ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.red,
             content: AdaptiveText(
@@ -349,7 +337,7 @@ class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
 }
 
 ///0=Person 1=Bank 2=Cash 3=Other
-Widget getBankAccountTypeIcon(int accountTypeId, {bool isForm = false}) {
+Widget getBankAccountTypeIcon(int? accountTypeId, {bool isForm = false}) {
   switch (accountTypeId) {
     case 0:
       return Icon(
@@ -380,7 +368,7 @@ Widget getBankAccountTypeIcon(int accountTypeId, {bool isForm = false}) {
 }
 
 class _AccountDialog extends StatefulWidget {
-  final List<Account> accounts;
+  final List<Account>? accounts;
 
   _AccountDialog(this.accounts);
 
@@ -390,21 +378,16 @@ class _AccountDialog extends StatefulWidget {
 
 class __AccountDialogState extends State<_AccountDialog> {
   // 0 = Person , 1 = Bank, 2 = Cash, 3 = Others
-  int _accountType = 1;
+  int? _accountType = 1;
   var _accountNameController = TextEditingController();
   var _openingBalanceController = TextEditingController();
 
   var _formKey = GlobalKey<FormState>();
-  List<Account> accounts;
-  Lang language;
+  List<Account>? accounts;
+  Lang? language;
   @override
   void initState() {
-    accounts = [
-      Account(type: 0, name: 'Person'),
-      Account(type: 1, name: 'Bank'),
-      Account(type: 2, name: 'Cash'),
-      Account(type: 3, name: 'Other')
-    ];
+    accounts = [Account(type: 0, name: 'Person'), Account(type: 1, name: 'Bank'), Account(type: 2, name: 'Cash'), Account(type: 3, name: 'Other')];
     super.initState();
   }
 
@@ -412,8 +395,7 @@ class __AccountDialogState extends State<_AccountDialog> {
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
     return Dialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(18.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(18.0))),
       backgroundColor: Colors.white,
       child: SingleChildScrollView(
         child: Padding(
@@ -463,9 +445,7 @@ class __AccountDialogState extends State<_AccountDialog> {
                             child: DropdownButton(
                               value: _accountType,
                               isExpanded: true,
-                              style: TextStyle(
-                                  color: Colors.black.withOpacity(0.8),
-                                  fontSize: 15.0),
+                              style: TextStyle(color: Colors.black.withOpacity(0.8), fontSize: 15.0),
                               icon: Icon(
                                 Icons.arrow_drop_down,
                                 color: Colors.grey,
@@ -473,20 +453,15 @@ class __AccountDialogState extends State<_AccountDialog> {
                               items: (accounts ?? [])
                                   .map(
                                     (e) => DropdownMenuItem(
-                                      child: dropDownMenuBuilder(
-                                          Icons.add, e.name,
-                                          iconBuilderWidget:
-                                              getBankAccountTypeIcon(e.type,
-                                                  isForm: true)),
+                                      child: dropDownMenuBuilder(Icons.add, e.name, iconBuilderWidget: getBankAccountTypeIcon(e.type, isForm: true)),
                                       value: e.type,
                                     ),
                                   )
                                   .toList(),
                               onTap: () {
-                                FocusScope.of(context)
-                                    .requestFocus(new FocusNode());
+                                FocusScope.of(context).requestFocus(new FocusNode());
                               },
-                              onChanged: (value) {
+                              onChanged: (dynamic value) {
                                 setState(() {
                                   _accountType = value;
                                 });
@@ -527,8 +502,7 @@ class __AccountDialogState extends State<_AccountDialog> {
                           child: TextFormField(
                             validator: validator,
                             controller: _accountNameController,
-                            style: TextStyle(
-                                color: Colors.grey[800], fontSize: 20.0),
+                            style: TextStyle(color: Colors.grey[800], fontSize: 20.0),
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.all(10),
@@ -566,7 +540,7 @@ class __AccountDialogState extends State<_AccountDialog> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: TextFormField(
-                        validator: (value) => value.isEmpty
+                        validator: (value) => value!.isEmpty
                             ? language == Lang.EN
                                 ? 'Balance Cannot be Empty'
                                 : 'ब्यालेन्स खाली हुन सक्दैन'
@@ -577,19 +551,16 @@ class __AccountDialogState extends State<_AccountDialog> {
                         ),
                         controller: _openingBalanceController,
                         keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly
-                        ],
-                        style:
-                            TextStyle(color: Colors.grey[800], fontSize: 20.0),
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        style: TextStyle(color: Colors.grey[800], fontSize: 20.0),
                       ),
                     ),
                   ],
                 ),
               ),
               SizedBox(height: 25.0),
-              FlatButton(
-                color: Configuration().incomeColor,
+              TextButton(
+                style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor)),
                 onPressed: _addAccount,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -620,26 +591,16 @@ class __AccountDialogState extends State<_AccountDialog> {
 
   Future _addAccount() async {
     FocusScope.of(context).requestFocus(new FocusNode());
-    if (_formKey.currentState.validate()) {
-      await AccountService().addAccount(
-          Account(
-              name: _accountNameController.text,
-              balance: _openingBalanceController.text,
-              type: _accountType,
-              transactionIds: []),
-          false);
+    if (_formKey.currentState!.validate()) {
+      await AccountService().addAccount(Account(name: _accountNameController.text, balance: _openingBalanceController.text, type: _accountType, transactionIds: []), false);
       Navigator.pop(context, true);
     }
   }
 
-  String validator(String value) {
-    if (value.isEmpty) {
-      return language == Lang.EN
-          ? 'Name Cannot be empty'
-          : 'नाम खाली हुनसक्दैन';
-    } else if (widget.accounts.any((account) =>
-        (account.name.toLowerCase() == value.toLowerCase() &&
-            account.type == _accountType))) {
+  String? validator(String? value) {
+    if (value!.isEmpty) {
+      return language == Lang.EN ? 'Name Cannot be empty' : 'नाम खाली हुनसक्दैन';
+    } else if (widget.accounts!.any((account) => (account.name!.toLowerCase() == value.toLowerCase() && account.type == _accountType))) {
       return language == Lang.EN ? 'Account already exixts' : 'खाता पहिल्यै छ';
     }
     return null;

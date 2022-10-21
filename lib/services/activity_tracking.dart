@@ -27,16 +27,15 @@ class ActivityTracker {
   }
 
   ///action=page to page transactions
-  Future pageTransactionActivity(String pageName,
-      {String action = 'Opened'}) async {
+  Future pageTransactionActivity(String pageName, {String action = 'Opened'}) async {
     try {
       int id = await PreferenceService.instance.getPageTrackCountIndex();
       PreferenceService.instance.setPageTrackCountIndex(id + 1);
-      final int pageId = getPageIdByName(pageName);
+      final int? pageId = getPageIdByName(pageName);
       var dbStore = await getDatabaseAndStore();
-      await dbStore.store.add(dbStore.database, {
+      await dbStore.store!.add(dbStore.database!, {
         'id': id,
-        'action': action ?? 'Opened',
+        'action': action,
         'pageId': pageId,
         'pageName': pageName,
         'actionDate': DateTime.now().toIso8601String(),
@@ -45,14 +44,13 @@ class ActivityTracker {
   }
 
   ///action=non-page transctions like dialog, alert etc
-  Future otherActivityOnPage(String pageName, String action, String widgetName,
-      String widgetType) async {
+  Future otherActivityOnPage(String pageName, String action, String widgetName, String widgetType) async {
     try {
       int id = await PreferenceService.instance.getPageTrackCountIndex();
       PreferenceService.instance.setPageTrackCountIndex(id + 1);
-      final int pageId = getPageIdByName(pageName);
+      final int? pageId = getPageIdByName(pageName);
       var dbStore = await getDatabaseAndStore();
-      await dbStore.store.add(dbStore.database, {
+      await dbStore.store!.add(dbStore.database!, {
         'id': id,
         'action': action,
         'pageId': pageId,
@@ -64,12 +62,11 @@ class ActivityTracker {
     } catch (e) {}
   }
 
-  int getPageIdByName(String pageName) {
+  int? getPageIdByName(String pageName) {
     if (PageName.pages == null) return null;
-    int pageId;
-    final data =
-        PageName.pages.where((element) => element['name'] == pageName).toList();
-    if ((data ?? []).isNotEmpty) {
+    int? pageId;
+    final data = PageName.pages!.where((element) => element['name'] == pageName).toList();
+    if ((data).isNotEmpty) {
       pageId = data.first['id'];
     }
     return pageId;
@@ -77,6 +74,6 @@ class ActivityTracker {
 
   Future<void> closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore();
-    await db.database.close();
+    await db.database!.close();
   }
 }

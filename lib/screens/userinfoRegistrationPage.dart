@@ -22,12 +22,11 @@ import '../providers/preference_provider.dart';
 import '../services/activity_tracking.dart';
 
 class UserInfoRegistrationPage extends StatefulWidget {
-  final User userData;
+  final User? userData;
 
-  const UserInfoRegistrationPage({Key key, this.userData}) : super(key: key);
+  const UserInfoRegistrationPage({Key? key, this.userData}) : super(key: key);
   @override
-  _UserInfoRegistrationPageState createState() =>
-      _UserInfoRegistrationPageState();
+  _UserInfoRegistrationPageState createState() => _UserInfoRegistrationPageState();
 }
 
 class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
@@ -38,37 +37,31 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  DateTime dateTime;
+  DateTime? dateTime;
   List<String> genders = ['Male', 'Female', 'Other'];
-  String genderValue = 'Male';
+  String? genderValue = 'Male';
   int popId = 0;
-  File image;
-  OutlineInputBorder border = OutlineInputBorder(
-      gapPadding: 0,
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: Colors.grey, width: 1.5));
-  TextStyle hintTextStyle = TextStyle(
-      color: Colors.grey[700], fontSize: 14, fontWeight: FontWeight.w500);
-  TextStyle titleStyle =
-      TextStyle(color: Colors.black, fontWeight: FontWeight.w400);
-  Lang language;
+  File? image;
+  OutlineInputBorder border = OutlineInputBorder(gapPadding: 0, borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey, width: 1.5));
+  TextStyle hintTextStyle = TextStyle(color: Colors.grey[700], fontSize: 14, fontWeight: FontWeight.w500);
+  TextStyle titleStyle = TextStyle(color: Colors.black, fontWeight: FontWeight.w400);
+  Lang? language;
   @override
   void initState() {
     super.initState();
     if (widget.userData != null) {
-      ActivityTracker()
-          .pageTransactionActivity(PageName.createProfile, action: 'Opened');
+      ActivityTracker().pageTransactionActivity(PageName.createProfile, action: 'Opened');
       addressController.text = widget.userData?.address ?? '';
       dateTime = widget.userData?.dob ?? null;
       emailController.text = widget.userData?.emailAddress ?? '';
       genderValue = widget.userData?.gender ?? null;
       image = widget.userData?.image != null
-          ? fileExists(widget.userData.image)
-              ? File(widget.userData.image)
+          ? fileExists(widget.userData!.image!)
+              ? File(widget.userData!.image!)
               : null
           : null;
-      fnameController.text = widget.userData?.name?.split(' ')?.first ?? '';
-      lnameController.text = widget.userData?.name?.split(' ')?.last ?? '';
+      fnameController.text = widget.userData?.name?.split(' ').first ?? '';
+      lnameController.text = widget.userData?.name?.split(' ').last ?? '';
       phoneNumberController.text = widget.userData?.phonenumber ?? '';
     }
   }
@@ -76,8 +69,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
   @override
   void dispose() {
     if (widget.userData != null) {
-      ActivityTracker()
-          .pageTransactionActivity(PageName.createProfile, action: 'Closed');
+      ActivityTracker().pageTransactionActivity(PageName.createProfile, action: 'Closed');
     }
     super.dispose();
   }
@@ -133,10 +125,8 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(new FocusNode());
                   if (phoneNumberController.text.length < 10) {
-                    _scaffoldKey.currentState.removeCurrentSnackBar();
-                    _scaffoldKey.currentState.showSnackBar(SnackBar(
-                        content: AdaptiveText(
-                            'Valid Phone Number must be added to Continue')));
+                    ScaffoldMessenger.of(_scaffoldKey.currentState!.context).removeCurrentSnackBar();
+                    ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(SnackBar(content: AdaptiveText('Valid Phone Number must be added to Continue')));
                   } else {
                     addNewUser(User(phonenumber: phoneNumberController.text));
                   }
@@ -167,8 +157,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                       if (!callback) {
                         return;
                       }
-                      final img = await ImagePicker()
-                          .getImage(source: ImageSource.gallery);
+                      final img = await ImagePicker().getImage(source: ImageSource.gallery);
                       if (img != null) {
                         image = File(img.path);
                         setState(() {});
@@ -178,16 +167,14 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                         width: double.maxFinite,
                         height: ScreenSizeConfig.blockSizeVertical * 25,
                         color: Colors.transparent,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: ScreenSizeConfig.blockSizeVertical * 10,
-                            vertical: 20),
+                        padding: EdgeInsets.symmetric(horizontal: ScreenSizeConfig.blockSizeVertical * 10, vertical: 20),
                         child: SizedBox(
                           width: double.maxFinite,
                           child: (image != null)
                               ? Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Image.file(
-                                    image,
+                                    image!,
                                     fit: BoxFit.contain,
                                   ),
                                 )
@@ -196,8 +183,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                   children: <Widget>[
                                     Icon(
                                       Icons.tag_faces,
-                                      size: ScreenSizeConfig.blockSizeVertical *
-                                          8,
+                                      size: ScreenSizeConfig.blockSizeVertical * 8,
                                       color: Colors.black,
                                     ),
                                     SizedBox(
@@ -205,8 +191,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     ),
                                     AdaptiveText(
                                       'Add Your Photo\nHere',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black),
+                                      style: TextStyle(fontSize: 16, color: Colors.black),
                                       textAlign: TextAlign.center,
                                     )
                                   ],
@@ -220,9 +205,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                 color: Colors.white,
                 shadowColor: Colors.black,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: ScreenSizeConfig.blockSizeHorizontal * 5,
-                      vertical: ScreenSizeConfig.blockSizeHorizontal * 6),
+                  padding: EdgeInsets.symmetric(horizontal: ScreenSizeConfig.blockSizeHorizontal * 5, vertical: ScreenSizeConfig.blockSizeHorizontal * 6),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -234,7 +217,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                               controller: fnameController,
                               hintText: 'John',
                               title: 'First Name',
-                              validator: (value) => value.trim.call().isEmpty
+                              validator: (value) => value!.trim.call().isEmpty
                                   ? language == Lang.EN
                                       ? "First Name Required"
                                       : 'पहिलो नाम आवाश्यक छ'
@@ -247,12 +230,11 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                 child: bodyField(
                                     title: 'Last Name',
                                     hintText: 'Doe',
-                                    validator: (value) =>
-                                        value.trim.call().isEmpty
-                                            ? language == Lang.EN
-                                                ? "Last Name Required"
-                                                : 'थरआवाश्यक छ'
-                                            : null,
+                                    validator: (value) => value!.trim.call().isEmpty
+                                        ? language == Lang.EN
+                                            ? "Last Name Required"
+                                            : 'थरआवाश्यक छ'
+                                        : null,
                                     controller: lnameController)),
                           ],
                         ),
@@ -261,14 +243,11 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                         ),
                         bodyField(
                             controller: phoneNumberController,
-                            textInputType: TextInputType.numberWithOptions(
-                                decimal: false, signed: false),
+                            textInputType: TextInputType.numberWithOptions(decimal: false, signed: false),
                             hintText: '9818212123',
                             title: 'Phone Number',
                             maxlength: 10,
-                            validator: (value) => value.trim.call().length < 10
-                                ? "Invalid Phone Number"
-                                : null),
+                            validator: (value) => value!.trim.call().length < 10 ? "Invalid Phone Number" : null),
                         SizedBox(
                           height: 15,
                         ),
@@ -310,43 +289,30 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                                     data: ThemeData(cardColor: Colors.white),
                                     child: DropdownButtonFormField<String>(
                                         onTap: () {
-                                          FocusScope.of(context)
-                                              .requestFocus(new FocusNode());
+                                          FocusScope.of(context).requestFocus(new FocusNode());
                                         },
                                         isExpanded: true,
-                                        validator: (value) =>
-                                            genderValue == null ? '' : null,
+                                        validator: (value) => genderValue == null ? '' : null,
                                         hint: Text('Gender'),
                                         decoration: InputDecoration(
                                           hintText: '',
-                                          contentPadding:
-                                              const EdgeInsets.fromLTRB(
-                                                  12, 12, 12, 13),
+                                          contentPadding: const EdgeInsets.fromLTRB(12, 12, 12, 13),
                                           isDense: true,
                                           border: border,
-                                          errorBorder: OutlineInputBorder(
-                                              gapPadding: 0,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              borderSide: BorderSide(
-                                                  color: Colors.red,
-                                                  width: 1.5)),
+                                          errorBorder: OutlineInputBorder(gapPadding: 0, borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.red, width: 1.5)),
                                           enabledBorder: border,
                                           disabledBorder: border,
                                           focusedBorder: border,
                                         ),
                                         value: genderValue,
                                         items: genders
-                                            .map(
-                                                (e) => DropdownMenuItem<String>(
-                                                    value: e,
-                                                    child: Container(
-                                                        child: AdaptiveText(
-                                                      e,
-                                                      style: TextStyle(
-                                                          color: const Color(
-                                                              0xff272b37)),
-                                                    ))))
+                                            .map((e) => DropdownMenuItem<String>(
+                                                value: e,
+                                                child: Container(
+                                                    child: AdaptiveText(
+                                                  e,
+                                                  style: TextStyle(color: const Color(0xff272b37)),
+                                                ))))
                                             .toList(),
                                         onChanged: (value) {
                                           setState(() {
@@ -362,13 +328,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                         SizedBox(
                           height: 15,
                         ),
-                        bodyField(
-                            controller: addressController,
-                            hintText: 'Lagankhel, Lalitpur',
-                            title: 'Address',
-                            validator: (value) => value.trim.call().isEmpty
-                                ? "Address Required"
-                                : null),
+                        bodyField(controller: addressController, hintText: 'Lagankhel, Lalitpur', title: 'Address', validator: (value) => value!.trim.call().isEmpty ? "Address Required" : null),
                         SizedBox(
                           height: 15,
                         ),
@@ -383,63 +343,45 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
                         SizedBox(
                           height: 15,
                         ),
-                        FlatButton(
-                          color: Configuration().incomeColor,
+                        TextButton(
+                          style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor)),
                           onPressed: () async {
-                            FocusScope.of(context)
-                                .requestFocus(new FocusNode());
-                            if (_formKey.currentState.validate()) {
-                              String imageDir;
+                            FocusScope.of(context).requestFocus(new FocusNode());
+                            if (_formKey.currentState!.validate()) {
+                              String? imageDir;
                               if (image != null) {
                                 try {
-                                  imageDir = (await Configuration().saveImage(
-                                          image,
-                                          'avatar',
-                                          DateTime.now().toIso8601String()))
-                                      .path;
+                                  imageDir = (await Configuration().saveImage(image!, 'avatar', DateTime.now().toIso8601String()))!.path;
                                 } catch (e) {
-                                  _scaffoldKey.currentState
-                                      .removeCurrentSnackBar();
-                                  _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                      content: AdaptiveText(
-                                          'Error, Image cannot be uploaded')));
+                                  ScaffoldMessenger.of(_scaffoldKey.currentState!.context).removeCurrentSnackBar();
+                                  ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(SnackBar(content: AdaptiveText('Error, Image cannot be uploaded')));
                                   return;
                                 }
                               }
                               User user = User(
-                                  address: addressController.text.isEmpty
-                                      ? null
-                                      : addressController.text,
+                                  address: addressController.text.isEmpty ? null : addressController.text,
                                   dob: dateTime,
-                                  emailAddress: emailController.text.isEmpty
-                                      ? null
-                                      : emailController.text,
+                                  emailAddress: emailController.text.isEmpty ? null : emailController.text,
                                   gender: genderValue,
                                   image: (imageDir != null) ? imageDir : null,
-                                  name: fnameController.text.trim() +
-                                      ' ' +
-                                      lnameController.text.trim(),
+                                  name: fnameController.text.trim() + ' ' + lnameController.text.trim(),
                                   phonenumber: phoneNumberController.text);
                               if (widget.userData == null) {
                                 addNewUser(user);
                               } else {
-                                if ((widget.userData.image ?? '').isNotEmpty) {
+                                if ((widget.userData!.image ?? '').isNotEmpty) {
                                   try {
-                                    File(widget.userData.image).delete();
+                                    File(widget.userData!.image!).delete();
                                   } catch (e) {}
                                 }
-                                await UserService()
-                                    .updateUser(user, widget.userData == null);
+                                await UserService().updateUser(user, widget.userData == null);
                                 Navigator.pop(context);
                               }
                             }
                           },
                           child: AdaptiveText(
                             'Save',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                           ),
                         )
                       ],
@@ -495,25 +437,17 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
       onCanceled: () {
         FocusScope.of(context).requestFocus(new FocusNode());
       },
-      onSelected: (id) async {
+      onSelected: (dynamic id) async {
         FocusScope.of(context).requestFocus(new FocusNode());
         DateTime date = DateTime(1910);
         popId = id;
         if (id == 0) {
-          NepaliDateTime date1 = await showAdaptiveDatePicker(
-              context: context,
-              initialDate: NepaliDateTime.now(),
-              firstDate: date.toNepaliDateTime(),
-              lastDate: NepaliDateTime.now());
+          NepaliDateTime? date1 = await showAdaptiveDatePicker(context: context, initialDate: NepaliDateTime.now(), firstDate: date.toNepaliDateTime(), lastDate: NepaliDateTime.now());
           if (date1 != null) {
             dateTime = date1.toDateTime();
           }
         } else {
-          final date1 = await showDatePicker(
-              context: context,
-              initialDate: DateTime.now(),
-              firstDate: date,
-              lastDate: DateTime.now());
+          final date1 = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: date, lastDate: DateTime.now());
           if (date1 != null) {
             dateTime = date1;
           }
@@ -526,35 +460,16 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
         decoration: InputDecoration(
           errorStyle: TextStyle(color: Colors.red),
           hintMaxLines: 2,
-          hintStyle: dateTime != null
-              ? TextStyle(
-                  color: Colors.black,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)
-              : TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold),
+          hintStyle: dateTime != null ? TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.bold) : TextStyle(color: Colors.grey[700], fontSize: 13, fontWeight: FontWeight.bold),
           contentPadding: EdgeInsets.symmetric(horizontal: 8),
           hintText: (dateTime == null)
               ? 'D.O.B'
               : (popId == 0)
-                  ? NepaliDateFormat(
-                          "MMMM dd, y (EEE)",
-                          language == Lang.EN
-                              ? Language.english
-                              : Language.nepali)
-                      .format(dateTime != null
-                          ? dateTime.toNepaliDateTime()
-                          : NepaliDateTime.now())
-                  : DateFormat("MMMM dd, y (EEEE)")
-                      .format(dateTime ?? DateTime.now()),
+                  ? NepaliDateFormat("MMMM dd, y (EEE)", language == Lang.EN ? Language.english : Language.nepali).format(dateTime != null ? dateTime!.toNepaliDateTime() : NepaliDateTime.now())
+                  : DateFormat("MMMM dd, y (EEEE)").format(dateTime ?? DateTime.now()),
           border: border,
           enabledBorder: border,
-          errorBorder: OutlineInputBorder(
-              gapPadding: 0,
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.red, width: 1.5)),
+          errorBorder: OutlineInputBorder(gapPadding: 0, borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.red, width: 1.5)),
           disabledBorder: border,
           focusedBorder: border,
         ),
@@ -562,13 +477,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
     );
   }
 
-  bodyField(
-      {String title,
-      String hintText,
-      String Function(String) validator,
-      TextEditingController controller,
-      int maxlength,
-      TextInputType textInputType = TextInputType.text}) {
+  bodyField({required String title, String? hintText, String? Function(String?)? validator, TextEditingController? controller, int? maxlength, TextInputType textInputType = TextInputType.text}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -581,14 +490,10 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
           height: 5,
         ),
         TextFormField(
-          enabled: (maxlength == null) ||
-              (maxlength != null && widget.userData?.phonenumber == null),
-          buildCounter: (context, {currentLength, isFocused, maxLength}) =>
-              Container(),
+          enabled: (maxlength == null) || (widget.userData?.phonenumber == null),
+          buildCounter: (context, {required currentLength, required isFocused, maxLength}) => Container(),
           keyboardType: textInputType,
-          inputFormatters: maxlength != null
-              ? [WhitelistingTextInputFormatter.digitsOnly]
-              : [],
+          inputFormatters: maxlength != null ? [FilteringTextInputFormatter.digitsOnly] : [],
           maxLength: maxlength,
           style: TextStyle(color: Colors.black, fontSize: 16),
           decoration: InputDecoration(
@@ -609,10 +514,7 @@ class _UserInfoRegistrationPageState extends State<UserInfoRegistrationPage> {
             contentPadding: EdgeInsets.symmetric(horizontal: 8),
             hintText: hintText,
             border: border,
-            errorBorder: OutlineInputBorder(
-                gapPadding: 0,
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.red, width: 1.5)),
+            errorBorder: OutlineInputBorder(gapPadding: 0, borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.red, width: 1.5)),
             enabledBorder: border,
             disabledBorder: border,
             focusedBorder: border,

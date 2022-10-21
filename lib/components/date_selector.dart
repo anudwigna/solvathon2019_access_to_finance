@@ -5,16 +5,16 @@ import 'package:nepali_utils/nepali_utils.dart';
 import 'package:provider/provider.dart';
 
 class DateSelector extends StatefulWidget {
-  final ValueChanged<NepaliDateTime> onDateChanged;
+  final ValueChanged<NepaliDateTime?> onDateChanged;
 
   ///OPTIONAL [default=2076]
-  final int initialDateYear;
-  final int initialMonth;
-  final NepaliDateTime currentDate;
-  final Color textColor;
+  final int? initialDateYear;
+  final int? initialMonth;
+  final NepaliDateTime? currentDate;
+  final Color? textColor;
 
   const DateSelector({
-    @required this.onDateChanged,
+    required this.onDateChanged,
     this.currentDate,
     this.initialDateYear,
     this.textColor,
@@ -26,8 +26,8 @@ class DateSelector extends StatefulWidget {
 }
 
 class _DateSelectorState extends State<DateSelector> {
-  NepaliDateTime _selectedDateTime;
-  int popid;
+  NepaliDateTime? _selectedDateTime;
+  int? popid;
 
   @override
   void initState() {
@@ -40,19 +40,19 @@ class _DateSelectorState extends State<DateSelector> {
     final language = Provider.of<PreferenceProvider>(context).language;
     return InkWell(
       onTap: () async {
-        NepaliDateTime date;
+        NepaliDateTime? date;
         date = await showAdaptiveDatePicker(
           initialDatePickerMode: DatePickerMode.day,
           context: context,
-          initialDate: _selectedDateTime
+          initialDate: _selectedDateTime!
                   .difference(NepaliDateTime(
                       widget.initialDateYear ?? NepaliDateTime.now().year,
                       widget.initialMonth ?? 1))
                   .isNegative
               ? NepaliDateTime(
                   widget.initialDateYear ?? NepaliDateTime.now().year,
-                  _selectedDateTime.month)
-              : _selectedDateTime,
+                  _selectedDateTime!.month)
+              : _selectedDateTime!,
           firstDate: NepaliDateTime(
               widget.initialDateYear ?? NepaliDateTime.now().year,
               widget.initialMonth ?? 1),
@@ -79,7 +79,7 @@ class _DateSelectorState extends State<DateSelector> {
           NepaliDateFormat("MMMM, y",
                   language == Lang.EN ? Language.english : Language.nepali)
               .format(
-            _selectedDateTime,
+            _selectedDateTime!,
           ),
           style: TextStyle(
               color: widget.textColor ?? Colors.grey,

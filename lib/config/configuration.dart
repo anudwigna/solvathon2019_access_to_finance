@@ -42,15 +42,15 @@ class Configuration {
     return NepaliDateTime(dateTime.year, dateTime.month, dateTime.day);
   }
 
-  Future<File> saveImage(
+  Future<File?> saveImage(
       File file, String directoryFolderName, String fileName) async {
-    File compressedImage =
+    File? compressedImage =
         await getCompressedImage(file, directoryFolderName, fileName);
     // print(compressedImage.path);
     return compressedImage;
   }
 
-  Future<File> getCompressedImage(
+  Future<File?> getCompressedImage(
       File _file, String directoryFolderName, String fileName) async {
     if (_file.path.split('/').last.split('.').last == 'jpg' ||
         _file.path.split('/').last.split('.').last == 'jpeg' ||

@@ -22,7 +22,7 @@ class MunshiG extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PreferenceProvider>(
-      builder: (context) => PreferenceProvider(),
+      create: ((context) => PreferenceProvider()),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MunshiG',
@@ -73,7 +73,7 @@ class _WrapperPageState extends State<WrapperPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<SubSectorProvider>(
-      builder: (context) => SubSectorProvider(),
+      create: ((context) => SubSectorProvider()),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MunshiG',

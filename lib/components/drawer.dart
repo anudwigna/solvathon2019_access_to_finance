@@ -13,9 +13,9 @@ import '../config/globals.dart';
 import 'adaptive_text.dart';
 
 class MyDrawer extends StatefulWidget {
-  final HomePageState homePageState;
+  final HomePageState? homePageState;
 
-  const MyDrawer({Key key, this.homePageState}) : super(key: key);
+  const MyDrawer({Key? key, this.homePageState}) : super(key: key);
   @override
   _MyDrawerState createState() => _MyDrawerState();
 }
@@ -62,7 +62,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 iconSize: 30,
                 dropdownColor: Colors.white,
                 items: [
-                  for (String subSector in globals.subSectors)
+                  for (String subSector in globals.subSectors as Iterable<String>)
                     DropdownMenuItem(
                       child: AdaptiveText(
                         subSector,
@@ -81,13 +81,13 @@ class _MyDrawerState extends State<MyDrawer> {
                     selectedSubSector.selectedSubSector = onValue;
                     PreferenceService.instance.setSelectedSubSector(onValue);
                     globals.incomeCategories = await CategoryService()
-                        .getCategories(selectedSubSector.selectedSubSector,
+                        .getCategories(selectedSubSector.selectedSubSector!,
                             CategoryType.INCOME);
                     globals.expenseCategories = await CategoryService()
-                        .getCategories(selectedSubSector.selectedSubSector,
+                        .getCategories(selectedSubSector.selectedSubSector!,
                             CategoryType.EXPENSE);
                     if (widget.homePageState != null) {
-                      await widget.homePageState.updateChartData();
+                      await widget.homePageState!.updateChartData();
                     }
                     setState(() {});
                     Navigator.pushNamedAndRemoveUntil(

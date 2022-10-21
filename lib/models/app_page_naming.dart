@@ -17,7 +17,7 @@ class PageName {
   static String addCashOut = "Add Cash Out Transaction Page";
   static String createProfile = "Create Profile Page";
   static String backupPage = "Backup Page";
-  static List<dynamic> pages;
+  static List<dynamic>? pages;
 
   init(List<dynamic> _pages) {
     pages = _pages;

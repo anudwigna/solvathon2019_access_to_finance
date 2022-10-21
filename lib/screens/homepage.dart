@@ -6,6 +6,7 @@ import 'package:MunshiG/config/globals.dart';
 import 'package:MunshiG/config/routes.dart';
 import 'package:MunshiG/icons/vector_icons.dart';
 import 'package:MunshiG/models/app_page_naming.dart';
+import 'package:MunshiG/models/category/category.dart';
 import 'package:MunshiG/models/transaction/transaction.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/transaction_page.dart';
@@ -29,11 +30,10 @@ class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  Lang language;
-  String selectedSubSector;
-  TabController _tabController;
+class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  Lang? language;
+  String? selectedSubSector;
+  TabController? _tabController;
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
   final int noOfmonths = 132;
@@ -50,8 +50,7 @@ class HomePageState extends State<HomePage>
     VersionChanges().v102Changes().then((value) {
       AppPage().initializeAppPages()
         ..then((value) {
-          ActivityTracker()
-              .pageTransactionActivity(PageName.dashboard, action: 'Opened');
+          ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Opened');
         }).catchError((onError) {
           print('error');
         });
@@ -71,16 +70,13 @@ class HomePageState extends State<HomePage>
 
     switch (state) {
       case AppLifecycleState.paused:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.dashboard, action: 'Paused');
+        ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Paused');
         break;
       case AppLifecycleState.inactive:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.dashboard, action: 'Inactive');
+        ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Inactive');
         break;
       case AppLifecycleState.resumed:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.dashboard, action: 'Resumed');
+        ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Resumed');
         break;
       case AppLifecycleState.detached:
         break;
@@ -100,10 +96,9 @@ class HomePageState extends State<HomePage>
 
   @override
   void dispose() {
-    ActivityTracker()
-        .pageTransactionActivity(PageName.dashboard, action: 'Closed');
+    ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Closed');
     WidgetsBinding.instance.removeObserver(this);
-    _tabController.dispose();
+    _tabController!.dispose();
     _dateResolver.clear();
     super.dispose();
   }
@@ -111,8 +106,7 @@ class HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
-    selectedSubSector =
-        Provider.of<SubSectorProvider>(context).selectedSubSector;
+    selectedSubSector = Provider.of<SubSectorProvider>(context).selectedSubSector;
     return WillPopScope(
       onWillPop: () async {
         exitApplication();
@@ -137,7 +131,7 @@ class HomePageState extends State<HomePage>
                   textAlign: TextAlign.center,
                 ),
                 AdaptiveText(
-                  (selectedSubSector),
+                  selectedSubSector!,
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 17,
@@ -174,12 +168,7 @@ class HomePageState extends State<HomePage>
                   language == Lang.EN
                       ? Tab(
                           child: Text(
-                            NepaliDateFormat(
-                                    "MMMM ''yy",
-                                    language == Lang.EN
-                                        ? Language.english
-                                        : Language.nepali)
-                                .format(
+                            NepaliDateFormat("MMMM ''yy", language == Lang.EN ? Language.english : Language.nepali).format(
                               NepaliDateTime(
                                 _dateResolver[index].year,
                                 _dateResolver[index].month,
@@ -189,14 +178,8 @@ class HomePageState extends State<HomePage>
                         )
                       : Tab(
                           child: Text(
-                            NepaliDateFormat(
-                                    "MMMM ''yy",
-                                    language == Lang.EN
-                                        ? Language.english
-                                        : Language.nepali)
-                                .format(
-                              NepaliDateTime(_dateResolver[index].year,
-                                  _dateResolver[index].month),
+                            NepaliDateFormat("MMMM ''yy", language == Lang.EN ? Language.english : Language.nepali).format(
+                              NepaliDateTime(_dateResolver[index].year, _dateResolver[index].month),
                             ),
                             style: TextStyle(color: Colors.white),
                           ),
@@ -208,8 +191,7 @@ class HomePageState extends State<HomePage>
           body: TabBarView(
             controller: _tabController,
             children: [
-              for (int index = 0; index < noOfmonths; index++)
-                _buildBody(_dateResolver[index]),
+              for (int index = 0; index < noOfmonths; index++) _buildBody(_dateResolver[index]),
             ],
           ),
         ),
@@ -218,13 +200,8 @@ class HomePageState extends State<HomePage>
   }
 
   exitApplication() {
-    showDeleteDialog(context,
-        title: 'Confirm Exit',
-        deleteButtonText: 'Exit  ',
-        description: 'Do you want to exit this application?',
-        onDeletePress: () {
-      ActivityTracker().otherActivityOnPage(PageName.dashboard,
-          'Exit App from In-App Dialog', 'Exit', 'FlatButton');
+    showDeleteDialog(context, title: 'Confirm Exit', deleteButtonText: 'Exit  ', description: 'Do you want to exit this application?', onDeletePress: () {
+      ActivityTracker().otherActivityOnPage(PageName.dashboard, 'Exit App from In-App Dialog', 'Exit', 'FlatButton');
       SystemNavigator.pop(animated: true);
     });
   }
@@ -239,33 +216,24 @@ class HomePageState extends State<HomePage>
           child: Column(
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: ScreenSizeConfig.blockSizeHorizontal * 10,
-                    vertical: ScreenSizeConfig.blockSizeHorizontal * 12),
+                padding: EdgeInsets.symmetric(horizontal: ScreenSizeConfig.blockSizeHorizontal * 10, vertical: ScreenSizeConfig.blockSizeHorizontal * 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     FutureBuilder<List<double>>(
-                      future: TransactionService().getTotalIncomeExpense(
-                          selectedSubSector, date.year, date.month),
+                      future: TransactionService().getTotalIncomeExpense(selectedSubSector!, date.year, date.month),
                       builder: (context, snapshot) {
                         final income = snapshot.data?.first ?? 0.0;
                         final expense = snapshot.data?.last ?? 0.0;
                         final bool isExpenseGreater = (expense - income) > 0;
-                        final percentSaved = income == 0.0
-                            ? 0.0
-                            : (income - expense) / (income) * 100;
+                        final percentSaved = income == 0.0 ? 0.0 : (income - expense) / (income) * 100;
                         return Center(
                           child: SleekCircularSlider(
                             innerWidget: (percentage) => Padding(
-                              padding: EdgeInsets.only(
-                                  top:
-                                      ScreenSizeConfig.blockSizeVertical * 4.5),
-                              child:
-                                  Center(child: _centerWidget(income, expense)),
+                              padding: EdgeInsets.only(top: ScreenSizeConfig.blockSizeVertical * 4.5),
+                              child: Center(child: _centerWidget(income, expense)),
                             ),
-                            initialValue:
-                                isExpenseGreater ? 100 : (percentSaved),
+                            initialValue: isExpenseGreater ? 100 : (percentSaved),
                             appearance: CircularSliderAppearance(
                               angleRange: 360,
                               startAngle: 270,
@@ -275,9 +243,7 @@ class HomePageState extends State<HomePage>
                               ),
                               customColors: CustomSliderColors(
                                 trackColor: Configuration().expenseColor,
-                                progressBarColors: (isExpenseGreater)
-                                    ? [Colors.red, Colors.red]
-                                    : [Color(0xff7635C7), Color(0xff7635C7)],
+                                progressBarColors: (isExpenseGreater) ? [Colors.red, Colors.red] : [Color(0xff7635C7), Color(0xff7635C7)],
                                 hideShadow: true,
                               ),
                               infoProperties: InfoProperties(
@@ -289,8 +255,7 @@ class HomePageState extends State<HomePage>
                                   color: Colors.black,
                                   fontSize: 20.0,
                                 ),
-                                mainLabelStyle: TextStyle(
-                                    fontSize: 17.0, color: Colors.black),
+                                mainLabelStyle: TextStyle(fontSize: 17.0, color: Colors.black),
                               ),
                             ),
                           ),
@@ -367,15 +332,8 @@ class HomePageState extends State<HomePage>
                 ),
               ),
               Text(
-                language == Lang.EN
-                    ? 'Overview for the month of ${NepaliDateFormat("MMMM").format(date)}'
-                    : '${NepaliDateFormat("MMMM", Language.nepali).format(date)} महिनाको विस्तृत सर्वेक्षण',
-                style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: Colors.black,
-                    height: 1.4285714285714286,
-                    fontWeight: FontWeight.w500),
+                language == Lang.EN ? 'Overview for the month of ${NepaliDateFormat("MMMM").format(date)}' : '${NepaliDateFormat("MMMM", Language.nepali).format(date)} महिनाको विस्तृत सर्वेक्षण',
+                style: TextStyle(fontFamily: 'Poppins', fontSize: 16, color: Colors.black, height: 1.4285714285714286, fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
               ),
               Divider(
@@ -386,11 +344,10 @@ class HomePageState extends State<HomePage>
                 height: 10.0,
               ),
               FutureBuilder<List<Transaction>>(
-                  future: TransactionService().getTransactions(
-                      selectedSubSector, date.year, date.month),
+                  future: TransactionService().getTransactions(selectedSubSector!, date.year, date.month),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      if (snapshot.data.length == 0) {
+                      if (snapshot.data!.length == 0) {
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -406,21 +363,13 @@ class HomePageState extends State<HomePage>
                             ),
                             AdaptiveText(
                               'No Transactions',
-                              style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                  height: 1.4285714285714286,
-                                  fontWeight: FontWeight.w500),
+                              style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey, height: 1.4285714285714286, fontWeight: FontWeight.w500),
                               textAlign: TextAlign.center,
                             ),
                           ],
                         );
                       } else {
-                        return TransactionList(
-                            transactionData: snapshot.data,
-                            date: date,
-                            language: language);
+                        return TransactionList(transactionData: snapshot.data, date: date, language: language);
                       }
                     } else {
                       return Center(
@@ -446,9 +395,8 @@ class HomePageState extends State<HomePage>
           ),
         ),
         Text(
-          nepaliNumberFormatter(income ?? 0),
-          style: TextStyle(
-              color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold),
+          nepaliNumberFormatter(income),
+          style: TextStyle(color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 10.0),
         AdaptiveText(
@@ -458,7 +406,7 @@ class HomePageState extends State<HomePage>
           ),
         ),
         Text(
-          nepaliNumberFormatter(expense ?? 0),
+          nepaliNumberFormatter(expense),
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -477,8 +425,7 @@ class HomePageState extends State<HomePage>
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color:
-            cashIn ? Configuration().incomeColor : Configuration().expenseColor,
+        color: cashIn ? Configuration().incomeColor : Configuration().expenseColor,
       ),
       height: 38,
       width: 38,
@@ -493,9 +440,9 @@ class HomePageState extends State<HomePage>
 }
 
 class TransactionList extends StatefulWidget {
-  final List<Transaction> transactionData;
-  final NepaliDateTime date;
-  final Lang language;
+  final List<Transaction>? transactionData;
+  final NepaliDateTime? date;
+  final Lang? language;
 
   TransactionList({this.date, this.language, this.transactionData});
 
@@ -505,8 +452,8 @@ class TransactionList extends StatefulWidget {
 
 class _TransactionListState extends State<TransactionList> {
   var _transactionMap = <String, List<Transaction>>{};
-  List<bool> _expansionRecords;
-  List<double> income, expense;
+  List<bool>? _expansionRecords;
+  List<double> income = [], expense = [];
   @override
   void initState() {
     super.initState();
@@ -514,7 +461,7 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   initData() {
-    _transactionMap = _buildTransactionMap(widget.transactionData);
+    _transactionMap = _buildTransactionMap(widget.transactionData!);
     income = List.filled(_transactionMap.length, 0.0);
     expense = List.filled(_transactionMap.length, 0.0);
     int z = 0;
@@ -530,7 +477,7 @@ class _TransactionListState extends State<TransactionList> {
   @override
   void didUpdateWidget(TransactionList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.transactionData.length != oldWidget.transactionData.length) {
+    if (widget.transactionData!.length != oldWidget.transactionData!.length) {
       initData();
     }
   }
@@ -538,27 +485,22 @@ class _TransactionListState extends State<TransactionList> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: Theme.of(context).copyWith(
-          cardColor: Colors.white,
-          cursorColor: Colors.red,
-          buttonColor: Colors.amber,
-          primaryColor: Colors.red),
+      data: Theme.of(context).copyWith(cardColor: Colors.white, primaryColor: Colors.red),
       child: ExpansionPanelList(
           // elevation: 0,
           expansionCallback: (index, isExpanded) {
             setState(() {
-              _expansionRecords[index] = !isExpanded;
+              _expansionRecords![index] = !isExpanded;
             });
           },
           children: [
             for (int i = 0; i < _transactionMap.length; i++)
               ExpansionPanel(
-                isExpanded: _expansionRecords[i],
+                isExpanded: _expansionRecords![i],
                 canTapOnHeader: true,
                 headerBuilder: (context, isExpanded) => ListTile(
                   leading: Chip(
-                    label: Text(
-                        getDateTimeFormat(_transactionMap.keys.toList()[i])),
+                    label: Text(getDateTimeFormat(_transactionMap.keys.toList()[i])),
                     backgroundColor: Configuration().incomeColor,
                   ),
                   title: SingleChildScrollView(
@@ -577,8 +519,7 @@ class _TransactionListState extends State<TransactionList> {
                     ),
                   ),
                 ),
-                body: _dailyTransactionWidget(
-                    _transactionMap[_transactionMap.keys.toList()[i]]),
+                body: _dailyTransactionWidget(_transactionMap[_transactionMap.keys.toList()[i]]!),
               ),
           ]),
     );
@@ -589,9 +530,9 @@ class _TransactionListState extends State<TransactionList> {
     double exValue = 0.0;
     data.forEach((element) {
       if (element.transactionType == 0) {
-        inValue = inValue + double.parse(element.amount);
+        inValue = inValue + double.parse(element.amount!);
       } else
-        exValue = exValue + double.parse(element.amount);
+        exValue = exValue + double.parse(element.amount!);
     });
     return [inValue, exValue];
   }
@@ -602,9 +543,7 @@ class _TransactionListState extends State<TransactionList> {
       child: Row(
         children: [
           Material(
-            color: (transactionType == 0)
-                ? Configuration().incomeColor
-                : Configuration().expenseColor,
+            color: (transactionType == 0) ? Configuration().incomeColor : Configuration().expenseColor,
             shape: CircleBorder(),
             child: SizedBox(
               width: 10.0,
@@ -625,9 +564,7 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   getDateTimeFormat(String date) {
-    return NepaliDateFormat("dd/MM/EE",
-            widget.language == Lang.EN ? Language.english : Language.nepali)
-        .format(NepaliDateTime.parse(NepaliDateTime(
+    return NepaliDateFormat("dd/MM/EE", widget.language == Lang.EN ? Language.english : Language.nepali).format(NepaliDateTime.parse(NepaliDateTime(
       int.parse(date.split('-').first),
       int.parse(date.split('-')[1]),
       int.parse(date.split('-').last),
@@ -655,26 +592,21 @@ class _TransactionListState extends State<TransactionList> {
                   itemCount: dailyTransactions.length,
                   reverse: true,
                   itemBuilder: (context, index) {
-                    return FutureBuilder(
+                    return FutureBuilder<Category>(
                       future: CategoryService().getCategoryById(
-                        selectedSubSector,
+                        selectedSubSector!,
                         dailyTransactions[index].categoryId,
                         dailyTransactions[index].transactionType,
                       ),
                       builder: (context, snapshot) {
-                        if (!snapshot.hasData)
-                          return Container(
-                            height: 1,
-                            width: 1,
-                          );
+                        if (!snapshot.hasData) return SizedBox.shrink();
                         return ListTile(
                           onTap: () async {
-                            await _showTransactionDetail(
-                                dailyTransactions[index]);
+                            await _showTransactionDetail(dailyTransactions[index]);
                           },
                           leading: Icon(
                             VectorIcons.fromName(
-                              snapshot.data.iconName,
+                              snapshot.data!.iconName,
                               provider: IconProvider.FontAwesome5,
                             ),
                             color: Configuration().incomeColor,
@@ -686,8 +618,7 @@ class _TransactionListState extends State<TransactionList> {
                             style: TextStyle(color: Colors.black),
                           ),
                           trailing: Text(
-                            nepaliNumberFormatter(double.tryParse(
-                                dailyTransactions[index].amount)),
+                            nepaliNumberFormatter(double.tryParse(dailyTransactions[index].amount!)),
                             style: getTextStyle(dailyTransactions[index]),
                           ),
                         );
@@ -707,29 +638,21 @@ class _TransactionListState extends State<TransactionList> {
   Future _showTransactionDetail(Transaction transaction) async {
     await detailDialog(context,
         title: 'Transaction Detail',
-        detailWidget: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              _detailsRow(
-                'Date: ',
-                NepaliDateFormat(
-                        "MMMM dd, y (EEE)",
-                        widget.language == Lang.EN
-                            ? Language.english
-                            : Language.nepali)
-                    .format(
-                  NepaliDateTime.parse(transaction.timestamp),
-                ),
-              ),
-              // SizedBox(height: 5.0),
-              _detailsRow('Detail: ', '${transaction.memo ?? ''}'),
-              // SizedBox(height: 5.0),
-              _detailsRow(
-                'Amount: ',
-                nepaliNumberFormatter(transaction.amount ?? 0),
-              ),
-            ]), onDelete: () {
+        detailWidget: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+          _detailsRow(
+            'Date: ',
+            NepaliDateFormat("MMMM dd, y (EEE)", widget.language == Lang.EN ? Language.english : Language.nepali).format(
+              NepaliDateTime.parse(transaction.timestamp!),
+            ),
+          ),
+          // SizedBox(height: 5.0),
+          _detailsRow('Detail: ', '${transaction.memo ?? ''}'),
+          // SizedBox(height: 5.0),
+          _detailsRow(
+            'Amount: ',
+            nepaliNumberFormatter(transaction.amount ?? 0),
+          ),
+        ]), onDelete: () {
       _deleteTransaction(transaction).then((value) {
         Navigator.of(context, rootNavigator: true).pop(value);
       });
@@ -797,27 +720,18 @@ class _TransactionListState extends State<TransactionList> {
     );
   }
 
-  TextStyle getTextStyle(Transaction transaction) => TextStyle(
-      color: transaction.transactionType == 0
-          ? Configuration().incomeColor
-          : Configuration().expenseColor,
-      fontWeight: FontWeight.bold);
+  TextStyle getTextStyle(Transaction transaction) => TextStyle(color: transaction.transactionType == 0 ? Configuration().incomeColor : Configuration().expenseColor, fontWeight: FontWeight.bold);
 
-  Map<String, List<Transaction>> _buildTransactionMap(
-      List<Transaction> transactions) {
-    transactions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  Map<String, List<Transaction>> _buildTransactionMap(List<Transaction> transactions) {
+    transactions.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
     final zz = transactions.reversed.toList();
-    final map = zz.groupBy((e) => e.timestamp.split('T').first);
+    final Map<String, List<Transaction>> map = zz.groupBy((e) => e.timestamp!.split('T').first);
     return map;
   }
 
   Future<bool> _deleteTransaction(Transaction transaction) async {
-    final d = await showDeleteDialog(context,
-        topIcon: Icons.error_outline,
-        description: 'Are you sure you want to delete this transaction?',
-        title: 'Delete Transaction', onDeletePress: () async {
-      await TransactionService()
-          .deleteTransaction(selectedSubSector, transaction, false);
+    final d = await showDeleteDialog(context, topIcon: Icons.error_outline, description: 'Are you sure you want to delete this transaction?', title: 'Delete Transaction', onDeletePress: () async {
+      await TransactionService().deleteTransaction(selectedSubSector!, transaction, false);
       Navigator.of(context, rootNavigator: true).pop(true);
     }, onCancelPress: () {
       Navigator.of(context, rootNavigator: true).pop(false);

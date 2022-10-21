@@ -4,10 +4,10 @@ part 'categoryHeading.g.dart';
 
 @JsonSerializable()
 class CategoryHeading extends Object {
-  final int id;
-  final String en;
-  final String np;
-  final String iconName;
+  final int? id;
+  final String? en;
+  final String? np;
+  final String? iconName;
   CategoryHeading({
     this.id,
     this.en,

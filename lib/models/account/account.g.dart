@@ -8,11 +8,11 @@ part of 'account.dart';
 
 Account _$AccountFromJson(Map<String, dynamic> json) {
   return Account(
-      name: json['name'] as String,
-      balance: json['balance'] as String,
-      type: json['type'] as int,
+      name: json['name'] as String?,
+      balance: json['balance'] as String?,
+      type: json['type'] as int?,
       transactionIds:
-          (json['transactionIds'] as List)?.map((e) => e as int)?.toList());
+          (json['transactionIds'] as List?)?.map((e) => e as int)?.toList());
 }
 
 Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{

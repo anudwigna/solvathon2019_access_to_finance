@@ -22,22 +22,21 @@ import '../services/activity_tracking.dart';
 import '../services/category_heading_service.dart';
 
 class BudgetPage extends StatefulWidget {
-  final bool isInflowProjection;
+  final bool? isInflowProjection;
 
-  const BudgetPage({Key key, this.isInflowProjection}) : super(key: key);
+  const BudgetPage({Key? key, this.isInflowProjection}) : super(key: key);
   @override
   _BudgetPageState createState() => _BudgetPageState();
 }
 
-class _BudgetPageState extends State<BudgetPage>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+class _BudgetPageState extends State<BudgetPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
-  Lang language;
-  TabController _tabController;
-  String selectedSubSector;
+  Lang? language;
+  TabController? _tabController;
+  String? selectedSubSector;
   final int noOfmonths = 132;
-  bool isInflow;
+  late bool isInflow;
   var _budgetAmountController = TextEditingController();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   var _dateResolver = <NepaliDateTime>[];
@@ -46,14 +45,9 @@ class _BudgetPageState extends State<BudgetPage>
     isInflow = widget.isInflowProjection ?? false;
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ActivityTracker().pageTransactionActivity(
-        widget.isInflowProjection
-            ? PageName.cashInflowProjection
-            : PageName.cashOutflowProjection,
-        action: 'Opened');
+    ActivityTracker().pageTransactionActivity(widget.isInflowProjection! ? PageName.cashInflowProjection : PageName.cashOutflowProjection, action: 'Opened');
     initializeDateResolver();
-    _tabController = TabController(
-        length: noOfmonths, vsync: this, initialIndex: _currentMonth - 1);
+    _tabController = TabController(length: noOfmonths, vsync: this, initialIndex: _currentMonth - 1);
   }
 
   @override
@@ -62,25 +56,13 @@ class _BudgetPageState extends State<BudgetPage>
 
     switch (state) {
       case AppLifecycleState.paused:
-        ActivityTracker().pageTransactionActivity(
-            widget.isInflowProjection
-                ? PageName.cashInflowProjection
-                : PageName.cashOutflowProjection,
-            action: 'Paused');
+        ActivityTracker().pageTransactionActivity(widget.isInflowProjection! ? PageName.cashInflowProjection : PageName.cashOutflowProjection, action: 'Paused');
         break;
       case AppLifecycleState.inactive:
-        ActivityTracker().pageTransactionActivity(
-            widget.isInflowProjection
-                ? PageName.cashInflowProjection
-                : PageName.cashOutflowProjection,
-            action: 'Inactive');
+        ActivityTracker().pageTransactionActivity(widget.isInflowProjection! ? PageName.cashInflowProjection : PageName.cashOutflowProjection, action: 'Inactive');
         break;
       case AppLifecycleState.resumed:
-        ActivityTracker().pageTransactionActivity(
-            widget.isInflowProjection
-                ? PageName.cashInflowProjection
-                : PageName.cashOutflowProjection,
-            action: 'Resumed');
+        ActivityTracker().pageTransactionActivity(widget.isInflowProjection! ? PageName.cashInflowProjection : PageName.cashOutflowProjection, action: 'Resumed');
         break;
       case AppLifecycleState.detached:
         break;
@@ -90,12 +72,8 @@ class _BudgetPageState extends State<BudgetPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ActivityTracker().pageTransactionActivity(
-        widget.isInflowProjection
-            ? PageName.cashInflowProjection
-            : PageName.cashOutflowProjection,
-        action: 'Closed');
-    _tabController.dispose();
+    ActivityTracker().pageTransactionActivity(widget.isInflowProjection! ? PageName.cashInflowProjection : PageName.cashOutflowProjection, action: 'Closed');
+    _tabController!.dispose();
     super.dispose();
   }
 
@@ -116,8 +94,7 @@ class _BudgetPageState extends State<BudgetPage>
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
-    selectedSubSector =
-        Provider.of<SubSectorProvider>(context).selectedSubSector;
+    selectedSubSector = Provider.of<SubSectorProvider>(context).selectedSubSector;
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Configuration().appColor,
@@ -134,14 +111,8 @@ class _BudgetPageState extends State<BudgetPage>
             for (int index = 0; index < noOfmonths; index++)
               Tab(
                 child: Text(
-                  NepaliDateFormat(
-                          "MMMM ''yy",
-                          language == Lang.EN
-                              ? Language.english
-                              : Language.nepali)
-                      .format(
-                    NepaliDateTime(
-                        _dateResolver[index].year, _dateResolver[index].month),
+                  NepaliDateFormat("MMMM ''yy", language == Lang.EN ? Language.english : Language.nepali).format(
+                    NepaliDateTime(_dateResolver[index].year, _dateResolver[index].month),
                   ),
                   style: TextStyle(color: Colors.white),
                 ),
@@ -177,9 +148,8 @@ class _BudgetPageState extends State<BudgetPage>
               Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: AdaptiveText(
-                  selectedSubSector,
+                  selectedSubSector!,
                   style: TextStyle(
-                  
                     fontSize: 16,
                     color: const Color(0xff1e1e1e),
                     fontWeight: FontWeight.w700,
@@ -188,28 +158,22 @@ class _BudgetPageState extends State<BudgetPage>
               ),
               Expanded(
                 child: FutureBuilder<List<Category>>(
-                  future: CategoryService().getCategories(selectedSubSector,
-                      isInflow ? CategoryType.INCOME : CategoryType.EXPENSE),
+                  future: CategoryService().getCategories(selectedSubSector!, isInflow ? CategoryType.INCOME : CategoryType.EXPENSE),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ListView.separated(
-                        itemCount: snapshot.data.length,
+                        itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) => Padding(
                           padding: EdgeInsets.only(
                             top: index == 0 ? 10 : 0,
-                            bottom: index == snapshot.data.length - 1 ? 30 : 0,
+                            bottom: index == snapshot.data!.length - 1 ? 30 : 0,
                           ),
                           child: DecoratedBox(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(
-                                    color: Colors.grey.withOpacity(0.7))),
-                            child:
-                                _buildCard(snapshot.data[index], month, year),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.grey.withOpacity(0.7))),
+                            child: _buildCard(snapshot.data![index], month, year),
                           ),
                         ),
-                        separatorBuilder: (context, _) =>
-                            SizedBox(height: 20.0),
+                        separatorBuilder: (context, _) => SizedBox(height: 20.0),
                       );
                     } else
                       return Center(
@@ -227,8 +191,7 @@ class _BudgetPageState extends State<BudgetPage>
 
   Widget _buildCard(Category category, int month, int year) {
     return FutureBuilder<Budget>(
-      future: BudgetService()
-          .getBudget(selectedSubSector, category.id, month, year),
+      future: BudgetService().getBudget(selectedSubSector!, category.id, month, year),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Column(
@@ -237,8 +200,7 @@ class _BudgetPageState extends State<BudgetPage>
                 color: Colors.white,
                 onSelected: (value) async {
                   if (value == 1) {
-                    _setBudgetDialog(snapshot.data, category, year, month,
-                        action: snapshot.data.spent == null ? 'set' : 'update');
+                    _setBudgetDialog(snapshot.data, category, year, month, action: snapshot.data!.spent == null ? 'set' : 'update');
                   } else {
                     _clearBudgetDialog(snapshot.data, category);
                   }
@@ -247,13 +209,11 @@ class _BudgetPageState extends State<BudgetPage>
                   PopupMenuItem(
                     value: 1,
                     child: AdaptiveText(
-                      snapshot.data.spent == null
-                          ? 'Set Budget'
-                          : 'Update Budget',
+                      snapshot.data!.spent == null ? 'Set Budget' : 'Update Budget',
                       style: TextStyle(color: Colors.grey[700]),
                     ),
                   ),
-                  if (snapshot.data.spent != null)
+                  if (snapshot.data!.spent != null)
                     PopupMenuItem(
                       value: 2,
                       child: AdaptiveText(
@@ -263,22 +223,15 @@ class _BudgetPageState extends State<BudgetPage>
                     ),
                 ],
                 child: Padding(
-                  padding: EdgeInsets.only(
-                      left: 15, right: 15.0, top: 13, bottom: 13),
+                  padding: EdgeInsets.only(left: 15, right: 15.0, top: 13, bottom: 13),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      FutureBuilder<CategoryHeading>(
-                        future: CategoryHeadingService().getCategoryHeadingById(
-                            widget.isInflowProjection
-                                ? CategoryType.INCOME
-                                : CategoryType.EXPENSE,
-                            category.categoryHeadingId == null
-                                ? (widget.isInflowProjection ? 100 : 1)
-                                : category.categoryHeadingId),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<CategoryHeading> snapshot1) {
+                      FutureBuilder<CategoryHeading?>(
+                        future: CategoryHeadingService().getCategoryHeadingById(widget.isInflowProjection! ? CategoryType.INCOME : CategoryType.EXPENSE,
+                            category.categoryHeadingId == null ? (widget.isInflowProjection! ? 100 : 1) : category.categoryHeadingId),
+                        builder: (BuildContext context, AsyncSnapshot<CategoryHeading?> snapshot1) {
                           return (!snapshot1.hasData)
                               ? Icon(
                                   VectorIcons.fromName(
@@ -288,8 +241,7 @@ class _BudgetPageState extends State<BudgetPage>
                                   color: Configuration().incomeColor,
                                   size: 20.0,
                                 )
-                              : SvgPicture.asset(
-                                  'assets/images/${snapshot1.data.iconName}');
+                              : SvgPicture.asset('assets/images/${snapshot1.data!.iconName}');
                         },
                       ),
                       SizedBox(width: 15.0),
@@ -301,18 +253,12 @@ class _BudgetPageState extends State<BudgetPage>
                             AdaptiveText(
                               '',
                               category: category,
-                              style: TextStyle(
-                                  fontSize: 15.0, color: Colors.black),
+                              style: TextStyle(fontSize: 15.0, color: Colors.black),
                             ),
                             SizedBox(height: 2.0),
                             AdaptiveText(
-                              (snapshot.data.total == null)
-                                  ? 'Click to set budget'
-                                  : 'Click to update budget',
-                              style: TextStyle(
-                                  fontSize: 11.0,
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.w500),
+                              (snapshot.data!.total == null) ? 'Click to set budget' : 'Click to update budget',
+                              style: TextStyle(fontSize: 11.0, color: Colors.grey, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -322,19 +268,16 @@ class _BudgetPageState extends State<BudgetPage>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
                           Text(
-                            nepaliNumberFormatter(snapshot.data.spent ?? 0) +
-                                '/',
+                            nepaliNumberFormatter(snapshot.data!.spent ?? 0) + '/',
                             style: TextStyle(
-                        
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Configuration().incomeColor,
                             ),
                           ),
                           Text(
-                            nepaliNumberFormatter(snapshot.data.total ?? 0),
+                            nepaliNumberFormatter(snapshot.data!.total ?? 0),
                             style: TextStyle(
-                        
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Configuration().incomeColor,
@@ -356,8 +299,8 @@ class _BudgetPageState extends State<BudgetPage>
   }
 
   double getProgressValue(String spent, String total) {
-    int _total = int.tryParse(total ?? '0') ?? 0;
-    int _spent = int.tryParse(spent ?? '0') ?? 0;
+    int _total = int.tryParse(total) ?? 0;
+    int _spent = int.tryParse(spent) ?? 0;
     if (_total == 0 && _spent == 0) return 1;
     if (_spent > _total) return 2;
     if (_total != 0 && _spent != 0) {
@@ -366,19 +309,16 @@ class _BudgetPageState extends State<BudgetPage>
     return 0.0;
   }
 
-  void _clearBudgetDialog(Budget budget, Category category) {
+  void _clearBudgetDialog(Budget? budget, Category category) {
     showDeleteDialog(context,
-            description: language == Lang.EN
-                ? 'Are you sure to clear the budget for ${category.en}?'
-                : 'के तपाई ${category.np}को लागि बजेट खाली गर्न निश्चित हुनुहुन्छ?',
+            description: language == Lang.EN ? 'Are you sure to clear the budget for ${category.en}?' : 'के तपाई ${category.np}को लागि बजेट खाली गर्न निश्चित हुनुहुन्छ?',
             title: 'Clear Budget', onDeletePress: () async {
-      if (await TransactionService().isBudgetEditable(
-          selectedSubSector, budget.categoryId, budget.month, budget.year)) {
-        await BudgetService().clearBudget(selectedSubSector, budget, false);
+      if (await TransactionService().isBudgetEditable(selectedSubSector!, budget!.categoryId, budget.month, budget.year)) {
+        await BudgetService().clearBudget(selectedSubSector!, budget, false);
         Navigator.of(context, rootNavigator: true).pop(true);
       } else {
         Navigator.of(context, rootNavigator: true).pop(false);
-        _scaffoldKey.currentState.showSnackBar(
+        ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.red,
             content: AdaptiveText(
@@ -398,16 +338,13 @@ class _BudgetPageState extends State<BudgetPage>
 
   var _formKey = GlobalKey<FormState>();
 
-  void _setBudgetDialog(
-      Budget oldBudgetData, Category category, int year, int month,
-      {String action = 'set'}) {
+  void _setBudgetDialog(Budget? oldBudgetData, Category category, int year, int month, {String action = 'set'}) {
     showFormDialog(
       context,
       buttonText: (action == 'set' ? 'Set' : 'Update') + ' Budget',
       onButtonPressed: () {
-        if (_formKey.currentState.validate()) {
-          _setBudget(oldBudgetData, category.id, year, month, action: action)
-              .then((value) {
+        if (_formKey.currentState!.validate()) {
+          _setBudget(oldBudgetData, category.id, year, month, action: action).then((value) {
             _budgetAmountController.clear();
             Navigator.of(context, rootNavigator: true).pop(value);
           });
@@ -422,7 +359,7 @@ class _BudgetPageState extends State<BudgetPage>
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: TextFormField(
-            validator: (value) => value.length == 0
+            validator: (value) => value!.length == 0
                 ? language == Lang.EN
                     ? 'Amount Cannot be empty'
                     : 'रकम खाली हुनसक्दैन '
@@ -435,8 +372,7 @@ class _BudgetPageState extends State<BudgetPage>
             decoration: InputDecoration(
               border: InputBorder.none,
               labelText: language == Lang.EN ? 'Budget amount' : 'बजेट रकम',
-              labelStyle:
-                  TextStyle(color: Colors.grey.withOpacity(0.8), fontSize: 15),
+              labelStyle: TextStyle(color: Colors.grey.withOpacity(0.8), fontSize: 15),
               contentPadding: const EdgeInsets.all(8.0),
             ),
           ),
@@ -449,14 +385,12 @@ class _BudgetPageState extends State<BudgetPage>
     });
   }
 
-  Future<bool> _setBudget(
-      Budget oldBudgetData, int categoryId, int year, int month,
-      {String action = 'set'}) async {
+  Future<bool> _setBudget(Budget? oldBudgetData, int? categoryId, int year, int month, {String action = 'set'}) async {
     if (action == 'set') {
       await BudgetService().updateBudget(
           selectedSubSector,
           Budget(
-            categoryId: oldBudgetData.categoryId ?? categoryId,
+            categoryId: oldBudgetData!.categoryId ?? categoryId,
             month: oldBudgetData.month ?? month,
             spent: '0',
             year: oldBudgetData.year ?? year,
@@ -466,11 +400,7 @@ class _BudgetPageState extends State<BudgetPage>
       return true;
     } else {
       int amount = int.tryParse(_budgetAmountController.text) ?? 0;
-      String spentString = (await BudgetService().getBudget(
-              selectedSubSector,
-              categoryId,
-              oldBudgetData.month ?? month,
-              oldBudgetData.year ?? year))
+      String? spentString = (await BudgetService().getBudget(selectedSubSector!, categoryId, oldBudgetData!.month ?? month, oldBudgetData.year ?? year))
 
           ///--------------change yearrrrr
           .spent;

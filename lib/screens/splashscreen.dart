@@ -7,7 +7,8 @@ import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/preference_service.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -30,14 +31,10 @@ class _SplashScreenState extends State<SplashScreen> {
                         type: 0,
                       )));
             } else {
-              globals.subSectors =
-                  await PreferenceService.instance.getSubSectors();
-              globals.selectedSubSector =
-                  await PreferenceService.instance.getSelectedSubSector();
-              globals.incomeCategories = await CategoryService().getCategories(
-                  globals.selectedSubSector, CategoryType.INCOME);
-              globals.expenseCategories = await CategoryService().getCategories(
-                  globals.selectedSubSector, CategoryType.EXPENSE);
+              globals.subSectors = await PreferenceService.instance.getSubSectors();
+              globals.selectedSubSector = await PreferenceService.instance.getSelectedSubSector();
+              globals.incomeCategories = await CategoryService().getCategories(globals.selectedSubSector!, CategoryType.INCOME);
+              globals.expenseCategories = await CategoryService().getCategories(globals.selectedSubSector!, CategoryType.EXPENSE);
               await Future.delayed(Duration(seconds: 2));
               Navigator.pushReplacementNamed(context, wrapper);
             }
@@ -45,8 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       } else {
         await Future.delayed(Duration(seconds: 1));
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LanguagePreferencePage()));
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LanguagePreferencePage()));
       }
     });
   }
@@ -78,9 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   future: PackageInfo.fromPlatform(),
                   builder: (context, snapshot) {
                     return Text(
-                      snapshot.hasData
-                          ? 'Version' + ' ' + snapshot.data.version
-                          : '',
+                      snapshot.hasData ? ('Version' + ' ' + snapshot.data!.version) : '',
                       maxLines: 1,
                       style: TextStyle(
                         fontFamily: 'SourceSansPro',
@@ -124,21 +118,17 @@ class LanguagePreferencePage extends StatelessWidget {
             SizedBox(
               height: 40,
             ),
-            RaisedButton(
-              elevation: 8,
-              color: const Color(0xff2b2f8e),
+            TextButton(
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => const Color(0xff2b2f8e))),
               onPressed: () async {
-                final preferenceProvider =
-                    Provider.of<PreferenceProvider>(context, listen: false);
+                final preferenceProvider = Provider.of<PreferenceProvider>(context, listen: false);
                 preferenceProvider.language = Lang.NP;
                 await PreferenceService.instance.setLanguage('np');
                 globals.language = 'np';
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UserInfoRegistrationPage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserInfoRegistrationPage()));
               },
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 15, horizontal: 7),
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 7),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -159,17 +149,14 @@ class LanguagePreferencePage extends StatelessWidget {
             SizedBox(
               height: 25,
             ),
-            RaisedButton(
-              elevation: 8,
-              color: const Color(0xff2b2f8e),
+            TextButton(
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => const Color(0xff2b2f8e))),
               onPressed: () async {
                 await PreferenceService.instance.setLanguage('en');
                 globals.language = 'en';
-                final preferenceProvider =
-                    Provider.of<PreferenceProvider>(context, listen: false);
+                final preferenceProvider = Provider.of<PreferenceProvider>(context, listen: false);
                 preferenceProvider.language = Lang.EN;
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UserInfoRegistrationPage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserInfoRegistrationPage()));
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 7),

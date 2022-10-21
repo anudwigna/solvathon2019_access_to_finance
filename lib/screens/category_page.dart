@@ -25,11 +25,10 @@ class CategoryPage extends StatefulWidget {
   _CategoryPageState createState() => _CategoryPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  TabController _tabController;
-  Lang language;
-  String selectedSubSector;
+class _CategoryPageState extends State<CategoryPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  TabController? _tabController;
+  Lang? language;
+  String? selectedSubSector;
   var _categoryName = TextEditingController();
   var _formKey = GlobalKey<FormState>();
 
@@ -37,8 +36,7 @@ class _CategoryPageState extends State<CategoryPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.categories, action: 'Opened');
+    ActivityTracker().pageTransactionActivity(PageName.categories, action: 'Opened');
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -48,16 +46,13 @@ class _CategoryPageState extends State<CategoryPage>
 
     switch (state) {
       case AppLifecycleState.paused:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.categories, action: 'Paused');
+        ActivityTracker().pageTransactionActivity(PageName.categories, action: 'Paused');
         break;
       case AppLifecycleState.inactive:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.categories, action: 'Inactive');
+        ActivityTracker().pageTransactionActivity(PageName.categories, action: 'Inactive');
         break;
       case AppLifecycleState.resumed:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.categories, action: 'Resumed');
+        ActivityTracker().pageTransactionActivity(PageName.categories, action: 'Resumed');
         break;
       case AppLifecycleState.detached:
         break;
@@ -67,9 +62,8 @@ class _CategoryPageState extends State<CategoryPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.categories, action: 'Closed');
-    _tabController.dispose();
+    ActivityTracker().pageTransactionActivity(PageName.categories, action: 'Closed');
+    _tabController!.dispose();
     super.dispose();
   }
 
@@ -78,44 +72,37 @@ class _CategoryPageState extends State<CategoryPage>
     return Consumer<PreferenceProvider>(
       builder: (context, preferenceProvider, _) {
         language = preferenceProvider.language;
-        selectedSubSector =
-            Provider.of<SubSectorProvider>(context).selectedSubSector;
+        selectedSubSector = Provider.of<SubSectorProvider>(context).selectedSubSector;
         return Scaffold(
           backgroundColor: Configuration().appColor,
           drawer: MyDrawer(),
           appBar: AppBar(
-            title: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  AdaptiveText(
-                    'Categories',
-                    style: TextStyle(fontSize: 17),
-                  ),
-                  Text(
-                    ' (',
-                    style: TextStyle(fontSize: 17),
-                  ),
-                  AdaptiveText(
-                    selectedSubSector.toString(),
-                    style: TextStyle(fontSize: 17),
-                  ),
-                  Text(
-                    ')',
-                    style: TextStyle(fontSize: 17),
-                  ),
-                ]),
+            title: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+              AdaptiveText(
+                'Categories',
+                style: TextStyle(fontSize: 17),
+              ),
+              Text(
+                ' (',
+                style: TextStyle(fontSize: 17),
+              ),
+              AdaptiveText(
+                selectedSubSector.toString(),
+                style: TextStyle(fontSize: 17),
+              ),
+              Text(
+                ')',
+                style: TextStyle(fontSize: 17),
+              ),
+            ]),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               if ((await showDialog(
                     context: context,
-                    builder: (context) =>
-                        ChangeNotifierProvider<PreferenceProvider>(
-                      builder: (context) => PreferenceProvider(),
-                      child: CategoryDialog(
-                        isCashIn: _tabController.index == 0,
+                    builder: (context) => Consumer<PreferenceProvider>(
+                      builder: (context, value, child) => CategoryDialog(
+                        isCashIn: _tabController!.index == 0,
                       ),
                     ),
                   )) ??
@@ -149,25 +136,19 @@ class _CategoryPageState extends State<CategoryPage>
                     tabs: [
                       Tab(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 0),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
                           child: AdaptiveText(
                             'Cash In',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                       Tab(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 0),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                           child: AdaptiveText(
                             'Cash Out',
-                            style: TextStyle(
-                                fontFamily: 'Source Sans Pro',
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
+                            style: TextStyle(fontFamily: 'Source Sans Pro', fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -182,9 +163,7 @@ class _CategoryPageState extends State<CategoryPage>
                       children: [CategoryType.INCOME, CategoryType.EXPENSE]
                           .map(
                             (categoryType) => _reorderableListView(
-                              categoryType == CategoryType.EXPENSE
-                                  ? globals.expenseCategories
-                                  : globals.incomeCategories,
+                              categoryType == CategoryType.EXPENSE ? globals.expenseCategories! : globals.incomeCategories!,
                               categoryType,
                             ),
                           )
@@ -206,10 +185,10 @@ class _CategoryPageState extends State<CategoryPage>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         FutureBuilder<List<Category>>(
-          future: CategoryService().getStockCategories(selectedSubSector, type),
+          future: CategoryService().getStockCategories(selectedSubSector!, type),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var _disabledCategories = snapshot.data;
+              var _disabledCategories = snapshot.data!;
               categories.forEach((category) {
                 _disabledCategories.removeWhere((dc) => dc.id == category.id);
               });
@@ -223,12 +202,8 @@ class _CategoryPageState extends State<CategoryPage>
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 18.0,
-                        color: _disabledCategories.length > 0
-                            ? Colors.black
-                            : Colors.grey,
-                        fontWeight: _disabledCategories.length > 0
-                            ? FontWeight.w500
-                            : FontWeight.normal,
+                        color: _disabledCategories.length > 0 ? Colors.black : Colors.grey,
+                        fontWeight: _disabledCategories.length > 0 ? FontWeight.w500 : FontWeight.normal,
                       ),
                     ),
                     SizedBox(height: 20.0),
@@ -242,10 +217,7 @@ class _CategoryPageState extends State<CategoryPage>
                           key: Key('${categories.id}'),
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: DecoratedBox(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                    color: Colors.grey.withOpacity(0.7))),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.withOpacity(0.7))),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 5),
                               child: ListTile(
@@ -279,11 +251,10 @@ class _CategoryPageState extends State<CategoryPage>
                                 trailing: InkWell(
                                   splashColor: Colors.transparent,
                                   onTap: () async {
-                                    var categoryList = await CategoryService()
-                                        .getCategories(selectedSubSector, type);
+                                    var categoryList = await CategoryService().getCategories(selectedSubSector!, type);
                                     if (!categoryList.contains(categories)) {
                                       await CategoryService().addCategory(
-                                        selectedSubSector,
+                                        selectedSubSector!,
                                         categories,
                                         type: type,
                                         isStockCategory: true,
@@ -322,8 +293,7 @@ class _CategoryPageState extends State<CategoryPage>
     );
   }
 
-  Widget _reorderableListView(
-      List<Category> categories, CategoryType categoryType) {
+  Widget _reorderableListView(List<Category> categories, CategoryType categoryType) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Component.ReorderableListView(
@@ -333,9 +303,7 @@ class _CategoryPageState extends State<CategoryPage>
               key: Key('$i'),
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: DecoratedBox(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: Colors.grey.withOpacity(0.7))),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.grey.withOpacity(0.7))),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: ListTile(
@@ -343,17 +311,10 @@ class _CategoryPageState extends State<CategoryPage>
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: FutureBuilder<CategoryHeading>(
+                          child: FutureBuilder<CategoryHeading?>(
                             future: CategoryHeadingService()
-                                .getCategoryHeadingById(
-                                    categoryType,
-                                    categories[i].categoryHeadingId == null
-                                        ? (categoryType == CategoryType.INCOME
-                                            ? 100
-                                            : 1)
-                                        : categories[i].categoryHeadingId),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<CategoryHeading> snapshot) {
+                                .getCategoryHeadingById(categoryType, categories[i].categoryHeadingId == null ? (categoryType == CategoryType.INCOME ? 100 : 1) : categories[i].categoryHeadingId),
+                            builder: (BuildContext context, AsyncSnapshot<CategoryHeading?> snapshot) {
                               return (!snapshot.hasData)
                                   ? Icon(
                                       VectorIcons.fromName(
@@ -363,8 +324,7 @@ class _CategoryPageState extends State<CategoryPage>
                                       color: Configuration().incomeColor,
                                       size: 20.0,
                                     )
-                                  : SvgPicture.asset(
-                                      'assets/images/${snapshot.data.iconName}');
+                                  : SvgPicture.asset('assets/images/${snapshot.data!.iconName}');
                             },
                           ),
                         ),
@@ -402,19 +362,10 @@ class _CategoryPageState extends State<CategoryPage>
     );
   }
 
-  Future _showDeleteDialog(int categoryId) async {
-    await showDeleteDialog(context,
-        title: 'Delete Category',
-        description:
-            '''Are you sure you want to delete this category? Deleting the category will also clear all the records related to it.''',
+  Future _showDeleteDialog(int? categoryId) async {
+    await showDeleteDialog(context, title: 'Delete Category', description: '''Are you sure you want to delete this category? Deleting the category will also clear all the records related to it.''',
         onDeletePress: () async {
-      await CategoryService().deleteCategory(
-          selectedSubSector,
-          categoryId,
-          _tabController.index == 0
-              ? CategoryType.INCOME
-              : CategoryType.EXPENSE,
-          false);
+      await CategoryService().deleteCategory(selectedSubSector!, categoryId, _tabController!.index == 0 ? CategoryType.INCOME : CategoryType.EXPENSE, false);
       Navigator.of(context, rootNavigator: true).pop(true);
     }, onCancelPress: () {
       Navigator.of(context, rootNavigator: true).pop(false);
@@ -426,69 +377,52 @@ class _CategoryPageState extends State<CategoryPage>
   }
 
   void _reorderCategoryList(int preIndex, int postIndex) {
-    if (_tabController.index == 0) {
-      Category temp = globals.expenseCategories[preIndex];
-      globals.expenseCategories.removeAt(preIndex);
-      globals.expenseCategories
-          .insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
-      CategoryService().refreshCategories(
-          selectedSubSector, globals.expenseCategories,
-          type: CategoryType.INCOME);
+    if (_tabController!.index == 0) {
+      Category temp = globals.expenseCategories![preIndex];
+      globals.expenseCategories!.removeAt(preIndex);
+      globals.expenseCategories!.insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
+      CategoryService().refreshCategories(selectedSubSector!, globals.expenseCategories!, type: CategoryType.INCOME);
     } else {
-      Category temp = globals.incomeCategories[preIndex];
-      globals.incomeCategories.removeAt(preIndex);
-      globals.incomeCategories
-          .insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
-      CategoryService().refreshCategories(
-          selectedSubSector, globals.incomeCategories,
-          type: CategoryType.EXPENSE);
+      Category temp = globals.incomeCategories![preIndex];
+      globals.incomeCategories!.removeAt(preIndex);
+      globals.incomeCategories!.insert(postIndex > preIndex ? postIndex - 1 : postIndex, temp);
+      CategoryService().refreshCategories(selectedSubSector!, globals.incomeCategories!, type: CategoryType.EXPENSE);
     }
     setState(() {});
   }
 
-  String validator(String value) {
+  String? validator(String value) {
     var _value = value.toLowerCase();
-    var categories = _tabController.index == 0
-        ? globals.expenseCategories
-        : globals.incomeCategories;
+    var categories = _tabController!.index == 0 ? globals.expenseCategories : globals.incomeCategories;
     if (value.isEmpty) {
       return language == Lang.EN ? 'Category is empty' : 'श्रेणी खाली छ';
-    } else if (categories.any((category) =>
-        category.en.toLowerCase() == _value ||
-        category.np.toLowerCase() == _value)) {
-      return language == Lang.EN
-          ? 'Category already exists!'
-          : 'श्रेणी पहिल्यै छ';
+    } else if (categories!.any((category) => category.en!.toLowerCase() == _value || category.np!.toLowerCase() == _value)) {
+      return language == Lang.EN ? 'Category already exists!' : 'श्रेणी पहिल्यै छ';
     }
     return null;
   }
 }
 
 class CategoryDialog extends StatefulWidget {
-  final bool isCashIn;
+  final bool? isCashIn;
 
-  const CategoryDialog({Key key, this.isCashIn}) : super(key: key);
+  const CategoryDialog({Key? key, this.isCashIn}) : super(key: key);
   @override
   _CategoryDialogState createState() => _CategoryDialogState();
 }
 
 class _CategoryDialogState extends State<CategoryDialog> {
-  int categoryHeadingId;
+  int? categoryHeadingId;
   var categoryName = TextEditingController();
   var _formKey = GlobalKey<FormState>();
-  Lang language;
-  List<CategoryHeading> categoryHeading;
+  Lang? language;
+  List<CategoryHeading>? categoryHeading;
   @override
   void initState() {
-    CategoryHeadingService()
-        .getAllCategoryHeadings(
-            widget.isCashIn ? CategoryType.INCOME : CategoryType.EXPENSE)
-        .then((value) {
-      if (value != null) {
-        setState(() {
-          categoryHeading = value;
-        });
-      }
+    CategoryHeadingService().getAllCategoryHeadings(widget.isCashIn! ? CategoryType.INCOME : CategoryType.EXPENSE).then((value) {
+      setState(() {
+        categoryHeading = value;
+      });
     });
     super.initState();
   }
@@ -499,8 +433,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
     return Theme(
       data: Theme.of(context).copyWith(canvasColor: Colors.white),
       child: Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(18.0))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(18.0))),
         backgroundColor: Colors.white,
         child: SingleChildScrollView(
           child: Padding(
@@ -552,22 +485,17 @@ class _CategoryDialogState extends State<CategoryDialog> {
                                 decoration: InputDecoration.collapsed(
                                   hintText: '',
                                 ),
-                                validator: (value) {
-                                  if (categoryHeadingId == null)
-                                    return language == Lang.EN
-                                        ? 'Category Heading cannot be empty'
-                                        : 'श्रेणी शीर्षक खाली हुन सक्दैन';
+                                validator: (dynamic value) {
+                                  if (categoryHeadingId == null) return language == Lang.EN ? 'Category Heading cannot be empty' : 'श्रेणी शीर्षक खाली हुन सक्दैन';
                                   return null;
                                 },
                                 onTap: () {
-                                  FocusScope.of(context)
-                                      .requestFocus(new FocusNode());
+                                  FocusScope.of(context).requestFocus(new FocusNode());
                                 },
                                 value: categoryHeadingId,
                                 isExpanded: true,
                                 isDense: false,
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 17.0),
+                                style: TextStyle(color: Colors.black, fontSize: 17.0),
                                 icon: Icon(
                                   Icons.arrow_drop_down,
                                   color: Colors.grey,
@@ -577,20 +505,14 @@ class _CategoryDialogState extends State<CategoryDialog> {
                                           child: dropDownMenuBuilder(
                                               VectorIcons.fromName(
                                                 'hornbill',
-                                                provider:
-                                                    IconProvider.FontAwesome5,
+                                                provider: IconProvider.FontAwesome5,
                                               ),
-                                              language == Lang.EN
-                                                  ? heading.en
-                                                  : heading.np,
-                                              iconBuilderWidget:
-                                                  SvgPicture.asset(
-                                                      'assets/images/' +
-                                                          heading.iconName)),
+                                              language == Lang.EN ? heading.en : heading.np,
+                                              iconBuilderWidget: SvgPicture.asset('assets/images/' + heading.iconName!)),
                                           value: heading.id,
                                         ))
                                     .toList(),
-                                onChanged: (value) {
+                                onChanged: (dynamic value) {
                                   setState(() {
                                     categoryHeadingId = value;
                                   });
@@ -632,8 +554,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
                             child: TextFormField(
                               validator: validator,
                               controller: categoryName,
-                              style: TextStyle(
-                                  color: Colors.grey[800], fontSize: 20.0),
+                              style: TextStyle(color: Colors.grey[800], fontSize: 20.0),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.all(10),
@@ -647,15 +568,12 @@ class _CategoryDialogState extends State<CategoryDialog> {
                 ),
                 SizedBox(height: 25.0),
                 Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      color: Configuration().incomeColor),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(30.0)), color: Configuration().incomeColor),
                   child: InkWell(
                     onTap: _addCategory,
                     borderRadius: BorderRadius.all(Radius.circular(30.0)),
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12.0, horizontal: 18),
+                      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 18),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -668,9 +586,7 @@ class _CategoryDialogState extends State<CategoryDialog> {
                             width: 5,
                           ),
                           AdaptiveText(
-                            'Add' +
-                                ' ' +
-                                (widget.isCashIn ? 'Cash In' : 'Cash Out'),
+                            'Add' + ' ' + (widget.isCashIn! ? 'Cash In' : 'Cash Out'),
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 17.0),
                           ),
@@ -690,36 +606,24 @@ class _CategoryDialogState extends State<CategoryDialog> {
 
   Future _addCategory() async {
     FocusScope.of(context).requestFocus(new FocusNode());
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       await CategoryService().addCategory(
-        selectedSubSector,
-        Category(
-            en: categoryName.text,
-            np: categoryName.text,
-            iconName: 'hornbill',
-            id: categoryName.text.hashCode,
-            categoryHeadingId: categoryHeadingId),
-        type: widget.isCashIn ? CategoryType.INCOME : CategoryType.EXPENSE,
+        selectedSubSector!,
+        Category(en: categoryName.text, np: categoryName.text, iconName: 'hornbill', id: categoryName.text.hashCode, categoryHeadingId: categoryHeadingId),
+        type: widget.isCashIn! ? CategoryType.INCOME : CategoryType.EXPENSE,
       );
       categoryName.clear();
       Navigator.of(context, rootNavigator: true).pop(true);
     }
   }
 
-  String validator(String value) {
-    var _value = value.toLowerCase();
-    var categories =
-        widget.isCashIn ? globals.incomeCategories : globals.expenseCategories;
+  String? validator(String? value) {
+    var _value = value!.toLowerCase();
+    var categories = widget.isCashIn! ? globals.incomeCategories : globals.expenseCategories;
     if (value.isEmpty) {
-      return language == Lang.EN
-          ? 'Category cannot be empty'
-          : 'श्रेणी खाली हुन सक्दैन';
-    } else if (categories.any((category) =>
-        category.en.toLowerCase() == _value ||
-        category.np.toLowerCase() == _value)) {
-      return language == Lang.EN
-          ? 'Category already exists!'
-          : 'श्रेणी पहिल्यै छ';
+      return language == Lang.EN ? 'Category cannot be empty' : 'श्रेणी खाली हुन सक्दैन';
+    } else if (categories!.any((category) => category.en!.toLowerCase() == _value || category.np!.toLowerCase() == _value)) {
+      return language == Lang.EN ? 'Category already exists!' : 'श्रेणी पहिल्यै छ';
     }
     return null;
   }

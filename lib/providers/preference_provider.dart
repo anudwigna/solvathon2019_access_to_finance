@@ -15,11 +15,11 @@ class PreferenceProvider extends ChangeNotifier {
 }
 
 class SubSectorProvider extends ChangeNotifier {
-  String _selectedSubSector = globals.selectedSubSector;
+  String? _selectedSubSector = globals.selectedSubSector;
 
-  String get selectedSubSector => _selectedSubSector;
+  String? get selectedSubSector => _selectedSubSector;
 
-  set selectedSubSector(String subSector) {
+  set selectedSubSector(String? subSector) {
     _selectedSubSector = subSector;
     notifyListeners();
   }

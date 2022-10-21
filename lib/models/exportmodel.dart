@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 class ExportDataModel {
-  final String date;
-  final double outflow;
-  final double inflow;
-  final double inflowMINUSoutflow;
-  final double cf;
+  final String? date;
+  final double? outflow;
+  final double? inflow;
+  final double? inflowMINUSoutflow;
+  final double? cf;
   ExportDataModel({
     this.date,
     this.outflow,

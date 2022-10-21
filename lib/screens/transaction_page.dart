@@ -33,56 +33,49 @@ import '../services/category_heading_service.dart';
 
 class TransactionPage extends StatefulWidget {
   //0 = Income   1 = Expense
-  final int transactionType;
-  final Transaction transaction;
-  final String selectedSubSector;
+  final int? transactionType;
+  final Transaction? transaction;
+  final String? selectedSubSector;
   // final NepaliDateTime dateTime;
 
   TransactionPage(
     this.transactionType, {
     this.transaction,
-    @required this.selectedSubSector,
+    required this.selectedSubSector,
   });
 
   @override
   _TransactionPageState createState() => _TransactionPageState();
 }
 
-class _TransactionPageState extends State<TransactionPage>
-    with WidgetsBindingObserver {
+class _TransactionPageState extends State<TransactionPage> with WidgetsBindingObserver {
   TextEditingController _categoryName = TextEditingController();
-  String selectedSubSector;
-  Lang language;
+  String? selectedSubSector;
+  Lang? language;
   double fontsize = 15.0;
-  BoxDecoration _decoration = BoxDecoration(
-      border: Border.all(color: Colors.grey),
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(5));
+  BoxDecoration _decoration = BoxDecoration(border: Border.all(color: Colors.grey), color: Colors.white, borderRadius: BorderRadius.circular(5));
   var _formKey = GlobalKey<FormState>();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   var _dropdownKey = GlobalKey();
   var _amountController = TextEditingController();
   var _descriptionController = TextEditingController();
-  int _selectedCategoryId;
-  File descriptonImage;
-  Account _selectedAccount;
-  NepaliDateTime _selectedDateTime = NepaliDateTime.now();
+  int? _selectedCategoryId;
+  File? descriptonImage;
+  Account? _selectedAccount;
+  NepaliDateTime? _selectedDateTime = NepaliDateTime.now();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ActivityTracker().pageTransactionActivity(
-        widget.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut,
-        action: 'Opened');
+    ActivityTracker().pageTransactionActivity(widget.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut, action: 'Opened');
     selectedSubSector = widget.selectedSubSector;
 
     if (widget.transaction != null) {
-      _selectedCategoryId = widget.transaction.categoryId;
-      _amountController.text = widget.transaction.amount;
-      _descriptionController.text = widget.transaction.memo;
-      List<String> zz =
-          widget.transaction.timestamp.split('T').first.split('-').toList();
+      _selectedCategoryId = widget.transaction!.categoryId;
+      _amountController.text = widget.transaction!.amount!;
+      _descriptionController.text = widget.transaction!.memo!;
+      List<String> zz = widget.transaction!.timestamp!.split('T').first.split('-').toList();
       _selectedDateTime = NepaliDateTime(
         int.parse(zz[0]),
         int.parse(zz[1]),
@@ -97,25 +90,13 @@ class _TransactionPageState extends State<TransactionPage>
 
     switch (state) {
       case AppLifecycleState.paused:
-        ActivityTracker().pageTransactionActivity(
-            widget.transactionType == 0
-                ? PageName.addCashIn
-                : PageName.addCashOut,
-            action: 'Paused');
+        ActivityTracker().pageTransactionActivity(widget.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut, action: 'Paused');
         break;
       case AppLifecycleState.inactive:
-        ActivityTracker().pageTransactionActivity(
-            widget.transactionType == 0
-                ? PageName.addCashIn
-                : PageName.addCashOut,
-            action: 'Inactive');
+        ActivityTracker().pageTransactionActivity(widget.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut, action: 'Inactive');
         break;
       case AppLifecycleState.resumed:
-        ActivityTracker().pageTransactionActivity(
-            widget.transactionType == 0
-                ? PageName.addCashIn
-                : PageName.addCashOut,
-            action: 'Resumed');
+        ActivityTracker().pageTransactionActivity(widget.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut, action: 'Resumed');
         break;
       case AppLifecycleState.detached:
         break;
@@ -125,9 +106,7 @@ class _TransactionPageState extends State<TransactionPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ActivityTracker().pageTransactionActivity(
-        widget.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut,
-        action: 'Closed');
+    ActivityTracker().pageTransactionActivity(widget.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut, action: 'Closed');
     super.dispose();
   }
 
@@ -179,10 +158,8 @@ class _TransactionPageState extends State<TransactionPage>
       padding: EdgeInsets.only(left: 12.0),
       child: FutureBuilder<List<Category>>(
         future: CategoryService().getCategories(
-          selectedSubSector,
-          widget.transactionType == 0
-              ? CategoryType.INCOME
-              : CategoryType.EXPENSE,
+          selectedSubSector!,
+          widget.transactionType == 0 ? CategoryType.INCOME : CategoryType.EXPENSE,
         ),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -207,7 +184,7 @@ class _TransactionPageState extends State<TransactionPage>
                   ),
                   value: _selectedCategoryId,
                   selectedItemBuilder: (BuildContext context) {
-                    return snapshot.data.map<Widget>((Category item) {
+                    return snapshot.data!.map<Widget>((Category item) {
                       return dropDownMenuBuilder(
                           VectorIcons.fromName(
                             'hornbill',
@@ -215,19 +192,10 @@ class _TransactionPageState extends State<TransactionPage>
                           ),
                           '',
                           category: item,
-                          iconBuilderWidget: FutureBuilder<CategoryHeading>(
-                              future: CategoryHeadingService()
-                                  .getCategoryHeadingById(
-                                      widget.transactionType == 0
-                                          ? CategoryType.INCOME
-                                          : CategoryType.EXPENSE,
-                                      item.categoryHeadingId == null
-                                          ? (widget.transactionType == 0
-                                              ? 100
-                                              : 1)
-                                          : item.categoryHeadingId),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<CategoryHeading> snapshot) {
+                          iconBuilderWidget: FutureBuilder<CategoryHeading?>(
+                              future: CategoryHeadingService().getCategoryHeadingById(widget.transactionType == 0 ? CategoryType.INCOME : CategoryType.EXPENSE,
+                                  item.categoryHeadingId == null ? (widget.transactionType == 0 ? 100 : 1) : item.categoryHeadingId),
+                              builder: (BuildContext context, AsyncSnapshot<CategoryHeading?> snapshot) {
                                 return (!snapshot.hasData)
                                     ? Icon(
                                         VectorIcons.fromName(
@@ -237,13 +205,12 @@ class _TransactionPageState extends State<TransactionPage>
                                         color: Configuration().incomeColor,
                                         size: 20.0,
                                       )
-                                    : SvgPicture.asset(
-                                        'assets/images/${snapshot.data.iconName}');
+                                    : SvgPicture.asset('assets/images/${snapshot.data!.iconName}');
                               }));
                     }).toList();
                   },
                   items: [
-                    for (int i = 0; i < snapshot.data.length; i++)
+                    for (int i = 0; i < snapshot.data!.length; i++)
                       DropdownMenuItem<int>(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -257,36 +224,21 @@ class _TransactionPageState extends State<TransactionPage>
                                   provider: IconProvider.FontAwesome5,
                                 ),
                                 '',
-                                category: snapshot.data[i],
-                                iconBuilderWidget:
-                                    FutureBuilder<CategoryHeading>(
-                                  future: CategoryHeadingService()
-                                      .getCategoryHeadingById(
-                                          widget.transactionType == 0
-                                              ? CategoryType.INCOME
-                                              : CategoryType.EXPENSE,
-                                          snapshot.data[i].categoryHeadingId ==
-                                                  null
-                                              ? (widget.transactionType == 0
-                                                  ? 100
-                                                  : 1)
-                                              : snapshot
-                                                  .data[i].categoryHeadingId),
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot<CategoryHeading>
-                                          snapshot1) {
+                                category: snapshot.data![i],
+                                iconBuilderWidget: FutureBuilder<CategoryHeading?>(
+                                  future: CategoryHeadingService().getCategoryHeadingById(widget.transactionType == 0 ? CategoryType.INCOME : CategoryType.EXPENSE,
+                                      snapshot.data![i].categoryHeadingId == null ? (widget.transactionType == 0 ? 100 : 1) : snapshot.data![i].categoryHeadingId),
+                                  builder: (BuildContext context, AsyncSnapshot<CategoryHeading?> snapshot1) {
                                     return (!snapshot1.hasData)
                                         ? Icon(
                                             VectorIcons.fromName(
                                               'hornbill',
-                                              provider:
-                                                  IconProvider.FontAwesome5,
+                                              provider: IconProvider.FontAwesome5,
                                             ),
                                             color: Configuration().incomeColor,
                                             size: 20.0,
                                           )
-                                        : SvgPicture.asset(
-                                            'assets/images/${snapshot1.data.iconName}');
+                                        : SvgPicture.asset('assets/images/${snapshot1.data!.iconName}');
                                   },
                                 ),
                               ),
@@ -297,7 +249,7 @@ class _TransactionPageState extends State<TransactionPage>
                             ],
                           ),
                         ),
-                        value: snapshot.data[i].id,
+                        value: snapshot.data![i].id,
                       ),
                     (widget.transaction == null)
                         ? DropdownMenuItem<int>(
@@ -344,11 +296,7 @@ class _TransactionPageState extends State<TransactionPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // SizedBox(height: 20.0),
-              AdaptiveText(
-                  (widget.transactionType == 1)
-                      ? 'Expense Amount'
-                      : 'Business Income',
-                  style: TextStyle(fontSize: fontsize, color: Colors.black)),
+              AdaptiveText((widget.transactionType == 1) ? 'Expense Amount' : 'Business Income', style: TextStyle(fontSize: fontsize, color: Colors.black)),
               SizedBox(
                 height: 5,
               ),
@@ -356,7 +304,7 @@ class _TransactionPageState extends State<TransactionPage>
                 padding: EdgeInsets.only(left: 12.0),
                 decoration: _decoration,
                 child: TextFormField(
-                  validator: (value) => value.length == 0
+                  validator: (value) => value!.length == 0
                       ? language == Lang.EN
                           ? 'Amount Required'
                           : 'रकम अनिवार्य छ'
@@ -364,12 +312,11 @@ class _TransactionPageState extends State<TransactionPage>
                   autofocus: false,
                   controller: _amountController,
                   keyboardType: TextInputType.number,
-                  inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   style: TextStyle(color: Colors.grey[800], fontSize: fontsize),
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText:
-                        language == Lang.EN ? 'Enter amount' : 'रकम लेख्नुहोस',
+                    hintText: language == Lang.EN ? 'Enter amount' : 'रकम लेख्नुहोस',
                   ),
                 ),
               ),
@@ -377,11 +324,7 @@ class _TransactionPageState extends State<TransactionPage>
               //  if (widget.transaction == null)
               SizedBox(height: 20.0),
               //    if (widget.transaction == null)
-              AdaptiveText(
-                  (widget.transactionType == 1)
-                      ? 'Expense Category'
-                      : 'Source of Income',
-                  style: TextStyle(fontSize: fontsize, color: Colors.black)),
+              AdaptiveText((widget.transactionType == 1) ? 'Expense Category' : 'Source of Income', style: TextStyle(fontSize: fontsize, color: Colors.black)),
               SizedBox(
                 height: 5,
               ),
@@ -394,11 +337,8 @@ class _TransactionPageState extends State<TransactionPage>
                   children: <Widget>[
                     if (language == Lang.EN)
                       Text(
-                        widget.transactionType == 0
-                            ? 'Deposit to:  '
-                            : 'Paid from:  ',
-                        style:
-                            TextStyle(fontSize: fontsize, color: Colors.black),
+                        widget.transactionType == 0 ? 'Deposit to:  ' : 'Paid from:  ',
+                        style: TextStyle(fontSize: fontsize, color: Colors.black),
                       ),
                     if (language == Lang.EN)
                       SizedBox(
@@ -426,22 +366,18 @@ class _TransactionPageState extends State<TransactionPage>
                                 ),
                                 value: _selectedAccount,
                                 items: [
-                                  for (int i = 0; i < snapshot.data.length; i++)
+                                  for (int i = 0; i < snapshot.data!.length; i++)
                                     DropdownMenuItem<Account>(
                                       child: dropDownMenuBuilder(
                                         Icons.add,
-                                        snapshot.data[i].name,
-                                        iconBuilderWidget:
-                                            getBankAccountTypeIcon(
-                                                snapshot.data[i].type,
-                                                isForm: true),
+                                        snapshot.data![i].name,
+                                        iconBuilderWidget: getBankAccountTypeIcon(snapshot.data![i].type, isForm: true),
                                       ),
-                                      value: snapshot.data[i],
+                                      value: snapshot.data![i],
                                     ),
                                 ],
                                 onTap: () {
-                                  FocusScope.of(context)
-                                      .requestFocus(new FocusNode());
+                                  FocusScope.of(context).requestFocus(new FocusNode());
                                 },
                                 onChanged: (value) {
                                   setState(() {
@@ -462,20 +398,13 @@ class _TransactionPageState extends State<TransactionPage>
                       ),
                     if (language == Lang.NP)
                       Text(
-                        widget.transactionType == 0
-                            ? 'मा जम्मा गरियो '
-                            : 'बाट तिरिएको',
-                        style:
-                            TextStyle(fontSize: fontsize, color: Colors.black),
+                        widget.transactionType == 0 ? 'मा जम्मा गरियो ' : 'बाट तिरिएको',
+                        style: TextStyle(fontSize: fontsize, color: Colors.black),
                       ),
                   ],
                 ),
               SizedBox(height: 20.0),
-              AdaptiveText(
-                  (widget.transactionType == 1)
-                      ? 'Date of Expense'
-                      : 'Date of Income',
-                  style: TextStyle(fontSize: fontsize, color: Colors.black)),
+              AdaptiveText((widget.transactionType == 1) ? 'Date of Expense' : 'Date of Income', style: TextStyle(fontSize: fontsize, color: Colors.black)),
               SizedBox(height: 5.0),
               Material(
                 elevation: 0,
@@ -498,9 +427,7 @@ class _TransactionPageState extends State<TransactionPage>
                       initialDate: NepaliDateTime.now(),
                       firstDate: NepaliDateTime(2073),
                       lastDate: NepaliDateTime(2090),
-                      language: language == Lang.EN
-                          ? Language.english
-                          : Language.nepali,
+                      language: language == Lang.EN ? Language.english : Language.nepali,
                     );
                     if (_selectedDateTime != null) {
                       setState(() {});
@@ -516,12 +443,7 @@ class _TransactionPageState extends State<TransactionPage>
                     child: Row(
                       children: <Widget>[
                         AdaptiveText(
-                          NepaliDateFormat(
-                                  "MMMM dd, y (EE)",
-                                  language == Lang.EN
-                                      ? Language.english
-                                      : Language.nepali)
-                              .format(_selectedDateTime),
+                          NepaliDateFormat("MMMM dd, y (EE)", language == Lang.EN ? Language.english : Language.nepali).format(_selectedDateTime!),
                           style: TextStyle(
                             color: Colors.grey[700],
                             fontSize: fontsize,
@@ -539,8 +461,7 @@ class _TransactionPageState extends State<TransactionPage>
                 ),
               ),
               SizedBox(height: 20.0),
-              AdaptiveText('Description (Optional)',
-                  style: TextStyle(fontSize: fontsize, color: Colors.black)),
+              AdaptiveText('Description (Optional)', style: TextStyle(fontSize: fontsize, color: Colors.black)),
               SizedBox(height: 5.0),
               Container(
                 decoration: _decoration,
@@ -548,22 +469,18 @@ class _TransactionPageState extends State<TransactionPage>
                   padding: EdgeInsets.only(left: 12.0),
                   child: TextFormField(
                     controller: _descriptionController,
-                    style:
-                        TextStyle(color: Colors.grey[800], fontSize: fontsize),
+                    style: TextStyle(color: Colors.grey[800], fontSize: fontsize),
                     decoration: InputDecoration(
                       suffixIcon: descriptonImage == null
                           ? InkWell(
                               onTap: () async {
-                                FocusScope.of(context)
-                                    .requestFocus(new FocusNode());
-                                bool callback =
-                                    await checkPermission(_scaffoldKey);
+                                FocusScope.of(context).requestFocus(new FocusNode());
+                                bool callback = await checkPermission(_scaffoldKey);
                                 if (!callback) {
                                   return;
                                 }
                                 try {
-                                  final img = await ImagePicker()
-                                      .getImage(source: ImageSource.gallery);
+                                  final img = await ImagePicker().getImage(source: ImageSource.gallery);
                                   if (img != null) {
                                     setState(() {
                                       descriptonImage = File(img.path);
@@ -578,10 +495,9 @@ class _TransactionPageState extends State<TransactionPage>
                                 color: Configuration.accountIconColor,
                               ))
                           : Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 8.0, right: 8),
+                              padding: const EdgeInsets.only(top: 8.0, right: 8),
                               child: Image.file(
-                                descriptonImage,
+                                descriptonImage!,
                                 fit: BoxFit.contain,
                                 width: 50,
                               ),
@@ -596,9 +512,7 @@ class _TransactionPageState extends State<TransactionPage>
                               : 'खर्च सम्बन्धि थप विवरण भए लेखुहोस्',
                       counterStyle: TextStyle(color: Colors.grey),
                     ),
-                    buildCounter: (context,
-                            {currentLength, isFocused, maxLength}) =>
-                        Container(
+                    buildCounter: (context, {required currentLength, required isFocused, maxLength}) => Container(
                       height: 1,
                       width: 1,
                     ),
@@ -609,13 +523,11 @@ class _TransactionPageState extends State<TransactionPage>
               ),
               SizedBox(height: 25.0),
               Center(
-                child: FlatButton(
-                  color: Configuration().incomeColor,
+                child: TextButton(
+                  style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor)),
                   onPressed: () {
                     FocusScope.of(context).requestFocus(new FocusNode());
-                    widget.transaction == null
-                        ? _addTransaction()
-                        : _updateTransaction();
+                    widget.transaction == null ? _addTransaction() : _updateTransaction();
                   },
                   child: Padding(
                     padding: EdgeInsets.all(14.0),
@@ -641,7 +553,7 @@ class _TransactionPageState extends State<TransactionPage>
   }
 
   Future _addTransaction() async {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       if (_selectedCategoryId == null) {
         _showMessage('Please select category.');
       } else if (_selectedAccount == null) {
@@ -651,22 +563,18 @@ class _TransactionPageState extends State<TransactionPage>
         int _spent;
         int _total;
         if (widget.transactionType == 1) {
-          oldBudget = await BudgetService().getBudget(
-              selectedSubSector,
-              _selectedCategoryId,
-              _selectedDateTime.month,
-              _selectedDateTime.year);
+          oldBudget = await BudgetService().getBudget(selectedSubSector!, _selectedCategoryId, _selectedDateTime!.month, _selectedDateTime!.year);
           _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
-          _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
+          _spent += int.tryParse(_amountController.text) ?? 0;
           _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
           if (_spent > _total) {
             await BudgetService().updateBudget(
                 selectedSubSector,
                 Budget(
                   categoryId: _selectedCategoryId,
-                  month: _selectedDateTime.month,
+                  month: _selectedDateTime!.month,
                   spent: '$_spent',
-                  year: _selectedDateTime.year,
+                  year: _selectedDateTime!.year,
                   total: oldBudget.total,
                 ),
                 true);
@@ -685,36 +593,29 @@ class _TransactionPageState extends State<TransactionPage>
             await _updateTransactionAndAccount(widget.transaction != null);
           }
         } else {
-          oldBudget = await BudgetService().getBudget(
-              selectedSubSector,
-              _selectedCategoryId,
-              _selectedDateTime.month,
-              _selectedDateTime.year);
+          oldBudget = await BudgetService().getBudget(selectedSubSector!, _selectedCategoryId, _selectedDateTime!.month, _selectedDateTime!.year);
           _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
-          _spent += int.tryParse(_amountController.text ?? '0') ?? 0;
+          _spent += int.tryParse(_amountController.text) ?? 0;
           _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
           await BudgetService().updateBudget(
               selectedSubSector,
               Budget(
                 categoryId: _selectedCategoryId,
-                month: _selectedDateTime.month,
+                month: _selectedDateTime!.month,
                 spent: '$_spent',
-                year: _selectedDateTime.year,
+                year: _selectedDateTime!.year,
                 total: oldBudget.total,
               ),
               true);
           await _updateTransactionAndAccount(widget.transaction != null);
         }
-        String imageDir;
+        String? imageDir;
         if (descriptonImage != null) {
           try {
-            imageDir = (await Configuration().saveImage(descriptonImage,
-                    'transaction', _selectedDateTime.toIso8601String()))
-                .path;
+            imageDir = (await Configuration().saveImage(descriptonImage!, 'transaction', _selectedDateTime!.toIso8601String()))!.path;
           } catch (e) {
-            _scaffoldKey.currentState.removeCurrentSnackBar();
-            _scaffoldKey.currentState.showSnackBar(
-                SnackBar(content: Text('Error, Image cannot be uploaded')));
+            ScaffoldMessenger.of(_scaffoldKey.currentState!.context).removeCurrentSnackBar();
+            ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(SnackBar(content: Text('Error, Image cannot be uploaded')));
             return;
           }
         }
@@ -724,29 +625,24 @@ class _TransactionPageState extends State<TransactionPage>
   }
 
   Future _updateTransaction() async {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       Budget oldBudget;
       int _spent;
       int _total;
       if (widget.transactionType == 1) {
-        oldBudget = await BudgetService().getBudget(
-            selectedSubSector,
-            widget.transaction.categoryId,
-            _selectedDateTime.month,
-            _selectedDateTime.year);
+        oldBudget = await BudgetService().getBudget(selectedSubSector!, widget.transaction!.categoryId, _selectedDateTime!.month, _selectedDateTime!.year);
         _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
-        int checkExpense = (int.tryParse(widget.transaction.amount) ?? 0) -
-            (int.tryParse(_amountController.text ?? '0') ?? 0);
+        int checkExpense = (int.tryParse(widget.transaction!.amount!) ?? 0) - (int.tryParse(_amountController.text) ?? 0);
         _spent -= checkExpense;
         _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
         if (_spent > _total) {
           await BudgetService().updateBudget(
               selectedSubSector,
               Budget(
-                categoryId: widget.transaction.categoryId,
-                month: _selectedDateTime.month,
+                categoryId: widget.transaction!.categoryId,
+                month: _selectedDateTime!.month,
                 spent: '$_spent',
-                year: _selectedDateTime.year,
+                year: _selectedDateTime!.year,
                 total: oldBudget.total,
               ),
               false);
@@ -765,24 +661,19 @@ class _TransactionPageState extends State<TransactionPage>
           await _updateTransactionAndAccount(widget.transaction != null);
         }
       } else {
-        oldBudget = await BudgetService().getBudget(
-            selectedSubSector,
-            widget.transaction.categoryId,
-            _selectedDateTime.month,
-            _selectedDateTime.year);
+        oldBudget = await BudgetService().getBudget(selectedSubSector!, widget.transaction!.categoryId, _selectedDateTime!.month, _selectedDateTime!.year);
         _spent = int.tryParse(oldBudget.spent ?? '0') ?? 0;
-        int checkExpense = (int.tryParse(widget.transaction.amount) ?? 0) -
-            (int.tryParse(_amountController.text ?? '0') ?? 0);
+        int checkExpense = (int.tryParse(widget.transaction!.amount!) ?? 0) - (int.tryParse(_amountController.text) ?? 0);
         _spent -= checkExpense;
         _total = int.tryParse(oldBudget.total ?? '0') ?? 0;
 
         await BudgetService().updateBudget(
             selectedSubSector,
             Budget(
-              categoryId: widget.transaction.categoryId,
-              month: _selectedDateTime.month,
+              categoryId: widget.transaction!.categoryId,
+              month: _selectedDateTime!.month,
               spent: '$_spent',
-              year: _selectedDateTime.year,
+              year: _selectedDateTime!.year,
               total: oldBudget.total,
             ),
             false);
@@ -794,52 +685,44 @@ class _TransactionPageState extends State<TransactionPage>
   }
 
   _updateTransactionAndAccount(bool isUpdate) async {
-    int transactionId = await TransactionService().updateTransaction(
-        selectedSubSector,
+    int? transactionId = await TransactionService().updateTransaction(
+        selectedSubSector!,
         Transaction(
-          id: (widget.transaction != null) ? widget.transaction.id : null,
+          id: (widget.transaction != null) ? widget.transaction!.id : null,
           amount: _amountController.text,
-          categoryId:
-              isUpdate ? widget.transaction.categoryId : _selectedCategoryId,
+          categoryId: isUpdate ? widget.transaction!.categoryId : _selectedCategoryId,
           memo: _descriptionController.text,
-          month: isUpdate ? widget.transaction.month : _selectedDateTime.month,
-          year: isUpdate ? widget.transaction.year : _selectedDateTime.year,
+          month: isUpdate ? widget.transaction!.month : _selectedDateTime!.month,
+          year: isUpdate ? widget.transaction!.year : _selectedDateTime!.year,
           transactionType: widget.transactionType,
-          timestamp: isUpdate
-              ? widget.transaction.timestamp
-              : _selectedDateTime.toIso8601String(),
+          timestamp: isUpdate ? widget.transaction!.timestamp : _selectedDateTime!.toIso8601String(),
         ),
         false);
     if (!isUpdate) {
       await AccountService().updateAccount(
           Account(
-            name: _selectedAccount.name,
-            type: _selectedAccount.type,
+            name: _selectedAccount!.name,
+            type: _selectedAccount!.type,
             balance: widget.transactionType == 0
-                ? '${int.parse(_selectedAccount.balance) + int.parse(_amountController.text)}'
-                : '${int.parse(_selectedAccount.balance) - int.parse(_amountController.text)}',
+                ? '${int.parse(_selectedAccount!.balance!) + int.parse(_amountController.text)}'
+                : '${int.parse(_selectedAccount!.balance!) - int.parse(_amountController.text)}',
             transactionIds: [
-              if (_selectedAccount.transactionIds != null)
-                ..._selectedAccount.transactionIds,
+              if (_selectedAccount!.transactionIds != null) ..._selectedAccount!.transactionIds!,
               transactionId,
             ],
           ),
           true);
     } else {
-      int checkExpense = (int.tryParse(widget.transaction.amount) ?? 0) -
-          (int.tryParse(_amountController.text ?? '0') ?? 0);
-      Account ac =
-          await AccountService().getAccountForTransaction(widget.transaction);
+      int checkExpense = (int.tryParse(widget.transaction!.amount!) ?? 0) - (int.tryParse(_amountController.text) ?? 0);
+      Account? ac = await AccountService().getAccountForTransaction(widget.transaction);
       if (ac != null) {
         await AccountService().updateAccount(
             Account(
               name: ac.name,
               type: ac.type,
-              balance: widget.transactionType == 0
-                  ? '${int.parse(ac.balance) - checkExpense}'
-                  : '${int.parse(ac.balance) + checkExpense}',
+              balance: widget.transactionType == 0 ? '${int.parse(ac.balance!) - checkExpense}' : '${int.parse(ac.balance!) + checkExpense}',
               transactionIds: [
-                if (ac.transactionIds != null) ...ac.transactionIds,
+                if (ac.transactionIds != null) ...ac.transactionIds!,
               ],
             ),
             true);
@@ -848,16 +731,14 @@ class _TransactionPageState extends State<TransactionPage>
   }
 
   _showMessage(String message) {
-    _scaffoldKey.currentState
-        .showSnackBar(SnackBar(content: AdaptiveText(message)));
+    ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(SnackBar(content: AdaptiveText(message)));
   }
 
   Future _showAddCategoryBottomSheet() async {
     if ((await showDialog(
           context: context,
-          builder: (context) => ChangeNotifierProvider<PreferenceProvider>(
-            builder: (context) => PreferenceProvider(),
-            child: CategoryDialog(
+          builder: (context) => Consumer<PreferenceProvider>(
+            builder: (context, a, b) => CategoryDialog(
               isCashIn: widget.transactionType == 0,
             ),
           ),
@@ -867,26 +748,19 @@ class _TransactionPageState extends State<TransactionPage>
     }
   }
 
-  String validator(String value) {
+  String? validator(String value) {
     var _value = value.toLowerCase();
-    var categories = widget.transactionType == 0
-        ? globals.expenseCategories
-        : globals.incomeCategories;
+    var categories = widget.transactionType == 0 ? globals.expenseCategories : globals.incomeCategories;
     if (value.isEmpty) {
       return language == Lang.EN ? 'Category is empty' : 'श्रेणी खाली छ';
-    } else if (categories.any((category) =>
-        category.en.toLowerCase() == _value ||
-        category.np.toLowerCase() == _value)) {
-      return language == Lang.EN
-          ? 'Category already exists!'
-          : 'श्रेणी पहिल्यै छ';
+    } else if (categories!.any((category) => category.en!.toLowerCase() == _value || category.np!.toLowerCase() == _value)) {
+      return language == Lang.EN ? 'Category already exists!' : 'श्रेणी पहिल्यै छ';
     }
     return null;
   }
 }
 
-Widget dropDownMenuBuilder(IconData leadingIcon, String title,
-    {Category category, Widget iconBuilderWidget}) {
+Widget dropDownMenuBuilder(IconData leadingIcon, String? title, {Category? category, Widget? iconBuilderWidget}) {
   return Row(
     mainAxisSize: MainAxisSize.min,
     mainAxisAlignment: MainAxisAlignment.start,
@@ -902,7 +776,7 @@ Widget dropDownMenuBuilder(IconData leadingIcon, String title,
       SizedBox(width: 10.0),
       Flexible(
         child: AdaptiveText(
-          category != null ? '' : title,
+          category != null ? '' : title!,
           category: category,
           maxLines: 2,
           overflow: TextOverflow.fade,

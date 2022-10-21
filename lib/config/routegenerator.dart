@@ -43,7 +43,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case budget:
       {
         builder = (BuildContext _) => BudgetPage(
-              isInflowProjection: settings.arguments,
+              isInflowProjection: settings.arguments as bool?,
             );
         break;
       }
@@ -55,7 +55,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case report:
       {
         builder = (BuildContext _) => ReportPage(
-              selectedSubSector: settings.arguments,
+              selectedSubSector: settings.arguments as String?,
             );
         break;
       }
@@ -67,7 +67,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case setting:
       {
         builder = (BuildContext _) => Settings(
-              type: settings.arguments,
+              type: settings.arguments as int?,
             );
         break;
       }

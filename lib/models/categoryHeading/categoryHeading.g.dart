@@ -8,10 +8,10 @@ part of 'categoryHeading.dart';
 
 CategoryHeading _$CategoryHeadingFromJson(Map<String, dynamic> json) {
   return CategoryHeading(
-      id: json['id'] as int,
-      en: json['en'] as String,
-      np: json['np'] as String,
-      iconName: json['iconName'] as String);
+      id: json['id'] as int?,
+      en: json['en'] as String?,
+      np: json['np'] as String?,
+      iconName: json['iconName'] as String?);
 }
 
 Map<String, dynamic> _$CategoryHeadingToJson(CategoryHeading instance) =>

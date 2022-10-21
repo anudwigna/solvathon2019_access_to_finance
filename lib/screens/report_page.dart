@@ -11,7 +11,7 @@ import 'package:MunshiG/models/exportmodel.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/category_service.dart';
-import 'package:excel/excel.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -26,9 +26,9 @@ import '../models/app_page_naming.dart';
 import '../services/activity_tracking.dart';
 
 class ReportPage extends StatefulWidget {
-  final String selectedSubSector;
+  final String? selectedSubSector;
   const ReportPage({
-    Key key,
+    Key? key,
     this.selectedSubSector,
   }) : super(key: key);
   @override
@@ -38,16 +38,15 @@ class ReportPage extends StatefulWidget {
 class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
   List<ExportDataModel> budgetExportDataModel = [];
   List<ExportDataModel> transcationExportDataModel = [];
-  Lang language;
-  String selectedSubSector;
+  Lang? language;
+  String? selectedSubSector;
   var _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.report, action: 'Opened');
+    ActivityTracker().pageTransactionActivity(PageName.report, action: 'Opened');
     selectedSubSector = widget.selectedSubSector ?? globals.selectedSubSector;
   }
 
@@ -57,16 +56,13 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
 
     switch (state) {
       case AppLifecycleState.paused:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.report, action: 'Paused');
+        ActivityTracker().pageTransactionActivity(PageName.report, action: 'Paused');
         break;
       case AppLifecycleState.inactive:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.report, action: 'Inactive');
+        ActivityTracker().pageTransactionActivity(PageName.report, action: 'Inactive');
         break;
       case AppLifecycleState.resumed:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.report, action: 'Resumed');
+        ActivityTracker().pageTransactionActivity(PageName.report, action: 'Resumed');
         break;
       case AppLifecycleState.detached:
         break;
@@ -76,13 +72,11 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.report, action: 'Closed');
+    ActivityTracker().pageTransactionActivity(PageName.report, action: 'Closed');
     super.dispose();
   }
 
-  List<NepaliDateTime> initializeDateResolver(
-      int fromyear, int frommonth, int toyear, int tomonth) {
+  List<NepaliDateTime> initializeDateResolver(int fromyear, int frommonth, int toyear, int tomonth) {
     List<NepaliDateTime> _dateResolver = [];
     int noOfMonths = ((((toyear - fromyear) * 12) + tomonth) - frommonth);
 
@@ -101,10 +95,8 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
     return _dateResolver;
   }
 
-  NepaliDateTime fromDate =
-      NepaliDateTime(NepaliDateTime.now().year, NepaliDateTime.now().month);
-  NepaliDateTime toDate =
-      NepaliDateTime(NepaliDateTime.now().year, NepaliDateTime.now().month + 1);
+  NepaliDateTime fromDate = NepaliDateTime(NepaliDateTime.now().year, NepaliDateTime.now().month);
+  NepaliDateTime toDate = NepaliDateTime(NepaliDateTime.now().year, NepaliDateTime.now().month + 1);
   Widget getSearchWidget() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -139,9 +131,10 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
                           DateSelector(
                             textColor: Colors.black,
                             onDateChanged: (value) {
-                              setState(() {
-                                fromDate = value;
-                              });
+                              if (value != null)
+                                setState(() {
+                                  fromDate = value;
+                                });
                             },
                             currentDate: fromDate,
                           )
@@ -166,9 +159,10 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
                             initialMonth: fromDate.month,
                             currentDate: toDate,
                             onDateChanged: (value) {
-                              setState(() {
-                                toDate = value;
-                              });
+                              if (value != null)
+                                setState(() {
+                                  toDate = value;
+                                });
                             },
                           )
                         ],
@@ -179,17 +173,14 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 15),
-                child: FlatButton(
-                  color: Configuration().incomeColor,
+                child: TextButton(
+                  style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor)),
                   onPressed: () {
                     if (toDate.difference(fromDate).isNegative) {
-                      _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                              'End date cannot be behind than From date')));
+                      ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(SnackBar(content: Text('End date cannot be behind than From date')));
                       return;
                     }
-                    getReportData(fromDate.year, fromDate.month, toDate.year,
-                        toDate.month);
+                    getReportData(fromDate.year, fromDate.month, toDate.year, toDate.month);
                   },
                   child: Center(
                     child: AdaptiveText(
@@ -216,23 +207,20 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
   getReportData(int formyear, int fromtmonth, int toyear, int tomonth) {
     clearVariable();
     Future.wait([
-      CategoryService()
-          .getCategoriesID(selectedSubSector, CategoryType.EXPENSE),
-      CategoryService().getCategoriesID(selectedSubSector, CategoryType.INCOME),
+      CategoryService().getCategoriesID(selectedSubSector!, CategoryType.EXPENSE),
+      CategoryService().getCategoriesID(selectedSubSector!, CategoryType.INCOME),
     ]).then((value) async {
       exCat = value[0];
       incomeCat = value[1];
       double budgetcf = 0;
       double transactioncf = 0;
-      final _dateResolver =
-          initializeDateResolver(formyear, fromtmonth, toyear, tomonth);
+      final _dateResolver = initializeDateResolver(formyear, fromtmonth, toyear, tomonth);
       for (int i = 0; i < _dateResolver.length; i++) {
         double inflowMINUSoutflow = 0.0;
         final e = _dateResolver[i];
 
         /// ---budjet projection data--
-        final value = await BudgetService()
-            .getTotalBudgetByDate(selectedSubSector, e.month, e.year);
+        final value = await BudgetService().getTotalBudgetByDate(selectedSubSector!, e.month, e.year);
         final totalData = getSumTotal(
           value,
         );
@@ -243,9 +231,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
         budgetcf = budgetcf + inflowMINUSoutflow;
         budgetExportDataModel.add(
           ExportDataModel(
-              date: NepaliDateFormat("MMMM yyyy",
-                      language == Lang.EN ? Language.english : Language.nepali)
-                  .format(
+              date: NepaliDateFormat("MMMM yyyy", language == Lang.EN ? Language.english : Language.nepali).format(
                 NepaliDateTime(e.year, e.month),
               ),
               inflow: budgetInflow,
@@ -267,9 +253,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
         transactioncf = transactioncf + inflowMINUSoutflow;
         transcationExportDataModel.add(
           ExportDataModel(
-              date: NepaliDateFormat("MMMM yyyy",
-                      language == Lang.EN ? Language.english : Language.nepali)
-                  .format(
+              date: NepaliDateFormat("MMMM yyyy", language == Lang.EN ? Language.english : Language.nepali).format(
                 NepaliDateTime(e.year, e.month),
               ),
               inflow: realDataInflow,
@@ -278,24 +262,21 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
               cf: transactioncf),
         );
       }
-      budgetGroupedData =
-          budgetExportDataModel.groupBy((e) => e.date.split("'").last);
+      budgetGroupedData = budgetExportDataModel.groupBy((e) => e.date!.split("'").last);
 
-      transactionGroupData =
-          transcationExportDataModel.groupBy((e) => e.date.split("'").last);
+      transactionGroupData = transcationExportDataModel.groupBy((e) => e.date!.split("'").last);
       setState(() {});
     });
   }
 
-  Map<String, List<ExportDataModel>> budgetGroupedData;
-  Map<String, List<ExportDataModel>> transactionGroupData;
-  List<int> incomeCat = [];
-  List<int> exCat = [];
+  Map<String, List<ExportDataModel>>? budgetGroupedData;
+  Map<String, List<ExportDataModel>>? transactionGroupData;
+  List<int?> incomeCat = [];
+  List<int?> exCat = [];
   @override
   // ignore: must_call_super
   Widget build(BuildContext context) {
-    return Consumer<PreferenceProvider>(
-        builder: (context, preferenceProvider, _) {
+    return Consumer<PreferenceProvider>(builder: (context, preferenceProvider, _) {
       language = preferenceProvider.language;
       return Scaffold(
           key: _scaffoldKey,
@@ -334,34 +315,30 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
                 icon: Icon(MdiIcons.informationOutline),
               )
             ],
-            title: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  AdaptiveText(
-                    'Report',
-                    style: TextStyle(fontSize: 17),
-                  ),
-                  Flexible(
-                    child: Row(
-                      children: [
-                        Text(
-                          ' (',
-                          style: TextStyle(fontSize: 17),
-                        ),
-                        AdaptiveText(
-                          selectedSubSector.toString(),
-                          style: TextStyle(fontSize: 17),
-                        ),
-                        Text(
-                          ')',
-                          style: TextStyle(fontSize: 17),
-                        ),
-                      ],
+            title: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+              AdaptiveText(
+                'Report',
+                style: TextStyle(fontSize: 17),
+              ),
+              Flexible(
+                child: Row(
+                  children: [
+                    Text(
+                      ' (',
+                      style: TextStyle(fontSize: 17),
                     ),
-                  )
-                ]),
+                    AdaptiveText(
+                      selectedSubSector.toString(),
+                      style: TextStyle(fontSize: 17),
+                    ),
+                    Text(
+                      ')',
+                      style: TextStyle(fontSize: 17),
+                    ),
+                  ],
+                ),
+              )
+            ]),
           ),
           floatingActionButton: budgetExportDataModel.isEmpty
               ? Container(
@@ -369,8 +346,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
                   width: 1,
                 )
               : Material(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   color: Colors.yellow[800],
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
@@ -378,8 +354,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
                     hoverColor: Colors.grey,
                     onTap: _exportDataToExcel,
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -395,8 +370,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
                           ),
                           AdaptiveText(
                             'Export Report',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w500),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                           )
                         ],
                       ),
@@ -421,12 +395,10 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               child: InfoCard(
                                 budgetData: budgetExportDataModel[index],
-                                transactionData:
-                                    transcationExportDataModel[index],
+                                transactionData: transcationExportDataModel[index],
                               ),
                             ),
                         separatorBuilder: (context, index) => SizedBox(
@@ -445,9 +417,9 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
   }
 
   getRowValue({
-    String svgImageName,
+    String? svgImageName,
     // Color iconColor,
-    String value,
+    required String value,
     // double angle,
     // Widget iconWidget,
   }) {
@@ -456,18 +428,14 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
       child: Row(
         children: [
           // if (svgImageName != null)
-          SvgPicture.asset('assets/images/$svgImageName.svg',
-              width: 18, color: Colors.black),
+          SvgPicture.asset('assets/images/$svgImageName.svg', width: 18, color: Colors.black),
           SizedBox(
             width: 5,
           ),
           Flexible(
             child: AdaptiveText(
               value,
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w400),
             ),
           )
         ],
@@ -476,7 +444,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
   }
 
   List<List<double>> getSumTotal(List<Budget> data, {bool isInflow = false}) {
-    if (data == null)
+    if (data.isEmpty)
       return [
         [0.0, 0.0],
         [0.0, 0.0]
@@ -487,17 +455,13 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
     double tranasctionoutflow = 0.0;
     data.forEach((element) {
       if (incomeCat.contains(element.categoryId)) {
-        budgetinflow =
-            budgetinflow + (double.tryParse(element?.total.toString()) ?? 0.0);
+        budgetinflow = budgetinflow + (double.tryParse(element.total.toString()) ?? 0.0);
 
-        transactioninflow = transactioninflow +
-            (double.tryParse(element?.spent.toString()) ?? 0.0);
+        transactioninflow = transactioninflow + (double.tryParse(element.spent.toString()) ?? 0.0);
       } else {
-        budgetoutflow =
-            budgetoutflow + (double.tryParse(element?.total.toString()) ?? 0.0);
+        budgetoutflow = budgetoutflow + (double.tryParse(element.total.toString()) ?? 0.0);
 
-        tranasctionoutflow = tranasctionoutflow +
-            (double.tryParse(element?.spent.toString()) ?? 0.0);
+        tranasctionoutflow = tranasctionoutflow + (double.tryParse(element.spent.toString()) ?? 0.0);
       }
     });
     return [
@@ -506,21 +470,11 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
     ];
   }
 
-  setExcelHeading(String sheet, Excel excel) {
-    excel.updateCell(
-        sheet, CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0), "Date");
-    excel.updateCell(
-        sheet,
-        CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 0),
-        "Inflow Project1ion");
-    excel.updateCell(
-        sheet,
-        CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 0),
-        "OutFlow Projection");
-    excel.updateCell(
-        sheet,
-        CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 0),
-        "Monthly Surplus/Deficit");
+  setExcelHeading(String? sheet, Excel excel) {
+    excel.updateCell(sheet, CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0), "Date");
+    excel.updateCell(sheet, CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 0), "Inflow Project1ion");
+    excel.updateCell(sheet, CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 0), "OutFlow Projection");
+    excel.updateCell(sheet, CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 0), "Monthly Surplus/Deficit");
     excel.updateCell(
       sheet,
       CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: 0),
@@ -645,11 +599,8 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
       row++;
     });
     excel.encode().then((value) async {
-      Directory directory = await getExternalStorageDirectory();
-      String finalPath = directory.path +
-          "/temp/" +
-          selectedSubSector +
-          "ProjectionSheet.xlsx";
+      Directory directory = await (getExternalStorageDirectory() as Future<Directory>);
+      String finalPath = directory.path + "/temp/" + selectedSubSector! + "ProjectionSheet.xlsx";
       File(finalPath)
         ..createSync(recursive: true)
         ..writeAsBytesSync(value);
@@ -658,11 +609,7 @@ class _ReportPageState extends State<ReportPage> with WidgetsBindingObserver {
   }
 
   emailSender(String path) async {
-    Email email = Email(
-        attachmentPaths: [path],
-        subject: selectedSubSector + ' Projection Details',
-        recipients: ['info@aria.com.np'],
-        isHTML: false);
+    Email email = Email(attachmentPaths: [path], subject: selectedSubSector! + ' Projection Details', recipients: ['info@aria.com.np'], isHTML: false);
     await FlutterEmailSender.send(email).then((value) {
       File(path).deleteSync();
     });

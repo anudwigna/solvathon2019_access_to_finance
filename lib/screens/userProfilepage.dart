@@ -23,15 +23,13 @@ class UserProfilePage extends StatefulWidget {
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage>
-    with WidgetsBindingObserver {
-  User user;
+class _UserProfilePageState extends State<UserProfilePage> with WidgetsBindingObserver {
+  User? user;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.profile, action: 'Opened');
+    ActivityTracker().pageTransactionActivity(PageName.profile, action: 'Opened');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       getData();
     });
@@ -50,16 +48,13 @@ class _UserProfilePageState extends State<UserProfilePage>
 
     switch (state) {
       case AppLifecycleState.paused:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.profile, action: 'Paused');
+        ActivityTracker().pageTransactionActivity(PageName.profile, action: 'Paused');
         break;
       case AppLifecycleState.inactive:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.profile, action: 'Inactive');
+        ActivityTracker().pageTransactionActivity(PageName.profile, action: 'Inactive');
         break;
       case AppLifecycleState.resumed:
-        ActivityTracker()
-            .pageTransactionActivity(PageName.profile, action: 'Resumed');
+        ActivityTracker().pageTransactionActivity(PageName.profile, action: 'Resumed');
         break;
       case AppLifecycleState.detached:
         break;
@@ -69,12 +64,11 @@ class _UserProfilePageState extends State<UserProfilePage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ActivityTracker()
-        .pageTransactionActivity(PageName.profile, action: 'Closed');
+    ActivityTracker().pageTransactionActivity(PageName.profile, action: 'Closed');
     super.dispose();
   }
 
-  Lang language;
+  Lang? language;
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
@@ -157,7 +151,7 @@ class _UserProfilePageState extends State<UserProfilePage>
               width: ScreenSizeConfig.blockSizeHorizontal * 35,
               height: ScreenSizeConfig.blockSizeVertical * 25,
               child: (File(user?.image ?? '').existsSync())
-                  ? (Image.file(File(user.image), fit: BoxFit.contain))
+                  ? (Image.file(File(user!.image!), fit: BoxFit.contain))
                   : Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -200,21 +194,14 @@ class _UserProfilePageState extends State<UserProfilePage>
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
                         Text(
-                          user?.name?.split(' ')?.first ?? '',
+                          user?.name?.split(' ').first ?? '',
                           maxLines: 2,
-                          style: TextStyle(
-                              height: 0,
-                              fontSize: 19,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500),
+                          style: TextStyle(height: 0, fontSize: 19, color: Colors.black, fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          user?.name?.split(' ')?.last ?? '',
+                          user?.name?.split(' ').last ?? '',
                           maxLines: 2,
-                          style: TextStyle(
-                              fontSize: 19,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500),
+                          style: TextStyle(fontSize: 19, color: Colors.black, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -233,10 +220,7 @@ class _UserProfilePageState extends State<UserProfilePage>
                         Flexible(
                           child: Text(
                             user?.phonenumber ?? '',
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500),
+                            style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.w500),
                           ),
                         ),
                       ],
@@ -256,23 +240,9 @@ class _UserProfilePageState extends State<UserProfilePage>
       children: <Widget>[
         detailbody(genderIcon, 'Gender', user?.gender ?? ''),
         detailbody(addressIcon, 'Address', user?.address ?? ''),
-        detailbody(
-            dobIcon,
-            'Date of Birth (B.S)',
-            (user?.dob != null)
-                ? (NepaliDateFormat(
-                        "MMMM dd, y",
-                        language == Lang.EN
-                            ? Language.english
-                            : Language.nepali)
-                    .format(user.dob.toNepaliDateTime()))
-                : ''),
-        detailbody(
-            dobIcon,
-            'Date of Birth (A.D)',
-            (user?.dob != null)
-                ? (DateFormat("MMMM dd, y").format(user.dob))
-                : ''),
+        detailbody(dobIcon, 'Date of Birth (B.S)',
+            (user?.dob != null) ? (NepaliDateFormat("MMMM dd, y", language == Lang.EN ? Language.english : Language.nepali).format(user!.dob!.toNepaliDateTime())) : ''),
+        detailbody(dobIcon, 'Date of Birth (A.D)', (user?.dob != null) ? (DateFormat("MMMM dd, y").format(user!.dob!)) : ''),
         detailbody(emailIcon, 'Email Address', user?.emailAddress ?? ''),
       ],
     );
@@ -296,17 +266,11 @@ class _UserProfilePageState extends State<UserProfilePage>
             children: <Widget>[
               AdaptiveText(
                 title,
-                style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 15),
+                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w400, fontSize: 15),
               ),
               Text(
-                data ?? '',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16),
+                data,
+                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 16),
               )
             ],
           )

@@ -8,11 +8,11 @@ part of 'budget.dart';
 
 Budget _$BudgetFromJson(Map<String, dynamic> json) {
   return Budget(
-      month: json['month'] as int,
-      total: json['total'] as String,
-      spent: json['spent'] as String,
-      categoryId: json['categoryId'] as int,
-      year: json['year'] as int);
+      month: json['month'] as int?,
+      total: json['total'] as String?,
+      spent: json['spent'] as String?,
+      categoryId: json['categoryId'] as int?,
+      year: json['year'] as int?);
 }
 
 Map<String, dynamic> _$BudgetToJson(Budget instance) => <String, dynamic>{

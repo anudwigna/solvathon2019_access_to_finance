@@ -27,18 +27,18 @@ class CategoryHeadingService {
   Future<List<CategoryHeading>> getAllCategoryHeadings(
       CategoryType type) async {
     var dbStore = await getDatabaseAndStore(type);
-    var snapshot = await dbStore.store.find(dbStore.database);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database!);
     return snapshot
         .map((record) => CategoryHeading.fromJson(record.value))
         .toList();
   }
 
-  Future<CategoryHeading> getCategoryHeadingById(
-      CategoryType type, int id) async {
+  Future<CategoryHeading?> getCategoryHeadingById(
+      CategoryType type, int? id) async {
     var dbStore = await getDatabaseAndStore(type);
     Finder finder = Finder(filter: Filter.equals('id', id));
-    var snapshot =
-        await dbStore.store.findFirst(dbStore.database, finder: finder);
+    RecordSnapshot<int?, Map<String, dynamic>>? snapshot =
+        await dbStore.store!.findFirst(dbStore.database!, finder: finder);
   
     if (snapshot == null) return null;
     return CategoryHeading.fromJson(snapshot.value);
@@ -129,8 +129,8 @@ class CategoryHeadingService {
     var dbStore = await getDatabaseAndStore(CategoryType.INCOME);
     incomeCategoryHeadings.forEach(
       (category) async {
-        await dbStore.store.record(category.id).put(
-              dbStore.database,
+        await dbStore.store!.record(category.id).put(
+              dbStore.database!,
               category.toJson(),
             );
       },
@@ -138,8 +138,8 @@ class CategoryHeadingService {
     dbStore = await getDatabaseAndStore(CategoryType.EXPENSE);
     expenseCategoryHeadings.forEach(
       (category) async {
-        await dbStore.store.record(category.id).put(
-              dbStore.database,
+        await dbStore.store!.record(category.id).put(
+              dbStore.database!,
               category.toJson(),
             );
       },
@@ -147,6 +147,6 @@ class CategoryHeadingService {
   }
   Future<void>closeDatabase(String subsector) async {
     final db = await getDatabaseAndStore(CategoryType.INCOME);
-    await db.database.close();
+    await db.database!.close();
   }
 }

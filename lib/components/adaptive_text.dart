@@ -7,19 +7,19 @@ import '../config/resource_map.dart';
 
 class AdaptiveText extends StatelessWidget {
   final String data;
-  final int maxLines;
-  final TextOverflow overflow;
-  final bool softWrap;
-  final bool isProviderEnabled;
-  final TextStyle style;
-  final TextAlign textAlign;
-  final TextDirection textDirection;
-  final double textScaleFactor;
-  final Category category;
+  final int? maxLines;
+  final TextOverflow? overflow;
+  final bool? softWrap;
+  final bool? isProviderEnabled;
+  final TextStyle? style;
+  final TextAlign? textAlign;
+  final TextDirection? textDirection;
+  final double? textScaleFactor;
+  final Category? category;
 
   AdaptiveText(
     this.data, {
-    Key key,
+    Key? key,
     this.isProviderEnabled,
     this.maxLines,
     this.overflow,
@@ -42,10 +42,10 @@ class AdaptiveText extends StatelessWidget {
     return Consumer<PreferenceProvider>(
       builder: (context, preferenceProvider, _) => Text(
         preferenceProvider.language == Lang.EN
-            ? category == null ? data : category.en ?? data
+            ? category == null ? data : category!.en ?? data
             : category == null
                 ? ResourceMap[data.toLowerCase()] ?? data
-                : category.np ?? data,
+                : category!.np ?? data,
         maxLines: maxLines,
         overflow: overflow,
         softWrap: softWrap,
