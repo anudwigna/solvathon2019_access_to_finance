@@ -559,26 +559,20 @@ class __AccountDialogState extends State<_AccountDialog> {
                 ),
               ),
               SizedBox(height: 25.0),
-              TextButton(
-                style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor)),
+              TextButton.icon(
+                icon: Icon(
+                  Icons.add,
+                  size: 20,
+                  color: Colors.white,
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor),
+                ),
                 onPressed: _addAccount,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      Icons.add,
-                      size: 20,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    AdaptiveText(
-                      'Add Account',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 17.0),
-                    ),
-                  ],
+                label: AdaptiveText(
+                  'Add Account',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 17.0, color: Colors.white),
                 ),
               ),
               SizedBox(height: 8.0),

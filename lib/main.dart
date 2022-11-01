@@ -48,7 +48,17 @@ final ThemeData themeData = ThemeData(
   ),
   scaffoldBackgroundColor: Colors.transparent,
   canvasColor: Colors.white,
-  buttonColor: Configuration().incomeColor,
+  textButtonTheme: TextButtonThemeData(
+    style: ButtonStyle(
+      shape: MaterialStateProperty.resolveWith(
+        (states) => RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(1),
+        ),
+      ),
+      textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(color: Colors.white)),
+      backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor),
+    ),
+  ),
   tabBarTheme: TabBarTheme(
       indicator: BoxDecoration(
     borderRadius: BorderRadius.circular(100),
@@ -60,7 +70,7 @@ final ThemeData themeData = ThemeData(
         borderRadius: BorderRadius.circular(12),
       ),
       buttonColor: Configuration().incomeColor,
-      height: 52,
+      height: 55,
       textTheme: ButtonTextTheme.normal),
 );
 

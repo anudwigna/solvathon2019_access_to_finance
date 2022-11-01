@@ -210,47 +210,48 @@ class _TransactionPageState extends State<TransactionPage> with WidgetsBindingOb
                     }).toList();
                   },
                   items: [
-                    for (int i = 0; i < snapshot.data!.length; i++)
-                      DropdownMenuItem<int>(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              dropDownMenuBuilder(
-                                VectorIcons.fromName(
-                                  'hornbill',
-                                  provider: IconProvider.FontAwesome5,
-                                ),
-                                '',
-                                category: snapshot.data![i],
-                                iconBuilderWidget: FutureBuilder<CategoryHeading?>(
-                                  future: CategoryHeadingService().getCategoryHeadingById(widget.transactionType == 0 ? CategoryType.INCOME : CategoryType.EXPENSE,
-                                      snapshot.data![i].categoryHeadingId == null ? (widget.transactionType == 0 ? 100 : 1) : snapshot.data![i].categoryHeadingId),
-                                  builder: (BuildContext context, AsyncSnapshot<CategoryHeading?> snapshot1) {
-                                    return (!snapshot1.hasData)
-                                        ? Icon(
-                                            VectorIcons.fromName(
-                                              'hornbill',
-                                              provider: IconProvider.FontAwesome5,
-                                            ),
-                                            color: Configuration().incomeColor,
-                                            size: 20.0,
-                                          )
-                                        : SvgPicture.asset('assets/images/${snapshot1.data!.iconName}');
-                                  },
-                                ),
+                    ...snapshot.data!
+                        .map(
+                          (e) => DropdownMenuItem<int>(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  dropDownMenuBuilder(
+                                    VectorIcons.fromName(
+                                      'hornbill',
+                                      provider: IconProvider.FontAwesome5,
+                                    ),
+                                    '',
+                                    category: e,
+                                    iconBuilderWidget: FutureBuilder<CategoryHeading?>(
+                                      future: CategoryHeadingService().getCategoryHeadingById(widget.transactionType == 0 ? CategoryType.INCOME : CategoryType.EXPENSE,
+                                          e.categoryHeadingId == null ? (widget.transactionType == 0 ? 100 : 1) : e.categoryHeadingId),
+                                      builder: (BuildContext context, AsyncSnapshot<CategoryHeading?> snapshot1) {
+                                        return (!snapshot1.hasData)
+                                            ? Icon(
+                                                VectorIcons.fromName(
+                                                  'hornbill',
+                                                  provider: IconProvider.FontAwesome5,
+                                                ),
+                                                color: Configuration().incomeColor,
+                                                size: 20.0,
+                                              )
+                                            : SvgPicture.asset('assets/images/${snapshot1.data!.iconName}');
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                              Divider(color: Colors.grey.withOpacity(0.5))
-                            ],
+                            ),
+                            value: e.id,
                           ),
-                        ),
-                        value: snapshot.data![i].id,
-                      ),
+                        )
+                        .toList(),
+                    // for (int i = 0; i < snapshot.data!.length; i++)
+
                     (widget.transaction == null)
                         ? DropdownMenuItem<int>(
                             child: dropDownMenuBuilder(
@@ -259,7 +260,7 @@ class _TransactionPageState extends State<TransactionPage> with WidgetsBindingOb
                                   provider: IconProvider.FontAwesome5,
                                 ),
                                 'Add New Category'),
-                            value: 'Add new Category'.hashCode,
+                            value: -1,
                           )
                         : DropdownMenuItem<int>(child: Container())
                   ],
@@ -267,7 +268,7 @@ class _TransactionPageState extends State<TransactionPage> with WidgetsBindingOb
                     FocusScope.of(context).requestFocus(new FocusNode());
                   },
                   onChanged: (value) {
-                    if (value == 'Add new Category'.hashCode) {
+                    if (value == -1) {
                       _showAddCategoryBottomSheet();
                     } else {
                       setState(() {

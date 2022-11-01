@@ -62,7 +62,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 iconSize: 30,
                 dropdownColor: Colors.white,
                 items: [
-                  for (String subSector in globals.subSectors as Iterable<String>)
+                  for (String subSector in (globals.subSectors ?? []))
                     DropdownMenuItem(
                       child: AdaptiveText(
                         subSector,
@@ -80,12 +80,8 @@ class _MyDrawerState extends State<MyDrawer> {
                     globals.selectedSubSector = onValue;
                     selectedSubSector.selectedSubSector = onValue;
                     PreferenceService.instance.setSelectedSubSector(onValue);
-                    globals.incomeCategories = await CategoryService()
-                        .getCategories(selectedSubSector.selectedSubSector!,
-                            CategoryType.INCOME);
-                    globals.expenseCategories = await CategoryService()
-                        .getCategories(selectedSubSector.selectedSubSector!,
-                            CategoryType.EXPENSE);
+                    globals.incomeCategories = await CategoryService().getCategories(selectedSubSector.selectedSubSector!, CategoryType.INCOME);
+                    globals.expenseCategories = await CategoryService().getCategories(selectedSubSector.selectedSubSector!, CategoryType.EXPENSE);
                     if (widget.homePageState != null) {
                       await widget.homePageState!.updateChartData();
                     }
@@ -163,9 +159,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: _style,
                 textAlign: TextAlign.left,
               ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context, budget, ModalRoute.withName(home),
-                  arguments: true),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(context, budget, ModalRoute.withName(home), arguments: true),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -178,9 +172,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: _style,
                 textAlign: TextAlign.left,
               ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context, budget, ModalRoute.withName(home),
-                  arguments: false),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(context, budget, ModalRoute.withName(home), arguments: false),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -210,9 +202,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: _style,
                 textAlign: TextAlign.left,
               ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(
-                  context, report, ModalRoute.withName(home),
-                  arguments: selectedSubSector.selectedSubSector),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(context, report, ModalRoute.withName(home), arguments: selectedSubSector.selectedSubSector),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -244,9 +234,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     style: _style,
                     textAlign: TextAlign.left,
                   ),
-                  onTap: () => Navigator.pushNamedAndRemoveUntil(
-                      context, setting, ModalRoute.withName(home),
-                      arguments: 1),
+                  onTap: () => Navigator.pushNamedAndRemoveUntil(context, setting, ModalRoute.withName(home), arguments: 1),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -260,8 +248,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     textAlign: TextAlign.left,
                   ),
                   trailing: Switch(
-                    value:
-                        preferenceProvider.language == Lang.NP ? true : false,
+                    value: preferenceProvider.language == Lang.NP ? true : false,
                     activeColor: Colors.white,
                     inactiveTrackColor: Colors.black,
                     inactiveThumbColor: Colors.white,

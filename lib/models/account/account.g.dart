@@ -12,7 +12,7 @@ Account _$AccountFromJson(Map<String, dynamic> json) {
       balance: json['balance'] as String?,
       type: json['type'] as int?,
       transactionIds:
-          (json['transactionIds'] as List?)?.map((e) => e as int)?.toList());
+          (json['transactionIds'] as List?)?.map((e) => e as int).toList());
 }
 
 Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
