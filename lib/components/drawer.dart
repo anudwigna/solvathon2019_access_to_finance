@@ -46,7 +46,7 @@ class _MyDrawerState extends State<MyDrawer> {
               child: Image.asset(
                 "assets/images/munshiji-logo.png",
                 height: 60.0,
-                color: Color(0xff2b2f8e),
+                color: Configuration().appColor,
                 fit: BoxFit.contain,
               ),
             ),
@@ -159,7 +159,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: _style,
                 textAlign: TextAlign.left,
               ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(context, budget, ModalRoute.withName(home), arguments: true),
+              onTap: () => Navigator.pushNamed(context, budget, arguments: true),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -172,7 +172,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: _style,
                 textAlign: TextAlign.left,
               ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(context, budget, ModalRoute.withName(home), arguments: false),
+              onTap: () => Navigator.pushNamed(context, budget, arguments: false),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
@@ -185,25 +185,25 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: _style,
                 textAlign: TextAlign.left,
               ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(
+              onTap: () => Navigator.pushNamed(
                 context,
                 account,
-                ModalRoute.withName(home),
               ),
             ),
             ListTile(
-              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
-              leading: SvgPicture.string(
-                categoriesIcon,
-                allowDrawingOutsideViewBox: true,
-              ),
-              title: AdaptiveText(
-                'Report',
-                style: _style,
-                textAlign: TextAlign.left,
-              ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(context, report, ModalRoute.withName(home), arguments: selectedSubSector.selectedSubSector),
-            ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                leading: SvgPicture.string(
+                  categoriesIcon,
+                  allowDrawingOutsideViewBox: true,
+                ),
+                title: AdaptiveText(
+                  'Report',
+                  style: _style,
+                  textAlign: TextAlign.left,
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, report, arguments: selectedSubSector.selectedSubSector);
+                }),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
               leading: SvgPicture.string(
@@ -215,10 +215,9 @@ class _MyDrawerState extends State<MyDrawer> {
                 style: _style,
                 textAlign: TextAlign.left,
               ),
-              onTap: () => Navigator.pushNamedAndRemoveUntil(
+              onTap: () => Navigator.pushNamed(
                 context,
                 backup,
-                ModalRoute.withName(home),
               ),
             ),
             Column(

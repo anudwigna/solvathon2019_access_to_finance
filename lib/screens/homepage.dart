@@ -116,7 +116,7 @@ class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin,
         decoration: Configuration().gradientDecoration,
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: const Color(0xff2b2f8e),
+          backgroundColor: Configuration().appColor,
           appBar: AppBar(
             title: Row(
               children: [

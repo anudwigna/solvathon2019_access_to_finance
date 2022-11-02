@@ -50,9 +50,10 @@ final ThemeData themeData = ThemeData(
   canvasColor: Colors.white,
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
+      minimumSize: MaterialStateProperty.resolveWith((states) => Size(double.maxFinite, 46)),
       shape: MaterialStateProperty.resolveWith(
         (states) => RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(1),
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
       textStyle: MaterialStateProperty.resolveWith((states) => TextStyle(color: Colors.white)),

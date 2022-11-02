@@ -118,7 +118,7 @@ class _TransactionPageState extends State<TransactionPage> with WidgetsBindingOb
       backgroundColor: Colors.white,
       appBar: AppBar(
         // centerTitle: true,
-        backgroundColor: Color(0xff2b2f8e),
+        backgroundColor: Configuration().appColor,
         title: widget.transaction != null
             ? AdaptiveText(
                 'Update ${widget.transactionType == 0 ? 'Income' : 'Expense'}',
@@ -133,7 +133,7 @@ class _TransactionPageState extends State<TransactionPage> with WidgetsBindingOb
         children: [
           Container(
             height: ScreenSizeConfig.blockSizeHorizontal * 50,
-            color: Color(0xff2b2f8e),
+            color: Configuration().appColor,
           ),
           Padding(
             padding: const EdgeInsets.only(top: 10),

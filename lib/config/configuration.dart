@@ -42,31 +42,23 @@ class Configuration {
     return NepaliDateTime(dateTime.year, dateTime.month, dateTime.day);
   }
 
-  Future<File?> saveImage(
-      File file, String directoryFolderName, String fileName) async {
-    File? compressedImage =
-        await getCompressedImage(file, directoryFolderName, fileName);
+  Future<File?> saveImage(File file, String directoryFolderName, String fileName) async {
+    File? compressedImage = await getCompressedImage(file, directoryFolderName, fileName);
     // print(compressedImage.path);
     return compressedImage;
   }
 
-  Future<File?> getCompressedImage(
-      File _file, String directoryFolderName, String fileName) async {
-    if (_file.path.split('/').last.split('.').last == 'jpg' ||
-        _file.path.split('/').last.split('.').last == 'jpeg' ||
-        _file.path.split('/').last.split('.').last == 'png') {
+  Future<File?> getCompressedImage(File _file, String directoryFolderName, String fileName) async {
+    if (_file.path.split('/').last.split('.').last == 'jpg' || _file.path.split('/').last.split('.').last == 'jpeg' || _file.path.split('/').last.split('.').last == 'png') {
       Directory _dir = await getApplicationSupportDirectory();
       String ext = _file.path.split('/').last.split('.').last;
-      Directory directory = await Directory(_dir.path + '/$directoryFolderName')
-          .create(recursive: true);
+      Directory directory = await Directory(_dir.path + '/$directoryFolderName').create(recursive: true);
       String filePath = directory.path + '/' + fileName + '.' + ext;
       try {
         final result = await FlutterImageCompress.compressAndGetFile(
           _file.path,
           filePath,
-          format: ((_file.path.split('/').last).split('.').last != 'png')
-              ? CompressFormat.jpeg
-              : CompressFormat.png,
+          format: ((_file.path.split('/').last).split('.').last != 'png') ? CompressFormat.jpeg : CompressFormat.png,
           quality: 40,
         );
         return result;

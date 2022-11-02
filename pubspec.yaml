@@ -25,6 +25,10 @@ dependencies:
   package_info_plus: ^3.0.1
   path_provider: ^2.0.11
   permission_handler: ^10.2.0
+  excel:
+    git:
+      url: https://github.com/justkawal/excel
+      ref: null-safety
   progress_dialog:
     git:
       url: https://github.com/Rishan99/progress-dialog

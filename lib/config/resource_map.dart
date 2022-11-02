@@ -22,8 +22,7 @@ const Map<String, String> ResourceMap = {
   'delete': 'मेटाउनुहोस',
   'indicators': 'सूचकहरू',
   'delete transaction': 'मेटाउनुहोस ',
-  'are you sure to delete this account?':
-      'के तपाई यो खाता मेटाउन निश्चित हुनुहुन्छ?',
+  'are you sure to delete this account?': 'के तपाई यो खाता मेटाउन निश्चित हुनुहुन्छ?',
   'budget': 'बजेट',
   'expense projection': 'खर्चको अनुमान',
   'click to set budget': 'बजेट तय गर्न थिच्नुहोस्',
@@ -44,10 +43,8 @@ const Map<String, String> ResourceMap = {
   'date of income': 'नगद भित्रीएको मिति',
   'add income': 'आम्दानी राख्नुहोस',
   'add expense': 'खर्च राख्नुहोस',
-  'sorry, income for current month can only be added!':
-      'माफ गर्नुहोस, चालु महिनाको मात्र आम्दानी रकम राख्न सकिन्छ!',
-  'sorry, expense for current month can only be added!':
-      'माफ गर्नुहोस, चालु महिनाको मात्र खर्च रकम राख्न सकिन्छ!',
+  'sorry, income for current month can only be added!': 'माफ गर्नुहोस, चालु महिनाको मात्र आम्दानी रकम राख्न सकिन्छ!',
+  'sorry, expense for current month can only be added!': 'माफ गर्नुहोस, चालु महिनाको मात्र खर्च रकम राख्न सकिन्छ!',
   'select account': 'खाता चुन्नुहोस',
   'choose date': 'मिति रोज्नुहोस',
   'submit': 'स्वीकार गर्नुहोस',
@@ -63,20 +60,17 @@ const Map<String, String> ResourceMap = {
   'okay    ': 'ठिक छ',
   'cancel': 'रद्द गर्नुहोस',
   'add new category': 'नयाँ शिर्षक राख्नुहोस',
-  'the data will be lost if you remove the app while using it as guest.':
-      'दर्ता नगरी चलाउनुहुदा, यो एप्प हटाउनुभएको खण्डमा सबै डेटाहरु हराउन सक्छन।',
-  'cannot delete! this account is linked with some transactions.':
-      'हटाउन सकिएन! यो खाता कुनै कारोबारसँग सम्बन्धित छ।',
-  'budget is not enough for the transaction. do you really want to add the transaction?':
-      'यो कारोबारको लागी बजेट रकम अपुग भएको छ। के तपाई साचै यो कारोबार राख्न चाहनुहुन्छ ?',
-  'Budget cannot be cleared as it in use.':
-      'बजेट प्रयोग भैराखेको हुनाले , खाली  गर्न सकिएन।',
+  'the data will be lost if you remove the app while using it as guest.': 'दर्ता नगरी चलाउनुहुदा, यो एप्प हटाउनुभएको खण्डमा सबै डेटाहरु हराउन सक्छन।',
+  'cannot delete! this account is linked with some transactions.': 'हटाउन सकिएन! यो खाता कुनै कारोबारसँग सम्बन्धित छ।',
+  'budget is not enough for the transaction. do you really want to add the transaction?': 'यो कारोबारको लागी बजेट रकम अपुग भएको छ। के तपाई साचै यो कारोबार राख्न चाहनुहुन्छ ?',
+  'Budget cannot be cleared as it in use.': 'बजेट प्रयोग भैराखेको हुनाले , खाली  गर्न सकिएन।',
   'budget amount is not enough.': 'बजेट रकम पुगेन।',
   'transaction detail': 'कारोबारको विवरण',
   'date: ': 'मिति: ',
   'detail: ': 'विवरण: ',
   'amount: ': 'रकम: ',
   'transportation fare': 'ढुवानी',
+  "please select atleast one preference": "कृपया कम्तिमा एक प्राथमिकता चयन गर्नुहोस्",
   'more categories': 'थप श्रेणीहरू',
   'category heading': 'श्रेणी शीर्षक',
   'delete category': 'श्रेणी हटाउने',
@@ -88,12 +82,9 @@ const Map<String, String> ResourceMap = {
       ' के तपाई साचै यो श्रेणी हटाउन चाहनुहुन्छ? हटाउनु भएको खण्डमा यो श्रेणीसँग सम्बन्धित सबै कारोबारहरूपनि मेटिने छन।',
   'update income': 'आम्दानी हेरफेर गर्नुहोस',
   'update expense': 'खर्च हेरफेर गर्नुहोस',
-  'are you sure you want to delete this category?':
-      'के तपाई साचै यो कारोबार हटाउन चाहनुहुन्छ?',
-  'are you sure you want to delete this account?':
-      'के तपाईं पक्का यो खाता मेटाउन चाहानुहुन्छ?',
-  'are you sure you want to delete this transaction?':
-      'के तपाईं पक्का यो लेनदेन मेटाउन चाहानुहुन्छ?',
+  'are you sure you want to delete this category?': 'के तपाई साचै यो कारोबार हटाउन चाहनुहुन्छ?',
+  'are you sure you want to delete this account?': 'के तपाईं पक्का यो खाता मेटाउन चाहानुहुन्छ?',
+  'are you sure you want to delete this transaction?': 'के तपाईं पक्का यो लेनदेन मेटाउन चाहानुहुन्छ?',
   'cash outflow projection': 'नगद बाहिरिने प्रक्षेपण',
   'cash inflow projection': 'नगद भित्रीने प्रक्षेपण',
   'cash outflow': 'नगद बाहिरिको',
@@ -114,8 +105,7 @@ const Map<String, String> ResourceMap = {
   'choose your language': 'भाषा छान्नुहोस्',
   'nepali': 'नेपाली',
   'english': 'अंग्रेजी',
-  'valid phone number must be added to continue':
-      'अगाडि बढ्नका लागी मान्य फोन नम्बर राख्नुहोस',
+  'valid phone number must be added to continue': 'अगाडि बढ्नका लागी मान्य फोन नम्बर राख्नुहोस',
   'skip': 'छोड्नुहोस्',
   'add your photo\nhere': 'तपाईंको फोटो यहाँ\nथप्नुहोस्',
   'error, image cannot be uploaded': 'फोटो अपलोड गर्न सकिएन ',
@@ -142,8 +132,7 @@ const Map<String, String> ResourceMap = {
   'export report': 'रिपोर्ट निर्यात गर्नुहोस्',
   'exit  ': 'बाहिरिनु  ',
   'confirm exit': 'निश्चित हुनुहुन्छ?',
-  'do you want to exit this application?':
-      'के तपाईं यस एप्पबाट बाहिर निस्कन चाहनुहुन्छ?',
+  'do you want to exit this application?': 'के तपाईं यस एप्पबाट बाहिर निस्कन चाहनुहुन्छ?',
   'upload your photo': 'फोटो अपलोड गर्नुहोस्',
   'projected': 'योजना',
   'real': 'वास्तविक',
@@ -152,8 +141,7 @@ const Map<String, String> ResourceMap = {
   'success': 'सफलता',
   'data has been backup successfully': 'डाटा सफलतापूर्वक ब्याकअप गरिएको छ।',
   'no backup found': 'कुनै ब्याकअप भेटिएन',
-  'you have to create account to create backup, please create account and try again.':
-      'तपाईंले ब्याकअप गर्न खाता सिर्जना गर्नुपर्नेछ, कृपया खाता सिर्जना गर्नुहोस् र पुन: प्रयास गर्नुहोस्।',
+  'you have to create account to create backup, please create account and try again.': 'तपाईंले ब्याकअप गर्न खाता सिर्जना गर्नुपर्नेछ, कृपया खाता सिर्जना गर्नुहोस् र पुन: प्रयास गर्नुहोस्।',
   'go to profile': 'प्रोफाइलमा जानुहोस्',
   'monthly surplus/deficit': 'मासिक बचत/ घाटा',
   'cumulative surplus/deficit': 'संचयी बचत/ घाटा',

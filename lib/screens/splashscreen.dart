@@ -1,4 +1,5 @@
 import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/config/globals.dart' as globals;
 import 'package:MunshiG/config/routes.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
@@ -51,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     ScreenSizeConfig().init(context);
     return Scaffold(
-      backgroundColor: const Color(0xff2b2f8e),
+      backgroundColor: Configuration().appColor,
       body: Stack(
         fit: StackFit.loose,
         children: <Widget>[
@@ -98,7 +99,7 @@ class LanguagePreferencePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff2b2f8e),
+      backgroundColor: Configuration().appColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 50),
         child: Column(
@@ -118,65 +119,58 @@ class LanguagePreferencePage extends StatelessWidget {
             SizedBox(
               height: 40,
             ),
-            TextButton(
-              style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => const Color(0xff2b2f8e))),
-              onPressed: () async {
-                final preferenceProvider = Provider.of<PreferenceProvider>(context, listen: false);
-                preferenceProvider.language = Lang.NP;
-                await PreferenceService.instance.setLanguage('np');
-                globals.language = 'np';
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserInfoRegistrationPage()));
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 7),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        child: Text(
-                      'नेपाली',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Image.asset(
-                      'assets/language/nepali.png',
-                      height: 35,
-                      width: 35,
-                      fit: BoxFit.contain,
-                    )
-                  ],
-                ),
-              ),
-            ),
+            languageSelectionWidget('नेपाली', 'assets/language/nepali.png', () {
+              final preferenceProvider = Provider.of<PreferenceProvider>(context, listen: false);
+              preferenceProvider.language = Lang.NP;
+              PreferenceService.instance.setLanguage('np');
+              globals.language = 'np';
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserInfoRegistrationPage()));
+            }),
             SizedBox(
               height: 25,
             ),
-            TextButton(
-              style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => const Color(0xff2b2f8e))),
-              onPressed: () async {
-                await PreferenceService.instance.setLanguage('en');
-                globals.language = 'en';
-                final preferenceProvider = Provider.of<PreferenceProvider>(context, listen: false);
-                preferenceProvider.language = Lang.EN;
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserInfoRegistrationPage()));
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 7),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        child: Text(
-                      'English',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Image.asset(
-                      'assets/language/english.png',
-                      height: 45,
-                      width: 35,
-                      fit: BoxFit.contain,
-                    )
-                  ],
-                ),
-              ),
-            ),
+            languageSelectionWidget('English', 'assets/language/english.png', () {
+              PreferenceService.instance.setLanguage('en');
+              globals.language = 'en';
+              final preferenceProvider = Provider.of<PreferenceProvider>(context, listen: false);
+              preferenceProvider.language = Lang.EN;
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserInfoRegistrationPage()));
+            })
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget languageSelectionWidget(String title, String imageSource, Function() onTap) {
+    return TextButton(
+      style: ButtonStyle(
+        elevation: MaterialStateProperty.resolveWith((states) => 10),
+        shape: MaterialStateProperty.resolveWith(
+          (states) => RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        backgroundColor: MaterialStateProperty.resolveWith(
+          (states) => Configuration().appColor,
+        ),
+      ),
+      onPressed: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 7),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+                child: Text(
+              title,
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            )),
+            Image.asset(
+              imageSource,
+              height: 35,
+              width: 35,
+              fit: BoxFit.contain,
+            )
           ],
         ),
       ),

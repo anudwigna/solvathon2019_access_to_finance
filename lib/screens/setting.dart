@@ -154,8 +154,7 @@ class _SettingsState extends State<Settings> {
                                     } else {
                                       if (!_newSelectedSubSectors.contains(snapshot.data![index])) {
                                         if (_subSectorsData.contains(snapshot.data![index])) {
-                                          ScaffoldMessenger.of(ScaffoldMessenger.of(_key.currentState!.context).context)
-                                              .showSnackBar(SnackBar(content: AdaptiveText("Selected Sub Sectors cannot be removed")));
+                                          ScaffoldMessenger.of(_key.currentState!.context).showSnackBar(SnackBar(content: AdaptiveText("Selected Sub Sectors cannot be removed")));
                                         } else {
                                           _newSelectedSubSectors.add(snapshot.data![index]);
                                         }
@@ -180,10 +179,11 @@ class _SettingsState extends State<Settings> {
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: TextButton(
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor)),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith((states) => Configuration().incomeColor),
+                        minimumSize: MaterialStateProperty.resolveWith((states) => Size(160, 46)),
+                      ),
                       onPressed: () async {
-                        // print('dsasd');
-                        // return;
                         try {
                           if (widget.type == 0) {
                             if (_subSectorsData.length > 0) {
@@ -201,16 +201,16 @@ class _SettingsState extends State<Settings> {
                               await Future.delayed(Duration(seconds: 2));
                               Navigator.pushNamedAndRemoveUntil(context, wrapper, (Route<dynamic> route) => false);
                             } else {
-                              ScaffoldMessenger.of(ScaffoldMessenger.of(_key.currentState!.context).context).showSnackBar(SnackBar(
+                              ScaffoldMessenger.of(_key.currentState!.context).showSnackBar(SnackBar(
                                 content: AdaptiveText(
-                                  'At least one options must be selected',
+                                  'Please Select atleast one preference',
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 backgroundColor: Colors.red,
                               ));
                             }
                           } else if (widget.type == 1) {
-                            ScaffoldMessenger.of(ScaffoldMessenger.of(_key.currentState!.context).context).removeCurrentSnackBar();
+                            ScaffoldMessenger.of(_key.currentState!.context).removeCurrentSnackBar();
                             if (_newSelectedSubSectors.length > 0) {
                               showFullBodyLoader(context);
                               globals.subSectors!.addAll(_newSelectedSubSectors);
@@ -218,7 +218,7 @@ class _SettingsState extends State<Settings> {
                               await _loadCategories(_newSelectedSubSectors);
                               _newSelectedSubSectors.clear();
                               Navigator.of(context, rootNavigator: true).pop();
-                              ScaffoldMessenger.of(ScaffoldMessenger.of(_key.currentState!.context).context).showSnackBar(SnackBar(
+                              ScaffoldMessenger.of(_key.currentState!.context).showSnackBar(SnackBar(
                                 content: AdaptiveText(
                                   'New Preference has been added',
                                   style: TextStyle(color: Colors.white),
