@@ -1,0 +1,43 @@
+{
+   "expense": [ 
+    {
+      "id": 1,
+      "en": "Operating Activities",
+       "np": "अपरेटिंग गतिविधिहरू",
+      "iconName": "operating.svg"
+    }, 
+    {
+      "id": 2,
+      "en": "Investing Activities",
+      "np": "लगानी लगानी ",
+      "iconName": "investing.svg"
+    },
+    {
+      "id": 3,
+      "en": "Financing Activities",
+      "np": "वित्तिय बिकाश ",
+      "iconName": "financing.svg"
+    }
+  ], 
+     "income": [  
+     	{ 
+      "id": 100,
+      "en": "Income",
+      "np": "आय",
+      "iconName": "income.svg"
+    },
+    {
+      "id": 101,
+      "en": "Capital",
+      "np": "पूंजी",
+      "iconName": "capital.svg"
+    },
+    
+    {
+      "id": 102,
+      "en": "Loan",
+       "np": "ऋण",
+      "iconName": "loan.svg"
+    }
+  ]
+}

@@ -1,26 +1,37 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
 import 'package:MunshiG/components/screen_size_config.dart';
-import 'package:MunshiG/configuration.dart';
+import 'package:MunshiG/config/configuration.dart';
 import 'package:MunshiG/models/user/user.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/userinfoRegistrationPage.dart';
 import 'package:MunshiG/services/user_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
+
+import '../config/globals.dart';
+import '../models/app_page_naming.dart';
+import '../services/activity_tracking.dart';
 
 class UserProfilePage extends StatefulWidget {
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> {
+class _UserProfilePageState extends State<UserProfilePage>
+    with WidgetsBindingObserver {
   User user;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    ActivityTracker()
+        .pageTransactionActivity(PageName.profile, action: 'Opened');
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       getData();
     });
@@ -34,7 +45,39 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+        ActivityTracker()
+            .pageTransactionActivity(PageName.profile, action: 'Paused');
+        break;
+      case AppLifecycleState.inactive:
+        ActivityTracker()
+            .pageTransactionActivity(PageName.profile, action: 'Inactive');
+        break;
+      case AppLifecycleState.resumed:
+        ActivityTracker()
+            .pageTransactionActivity(PageName.profile, action: 'Resumed');
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    ActivityTracker()
+        .pageTransactionActivity(PageName.profile, action: 'Closed');
+    super.dispose();
+  }
+
+  Lang language;
+  @override
   Widget build(BuildContext context) {
+    language = Provider.of<PreferenceProvider>(context).language;
     return Scaffold(
       drawer: MyDrawer(),
       appBar: AppBar(
@@ -55,43 +98,48 @@ class _UserProfilePageState extends State<UserProfilePage> {
             },
             child: Padding(
               padding: const EdgeInsets.all(10.0),
-              child: AdaptiveText(
-                'Edit',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
+              child: Image.asset('assets/images/editIcon.png'),
             ),
           )),
         ],
       ),
       backgroundColor: Configuration().appColor,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(
-                left: ScreenSizeConfig.blockSizeHorizontal * 10, right: 10),
-            child: headerWidget(),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 23.0),
+        child: Container(
+          height: double.maxFinite,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+            ),
           ),
-          SizedBox(
-            height: 20,
+          padding: EdgeInsets.only(top: 30),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  headerWidget(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Divider(
+                    color: Colors.grey.withOpacity(0.2),
+                    thickness: 1,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  detailsWidget(),
+                ],
+              ),
+            ),
           ),
-          Divider(
-            color: Colors.grey.withOpacity(0.2),
-            thickness: 5,
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-                left: ScreenSizeConfig.blockSizeHorizontal * 7, right: 10),
-            child: detailsWidget(),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -102,25 +150,39 @@ class _UserProfilePageState extends State<UserProfilePage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Container(
-              decoration: BoxDecoration(
-                  border: Border.all(
-                      width: 10,
-                      style: BorderStyle.solid,
-                      color: Colors.grey.withOpacity(0.19))),
-              width: ScreenSizeConfig.blockSizeHorizontal * 40,
-              height: ScreenSizeConfig.blockSizeVertical * 32,
-              child: (user?.image != null)
-                  ? (Image.file(
-                      File(user.image),
-                      fit: BoxFit.cover,
-                    ))
-                  : Image.asset(
-                      'assets/image_placeholder.jpg',
-                      fit: BoxFit.cover,
+              width: ScreenSizeConfig.blockSizeHorizontal * 35,
+              height: ScreenSizeConfig.blockSizeVertical * 25,
+              child: (File(user?.image ?? '').existsSync())
+                  ? (Image.file(File(user.image), fit: BoxFit.contain))
+                  : Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.5),
+                          )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Image.asset(
+                              'assets/images/image_placeholder.png',
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          AdaptiveText(
+                            'Upload your photo',
+                            maxLines: 3,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          )
+                        ],
+                      ),
                     ),
             ),
             SizedBox(
@@ -128,45 +190,56 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
             Flexible(
               child: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
+                padding: const EdgeInsets.symmetric(vertical: 5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
                         Text(
                           user?.name?.split(' ')?.first ?? '',
                           maxLines: 2,
                           style: TextStyle(
-                              fontSize: 28,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(
-                          height: 3,
+                              height: 0,
+                              fontSize: 19,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
                         ),
                         Text(
                           user?.name?.split(' ')?.last ?? '',
                           maxLines: 2,
                           style: TextStyle(
-                              fontSize: 28,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600),
+                              fontSize: 19,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 3,
                     ),
-                    Text(
-                      user?.phonenumber ?? '',
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w600),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 3),
+                          child: Icon(
+                            Icons.call,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Flexible(
+                          child: Text(
+                            user?.phonenumber ?? '',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -181,49 +254,39 @@ class _UserProfilePageState extends State<UserProfilePage> {
   detailsWidget() {
     return Column(
       children: <Widget>[
-        detailbody(Icons.face, 'Gender', user?.gender ?? ''),
-        detailbody(Icons.email, 'Address', user?.address ?? ''),
+        detailbody(genderIcon, 'Gender', user?.gender ?? ''),
+        detailbody(addressIcon, 'Address', user?.address ?? ''),
         detailbody(
-            (user?.dob == null) ? Icons.calendar_today : Icons.event,
+            dobIcon,
             'Date of Birth (B.S)',
             (user?.dob != null)
-                ? (NepaliDateFormat("MMMM dd, y (EEE)")
+                ? (NepaliDateFormat(
+                        "MMMM dd, y",
+                        language == Lang.EN
+                            ? Language.english
+                            : Language.nepali)
                     .format(user.dob.toNepaliDateTime()))
                 : ''),
         detailbody(
-            (user?.dob == null) ? Icons.calendar_today : Icons.event,
+            dobIcon,
             'Date of Birth (A.D)',
             (user?.dob != null)
-                ? (DateFormat("MMMM dd, y (EEEE)").format(user.dob))
+                ? (DateFormat("MMMM dd, y").format(user.dob))
                 : ''),
-        detailbody(Icons.email, 'Email Address', user?.emailAddress ?? ''),
+        detailbody(emailIcon, 'Email Address', user?.emailAddress ?? ''),
       ],
     );
   }
 
-  detailbody(IconData icon, String title, String data) {
+  detailbody(String icon, String title, String data) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black, offset: Offset(0, 0), blurRadius: 3)
-                ],
-                shape: BoxShape.circle),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(
-                icon,
-                size: 20,
-                color: Colors.black.withOpacity(0.8),
-              ),
-            ),
+          SvgPicture.string(
+            icon,
           ),
           SizedBox(
             width: 15,
@@ -238,12 +301,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     fontWeight: FontWeight.w400,
                     fontSize: 15),
               ),
-              SizedBox(
-                height: 3,
-              ),
               Text(
                 data ?? '',
-                style: TextStyle(color: Colors.white, fontSize: 15),
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16),
               )
             ],
           )

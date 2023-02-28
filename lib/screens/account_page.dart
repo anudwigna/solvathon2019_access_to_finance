@@ -1,34 +1,68 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
-import 'package:nepali_utils/nepali_utils.dart';
 import 'package:MunshiG/models/account/account.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/account_service.dart';
-import '../globals.dart';
-import '../configuration.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+
+import '../components/extra_componenets.dart';
+import '../config/configuration.dart';
+import '../config/globals.dart';
+import '../icons/vector_icons.dart';
+import '../models/app_page_naming.dart';
+import '../screens/transaction_page.dart';
+import '../services/activity_tracking.dart';
 
 class AccountPage extends StatefulWidget {
   @override
   _AccountPageState createState() => _AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
+class _AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   int _currentBalance = 0;
   Lang language;
   var _accounts = <Account>[];
-  // var _updatedBalanceController = TextEditingController();
-
   var _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
     super.initState();
     _refreshBalance();
+    WidgetsBinding.instance.addObserver(this);
+    ActivityTracker()
+        .pageTransactionActivity(PageName.account, action: 'Opened');
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+        ActivityTracker()
+            .pageTransactionActivity(PageName.account, action: 'Paused');
+        break;
+      case AppLifecycleState.inactive:
+        ActivityTracker()
+            .pageTransactionActivity(PageName.account, action: 'Inactive');
+        break;
+      case AppLifecycleState.resumed:
+        ActivityTracker()
+            .pageTransactionActivity(PageName.account, action: 'Resumed');
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    ActivityTracker()
+        .pageTransactionActivity(PageName.account, action: 'Closed');
+    super.dispose();
   }
 
   _refreshBalance() => AccountService().getAccounts().then(
@@ -55,10 +89,14 @@ class _AccountPageState extends State<AccountPage> {
           key: _scaffoldKey,
           drawer: MyDrawer(),
           appBar: AppBar(
-            centerTitle: true,
-            title: AdaptiveText('Accounts'),
+            // centerTitle: true,
+            title: AdaptiveText(
+              'Accounts',
+              style: TextStyle(fontSize: 17),
+            ),
           ),
           floatingActionButton: FloatingActionButton(
+            splashColor: const Color(0xff7635c7),
             onPressed: () async {
               if ((await showDialog(
                     context: context,
@@ -72,7 +110,11 @@ class _AccountPageState extends State<AccountPage> {
                 _refreshBalance();
               }
             },
-            child: Icon(Icons.add),
+            child: Icon(
+              Icons.add,
+              size: 33,
+              color: Configuration().appColor,
+            ),
             backgroundColor: Colors.white,
           ),
           body: _buildBody(),
@@ -99,7 +141,6 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 color: const Color(0xff7635c7),
               ),
-              //  height: MediaQuery.of(context).size.shortestSide * 0.7,
               child: Padding(
                 padding: const EdgeInsets.only(top: 20, left: 20),
                 child: Column(
@@ -109,7 +150,6 @@ class _AccountPageState extends State<AccountPage> {
                     AdaptiveText(
                       'Current Balance',
                       style: TextStyle(
-                        fontFamily: 'Poppins',
                         fontSize: 20,
                         color: const Color(0xffffffff),
                         fontWeight: FontWeight.w600,
@@ -123,7 +163,6 @@ class _AccountPageState extends State<AccountPage> {
                         Text(
                           _formatBalanceWithComma('$_currentBalance'),
                           style: TextStyle(
-                            fontFamily: 'Poppins',
                             fontSize: 31,
                             color: const Color(0xffffffff),
                             fontWeight: FontWeight.w700,
@@ -137,7 +176,6 @@ class _AccountPageState extends State<AccountPage> {
                           child: AdaptiveText(
                             'NPR',
                             style: TextStyle(
-                              fontFamily: 'Poppins',
                               fontSize: 14,
                               color: const Color(0xffb182ec),
                               fontWeight: FontWeight.w700,
@@ -184,15 +222,13 @@ class _AccountPageState extends State<AccountPage> {
                           child: ListTile(
                             leading: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: SvgPicture.string(
-                                cash,
-                                allowDrawingOutsideViewBox: true,
-                              ),
+                              child: getBankAccountTypeIcon(
+                                  _accounts[_index].type),
+                              // child:
                             ),
                             title: AdaptiveText(
                               _accounts[_index].name ?? '',
                               style: TextStyle(
-                                fontFamily: 'Poppins',
                                 fontSize: 16,
                                 color: const Color(0xff272b37),
                                 height: 1.4285714285714286,
@@ -202,7 +238,6 @@ class _AccountPageState extends State<AccountPage> {
                             subtitle: AdaptiveText(
                               _accountType(_accounts[_index].type),
                               style: TextStyle(
-                                fontFamily: 'Poppins',
                                 fontSize: 12,
                                 color: Colors.grey,
                               ),
@@ -215,7 +250,6 @@ class _AccountPageState extends State<AccountPage> {
                                   _formatBalanceWithComma(
                                       _accounts[_index].balance),
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
                                     fontSize: 18,
                                     color: const Color(0xff1e1e1e),
                                     fontWeight: FontWeight.w700,
@@ -232,15 +266,7 @@ class _AccountPageState extends State<AccountPage> {
                                     ),
                                     onSelected: (value) async {
                                       if (value == 1) {
-                                        if ((await showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  _deleteDialog(
-                                                      _accounts[_index]),
-                                            )) ??
-                                            false) {
-                                          _refreshBalance();
-                                        }
+                                        _deleteDialog(_accounts[_index]);
                                       }
                                     },
                                     itemBuilder: (context) => [
@@ -276,16 +302,9 @@ class _AccountPageState extends State<AccountPage> {
   String _formatBalanceWithComma(String balance) {
     if (balance.contains('-')) {
       return '-' +
-          NepaliNumberFormat(
-                  language: (language == Lang.EN)
-                      ? Language.english
-                      : Language.nepali)
-              .format(double.parse(balance.substring(1)) ?? 0);
+          nepaliNumberFormatter(double.parse(balance.substring(1)) ?? 0);
     } else
-      return NepaliNumberFormat(
-              language:
-                  (language == Lang.EN) ? Language.english : Language.nepali)
-          .format(balance ?? 0);
+      return nepaliNumberFormatter(balance ?? 0);
   }
 
   String _accountType(int value) {
@@ -301,112 +320,62 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  Widget _deleteDialog(Account account) {
-    return Theme(
-      data: Theme.of(context).copyWith(canvasColor: Colors.white),
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(32.0))),
-        backgroundColor: Colors.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            SizedBox(
-              height: 10.0,
+  void _deleteDialog(Account account) {
+    showDeleteDialog(context,
+            title: 'Delete Account',
+            deleteButtonText: 'Delete', onDeletePress: () async {
+      if ((account.transactionIds?.length ?? 0) == 0) {
+        await AccountService().deleteAccount(account, false);
+        Navigator.of(context, rootNavigator: true).pop(true);
+      } else {
+        Navigator.of(context, rootNavigator: true).pop(false);
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: AdaptiveText(
+              'Cannot delete! This account is linked with some transactions.',
+              style: TextStyle(color: Colors.white),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-              child: Column(
-                children: <Widget>[
-                  Icon(
-                    Icons.warning,
-                    color: Colors.black,
-                    size: 35,
-                  ),
-                  AdaptiveText(
-                    'Warning!!',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 20,
-                      color: const Color(0xff1e1e1e),
-                      fontWeight: FontWeight.w700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  AdaptiveText(
-                    'Are you sure you want to delete this account?',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                      color: const Color(0xff43425d),
-                      height: 1.5625,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  InkWell(
-                    onTap: () async {
-                      if ((account.transactionIds?.length ?? 0) == 0) {
-                        await AccountService().deleteAccount(account);
-                      } else {
-                        _scaffoldKey.currentState.showSnackBar(
-                          SnackBar(
-                            content: AdaptiveText(
-                                'Cannot delete! This account is linked with some transactions.'),
-                          ),
-                        );
-                      }
-                      Navigator.of(context, rootNavigator: true).pop(true);
-                    },
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(21.0),
-                        color: const Color(0xfffc717f),
-                      ),
-                      child: AdaptiveText(
-                        'DELETE',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () =>
-                        Navigator.of(context, rootNavigator: true).pop(true),
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(21.0),
-                        color: const Color(0xffb9bbc5),
-                      ),
-                      child: AdaptiveText(
-                        'Cancel',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
+      }
+    }, description: 'Are you sure you want to delete this account?')
+        .then((value) {
+      if (value ?? false) {
+        _refreshBalance();
+      }
+    });
+  }
+}
+
+///0=Person 1=Bank 2=Cash 3=Other
+Widget getBankAccountTypeIcon(int accountTypeId, {bool isForm = false}) {
+  switch (accountTypeId) {
+    case 0:
+      return Icon(
+        VectorIcons.fromName('user-tie', provider: IconProvider.FontAwesome5),
+        color: Configuration.accountIconColor,
+        size: isForm ? 18 : 25,
+      );
+    case 1:
+      return Icon(
+        VectorIcons.fromName('university', provider: IconProvider.FontAwesome5),
+        color: Configuration.accountIconColor,
+        size: isForm ? 18 : 25,
+      );
+    case 2:
+      return SvgPicture.string(
+        cashIcon,
+        fit: BoxFit.fill,
+        height: isForm ? 14 : null,
+        allowDrawingOutsideViewBox: false,
+      );
+    default:
+      return Icon(
+        VectorIcons.fromName('wallet', provider: IconProvider.FontAwesome5),
+        color: Configuration.accountIconColor,
+        size: isForm ? 18 : 25,
+      );
   }
 }
 
@@ -426,227 +395,222 @@ class __AccountDialogState extends State<_AccountDialog> {
   var _openingBalanceController = TextEditingController();
 
   var _formKey = GlobalKey<FormState>();
-
+  List<Account> accounts;
   Lang language;
+  @override
+  void initState() {
+    accounts = [
+      Account(type: 0, name: 'Person'),
+      Account(type: 1, name: 'Bank'),
+      Account(type: 2, name: 'Cash'),
+      Account(type: 3, name: 'Other')
+    ];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
-    return Theme(
-      data: Theme.of(context).copyWith(canvasColor: Colors.white),
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0))),
-        backgroundColor: Colors.white,
-        child: SingleChildScrollView(
+    return Dialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(18.0))),
+      backgroundColor: Colors.white,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 23),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(
-                    top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          AdaptiveText(
-                            'Account Type: ',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 20,
-                              color: const Color(0xff4b4b4d),
-                              height: 1.25,
+              Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            SvgPicture.string(
+                              userLogo,
+                              allowDrawingOutsideViewBox: true,
                             ),
-                          ),
-                          SizedBox(width: 10.0),
-                          Expanded(
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton(
-                                value: _accountType,
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 20.0),
-                                icon: Icon(
-                                  Icons.arrow_drop_down,
-                                  color: Colors.grey,
-                                ),
-                                items: [
-                                  DropdownMenuItem(
-                                    child: AdaptiveText(
-                                      'Person',
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 20.0),
-                                    ),
-                                    value: 0,
-                                  ),
-                                  DropdownMenuItem(
-                                    child: AdaptiveText(
-                                      'Bank',
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 20.0),
-                                    ),
-                                    value: 1,
-                                  ),
-                                  DropdownMenuItem(
-                                    child: AdaptiveText(
-                                      'Cash',
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 20.0),
-                                    ),
-                                    value: 2,
-                                  ),
-                                  DropdownMenuItem(
-                                    child: AdaptiveText(
-                                      'Other',
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 20.0),
-                                    ),
-                                    value: 3,
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    _accountType = value;
-                                  });
-                                },
-                              ),
+                            SizedBox(
+                              width: 5,
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              SvgPicture.string(
-                                userLogo,
-                                allowDrawingOutsideViewBox: true,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                language == Lang.EN
-                                    ? 'Enter account name'
-                                    : 'खाताको नाम लेख्नुहोस',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 16,
-                                  color: const Color(0xff43425d),
-                                  height: 1.5625,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: TextFormField(
-                              validator: validator,
-                              controller: _accountNameController,
+                            AdaptiveText(
+                              'Account Type',
                               style: TextStyle(
-                                  color: Colors.grey[800], fontSize: 20.0),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.all(10),
-                                hintStyle: TextStyle(
-                                    color: Colors.grey, fontSize: 20.0),
-                                errorStyle: TextStyle(fontSize: 10.0),
+                                fontSize: 16,
+                                color: const Color(0xff43425d),
+                                height: 1.5625,
                               ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          width: double.maxFinite,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              value: _accountType,
+                              isExpanded: true,
+                              style: TextStyle(
+                                  color: Colors.black.withOpacity(0.8),
+                                  fontSize: 15.0),
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.grey,
+                              ),
+                              items: (accounts ?? [])
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      child: dropDownMenuBuilder(
+                                          Icons.add, e.name,
+                                          iconBuilderWidget:
+                                              getBankAccountTypeIcon(e.type,
+                                                  isForm: true)),
+                                      value: e.type,
+                                    ),
+                                  )
+                                  .toList(),
+                              onTap: () {
+                                FocusScope.of(context)
+                                    .requestFocus(new FocusNode());
+                              },
+                              onChanged: (value) {
+                                setState(() {
+                                  _accountType = value;
+                                });
+                              },
                             ),
                           ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Row(
-                            children: <Widget>[
-                              SvgPicture.string(
-                                loading,
-                                allowDrawingOutsideViewBox: true,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                language == Lang.EN
-                                    ? 'Enter opening balance'
-                                    : 'सुरुवाती रकम लेख्नुहोस',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 16,
-                                  color: const Color(0xff43425d),
-                                  height: 1.5625,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 5.0),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(10),
-                            hintStyle:
-                                TextStyle(color: Colors.grey, fontSize: 20.0),
-                            errorStyle: TextStyle(fontSize: 10.0),
-                          ),
-                          controller: _openingBalanceController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            SvgPicture.string(
+                              userLogo,
+                              allowDrawingOutsideViewBox: true,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            AdaptiveText(
+                              'Enter Account Name',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: const Color(0xff43425d),
+                                height: 1.5625,
+                              ),
+                            ),
                           ],
-                          style: TextStyle(
-                              color: Colors.grey[800], fontSize: 20.0),
                         ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: TextFormField(
+                            validator: validator,
+                            controller: _accountNameController,
+                            style: TextStyle(
+                                color: Colors.grey[800], fontSize: 20.0),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(10),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            SvgPicture.string(
+                              loadingIcon,
+                              allowDrawingOutsideViewBox: true,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            AdaptiveText(
+                              'Enter Opening Balance',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: const Color(0xff43425d),
+                                height: 1.5625,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5.0),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                    ],
-                  ),
+                      child: TextFormField(
+                        validator: (value) => value.isEmpty
+                            ? language == Lang.EN
+                                ? 'Balance Cannot be Empty'
+                                : 'ब्यालेन्स खाली हुन सक्दैन'
+                            : null,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(10),
+                        ),
+                        controller: _openingBalanceController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly
+                        ],
+                        style:
+                            TextStyle(color: Colors.grey[800], fontSize: 20.0),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                    gradient: LinearGradient(
-                      colors: Configuration().gradientColors,
-                      begin: FractionalOffset.centerLeft,
-                      end: FractionalOffset.centerRight,
+              SizedBox(height: 25.0),
+              FlatButton(
+                color: Configuration().incomeColor,
+                onPressed: _addAccount,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.add,
+                      size: 20,
                     ),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: _addAccount,
-                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16.0),
-                        child: AdaptiveText(
-                          'ADD',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 20.0),
-                        ),
-                      ),
+                    SizedBox(
+                      width: 5,
                     ),
-                  ),
+                    AdaptiveText(
+                      'Add Account',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 17.0),
+                    ),
+                  ],
                 ),
               ),
+              SizedBox(height: 8.0),
             ],
           ),
         ),
@@ -655,27 +619,28 @@ class __AccountDialogState extends State<_AccountDialog> {
   }
 
   Future _addAccount() async {
+    FocusScope.of(context).requestFocus(new FocusNode());
     if (_formKey.currentState.validate()) {
       await AccountService().addAccount(
-        Account(
-            name: _accountNameController.text,
-            balance: _openingBalanceController.text,
-            type: _accountType,
-            transactionIds: []),
-      );
+          Account(
+              name: _accountNameController.text,
+              balance: _openingBalanceController.text,
+              type: _accountType,
+              transactionIds: []),
+          false);
       Navigator.pop(context, true);
     }
   }
 
   String validator(String value) {
     if (value.isEmpty) {
-      return language == Lang.EN ? '    Cannot be empty' : '    खाली हुनसक्दैन';
+      return language == Lang.EN
+          ? 'Name Cannot be empty'
+          : 'नाम खाली हुनसक्दैन';
     } else if (widget.accounts.any((account) =>
         (account.name.toLowerCase() == value.toLowerCase() &&
             account.type == _accountType))) {
-      return language == Lang.EN
-          ? '    Account already exixts'
-          : '    खाता पहिल्यै छ';
+      return language == Lang.EN ? 'Account already exixts' : 'खाता पहिल्यै छ';
     }
     return null;
   }

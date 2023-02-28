@@ -1,14 +1,15 @@
+import 'package:MunshiG/config/globals.dart' as globals;
+import 'package:MunshiG/config/routes.dart';
+import 'package:MunshiG/providers/preference_provider.dart';
+import 'package:MunshiG/screens/homepage.dart';
+import 'package:MunshiG/services/category_service.dart';
+import 'package:MunshiG/services/preference_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:MunshiG/globals.dart' as globals;
-import 'package:MunshiG/providers/preference_provider.dart';
-import 'package:MunshiG/screens/homepage.dart';
-import 'package:MunshiG/screens/setting.dart';
-import 'package:MunshiG/services/category_service.dart';
-import 'package:MunshiG/services/preference_service.dart';
-import '../configuration.dart';
-import '../globals.dart';
+
+import '../config/configuration.dart';
+import '../config/globals.dart';
 import 'adaptive_text.dart';
 
 class MyDrawer extends StatefulWidget {
@@ -21,7 +22,6 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   TextStyle _style = TextStyle(
-    fontFamily: 'Poppins',
     fontSize: 16,
     color: const Color(0xff1e1e1e),
   );
@@ -35,7 +35,8 @@ class _MyDrawerState extends State<MyDrawer> {
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Padding(
         padding: MediaQuery.of(context).viewPadding,
-        child: Column(
+        child: ListView(
+          physics: BouncingScrollPhysics(),
           children: <Widget>[
             SizedBox(
               height: 15,
@@ -52,68 +53,57 @@ class _MyDrawerState extends State<MyDrawer> {
             SizedBox(
               height: 15,
             ),
-            Theme(
-              data: ThemeData(
-                textTheme: TextTheme(
-                  subhead: TextStyle(fontSize: 18),
-                ),
-                canvasColor: Configuration().appColor,
-                brightness: Brightness.dark,
-                primarySwatch: MaterialColor(0xffffffff, {}),
-              ),
-              child: DropdownButton<String>(
-                  isDense: true,
-                  iconEnabledColor: Colors.black,
-                  iconDisabledColor: Colors.black,
-                  isExpanded: true,
-                  value: selectedSubSector.selectedSubSector,
-                  iconSize: 30,
-                  dropdownColor: Colors.white,
-                  items: [
-                    for (String subSector in globals.subSectors)
-                      DropdownMenuItem(
-                        child: Text(
-                          subSector,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 15,
-                            color: const Color(0xff1e1e1e),
-                            fontWeight: FontWeight.w700,
-                          ),
+            DropdownButton<String>(
+                isDense: true,
+                iconEnabledColor: Colors.black,
+                iconDisabledColor: Colors.black,
+                isExpanded: true,
+                value: selectedSubSector.selectedSubSector,
+                iconSize: 30,
+                dropdownColor: Colors.white,
+                items: [
+                  for (String subSector in globals.subSectors)
+                    DropdownMenuItem(
+                      child: AdaptiveText(
+                        subSector,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: const Color(0xff1e1e1e),
+                          fontWeight: FontWeight.w700,
                         ),
-                        value: subSector,
-                      )
-                  ],
-                  onChanged: (onValue) async {
-                    if (onValue != selectedSubSector.selectedSubSector) {
-                      globals.selectedSubSector = onValue;
-                      selectedSubSector.selectedSubSector = onValue;
-                      PreferenceService.instance.setSelectedSubSector(onValue);
-                      globals.incomeCategories = await CategoryService()
-                          .getCategories(selectedSubSector.selectedSubSector,
-                              CategoryType.INCOME);
-                      globals.expenseCategories = await CategoryService()
-                          .getCategories(selectedSubSector.selectedSubSector,
-                              CategoryType.EXPENSE);
-                      if (widget.homePageState != null) {
-                        await widget.homePageState.updateChartData();
-                      }
-                      setState(() {});
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/home',
-                        ModalRoute.withName('/home'),
-                      );
+                      ),
+                      value: subSector,
+                    )
+                ],
+                onChanged: (onValue) async {
+                  if (onValue != selectedSubSector.selectedSubSector) {
+                    globals.selectedSubSector = onValue;
+                    selectedSubSector.selectedSubSector = onValue;
+                    PreferenceService.instance.setSelectedSubSector(onValue);
+                    globals.incomeCategories = await CategoryService()
+                        .getCategories(selectedSubSector.selectedSubSector,
+                            CategoryType.INCOME);
+                    globals.expenseCategories = await CategoryService()
+                        .getCategories(selectedSubSector.selectedSubSector,
+                            CategoryType.EXPENSE);
+                    if (widget.homePageState != null) {
+                      await widget.homePageState.updateChartData();
                     }
-                  }),
-            ),
+                    setState(() {});
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      home,
+                      ModalRoute.withName(home),
+                    );
+                  }
+                }),
             SizedBox(
               height: 10,
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
               leading: SvgPicture.string(
-                dashboard,
+                dashboardIcon,
                 allowDrawingOutsideViewBox: true,
                 alignment: Alignment.bottomCenter,
               ),
@@ -123,16 +113,16 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/home',
-                ModalRoute.withName('/home'),
+                home,
+                ModalRoute.withName(home),
               ),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
               dense: true,
               leading: Icon(
-                Icons.person,
-                color: Configuration().incomeColor,
+                Icons.person_outline,
+                color: Configuration.accountIconColor,
               ),
               title: AdaptiveText(
                 'Profile',
@@ -141,14 +131,14 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/profilepage',
-                ModalRoute.withName('/home'),
+                profilePage,
+                ModalRoute.withName(home),
               ),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
               leading: SvgPicture.string(
-                categories,
+                categoriesIcon,
                 allowDrawingOutsideViewBox: true,
               ),
               title: AdaptiveText(
@@ -158,14 +148,29 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/category',
-                ModalRoute.withName('/home'),
+                category,
+                ModalRoute.withName(home),
               ),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
               leading: SvgPicture.string(
-                castOutflow,
+                castOutflowIcon,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Cash Inflow Projection',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context, budget, ModalRoute.withName(home),
+                  arguments: true),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                castOutflowIcon,
                 allowDrawingOutsideViewBox: true,
               ),
               title: AdaptiveText(
@@ -174,15 +179,13 @@ class _MyDrawerState extends State<MyDrawer> {
                 textAlign: TextAlign.left,
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/budget',
-                ModalRoute.withName('/home'),
-              ),
+                  context, budget, ModalRoute.withName(home),
+                  arguments: false),
             ),
             ListTile(
               contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
               leading: SvgPicture.string(
-                accounts,
+                accountsIcon,
                 allowDrawingOutsideViewBox: true,
               ),
               title: AdaptiveText(
@@ -192,17 +195,48 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               onTap: () => Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/account',
-                ModalRoute.withName('/home'),
+                account,
+                ModalRoute.withName(home),
               ),
             ),
-            Expanded(child: Container()),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                categoriesIcon,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Report',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  context, report, ModalRoute.withName(home),
+                  arguments: selectedSubSector.selectedSubSector),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+              leading: SvgPicture.string(
+                categoriesIcon,
+                allowDrawingOutsideViewBox: true,
+              ),
+              title: AdaptiveText(
+                'Backup',
+                style: _style,
+                textAlign: TextAlign.left,
+              ),
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                context,
+                backup,
+                ModalRoute.withName(home),
+              ),
+            ),
             Column(
               children: <Widget>[
                 ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
                   leading: SvgPicture.string(
-                    settings,
+                    settingsIcon,
                     allowDrawingOutsideViewBox: true,
                   ),
                   title: AdaptiveText(
@@ -210,17 +244,14 @@ class _MyDrawerState extends State<MyDrawer> {
                     style: _style,
                     textAlign: TextAlign.left,
                   ),
-                  onTap: () => Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => Settings(
-                                type: 1,
-                              )),
-                      (Route<dynamic> route) => false),
+                  onTap: () => Navigator.pushNamedAndRemoveUntil(
+                      context, setting, ModalRoute.withName(home),
+                      arguments: 1),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
                   leading: SvgPicture.string(
-                    nepaliLanguage,
+                    nepaliLanguageIcon,
                     allowDrawingOutsideViewBox: true,
                   ),
                   title: AdaptiveText(

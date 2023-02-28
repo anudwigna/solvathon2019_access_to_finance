@@ -4,6 +4,8 @@ import 'package:MunshiG/models/user/user.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:path/path.dart';
+import '../services/activity_tracking.dart';
+import '../models/app_page_naming.dart';
 
 class UserService {
   UserService._();
@@ -25,7 +27,7 @@ class UserService {
 
   Future<void> addUser(User data) async {
     var dbStore = await getDatabaseAndStore();
-    var d = await dbStore.store.add(dbStore.database, data.toJson());
+    await dbStore.store.add(dbStore.database, data.toJson());
   }
 
   Future<User> getAccounts() async {
@@ -34,9 +36,33 @@ class UserService {
     return (snapshot?.value != null) ? User.fromJson(snapshot.value) : User();
   }
 
-  Future<void> updateUser(User user) async {
+  Future<void> updateUser(User user, bool isAutomated) async {
     var dbStore = await getDatabaseAndStore();
-    var snapshot = await dbStore.store.update(dbStore.database, user.toJson(),
+    await dbStore.store.update(dbStore.database, user.toJson(),
         finder: Finder(filter: Filter.equals('phonenumber', user.phonenumber)));
+    if (!(isAutomated ?? true)) {
+      ActivityTracker().otherActivityOnPage(
+          PageName.createProfile, 'Update User', 'Save', 'FlatButton');
+    }
+  }
+
+  Future<bool> canPerformBackUp() async {
+    try {
+      var dbStore = await getDatabaseAndStore();
+      var d = await dbStore.store.findFirst(dbStore.database);
+      if (d == null) return false;
+      if (d.value['name'] != null &&
+          d.value['gender'] != null &&
+          d.value['phonenumber'] != null &&
+          d.value['address'] != null) return true;
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> closeDatabase(String subsector) async {
+    final db = await getDatabaseAndStore();
+    await db.database.close();
   }
 }

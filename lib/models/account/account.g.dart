@@ -19,5 +19,5 @@ Map<String, dynamic> _$AccountToJson(Account instance) => <String, dynamic>{
       'name': instance.name,
       'balance': instance.balance,
       'type': instance.type,
-      'transactionIds': instance.transactionIds ?? []
+      'transactionIds': instance.transactionIds
     };

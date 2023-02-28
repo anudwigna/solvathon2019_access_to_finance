@@ -61,6 +61,16 @@ class PreferenceService {
     return (await prefs.get('CURRENT_INCOME_CATEGORY_INDEX') ?? 0) as int;
   }
 
+  Future setV102ChangesFlag() async {
+    var prefs = await _init();
+    prefs.set('V102_CHANGES_FLAG', true);
+  }
+
+  Future<bool> getV102ChangesFlag() async {
+    var prefs = await _init();
+    return (await prefs.get('V102_CHANGES_FLAG') ?? false);
+  }
+
   Future setCurrentExpenseCategoryIndex(int value) async {
     var prefs = await _init();
     prefs.set('CURRENT_EXPENSE_CATEGORY_INDEX', value);
@@ -89,6 +99,26 @@ class PreferenceService {
   Future<List<dynamic>> getSubSectors() async {
     var prefs = await _init();
     return (await prefs.get('SUBSECTORS') ?? []) as List<dynamic>;
+  }
+
+  Future setPageTrackCountIndex(int value) async {
+    var prefs = await _init();
+    prefs.set('PAGE_TRACK_COUNT_INDEX', value);
+  }
+
+  Future<int> getPageTrackCountIndex() async {
+    var prefs = await _init();
+    return (await prefs.get('PAGE_TRACK_COUNT_INDEX') ?? 0) as int;
+  }
+
+  Future setLastBackUpDate() async {
+    var prefs = await _init();
+    prefs.set('LAST_BACK_UP_DATE', DateTime.now().toIso8601String());
+  }
+
+  Future<String> getLastBackUpDate() async {
+    var prefs = await _init();
+    return await prefs.get('LAST_BACK_UP_DATE');
   }
 }
 

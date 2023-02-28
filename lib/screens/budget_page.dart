@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:nepali_utils/nepali_utils.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 import 'package:MunshiG/components/drawer.dart';
 import 'package:MunshiG/icons/vector_icons.dart';
@@ -11,41 +7,103 @@ import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
 
-import '../configuration.dart';
+import '../components/extra_componenets.dart';
+import '../config/configuration.dart';
+import '../config/globals.dart';
+import '../models/app_page_naming.dart';
+import '../models/categoryHeading/categoryHeading.dart';
+import '../services/activity_tracking.dart';
+import '../services/category_heading_service.dart';
 
 class BudgetPage extends StatefulWidget {
+  final bool isInflowProjection;
+
+  const BudgetPage({Key key, this.isInflowProjection}) : super(key: key);
   @override
   _BudgetPageState createState() => _BudgetPageState();
 }
 
 class _BudgetPageState extends State<BudgetPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
   Lang language;
   TabController _tabController;
   String selectedSubSector;
-  final int noOfmonths = 60;
-
+  final int noOfmonths = 132;
+  bool isInflow;
   var _budgetAmountController = TextEditingController();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   var _dateResolver = <NepaliDateTime>[];
   @override
   void initState() {
+    isInflow = widget.isInflowProjection ?? false;
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    ActivityTracker().pageTransactionActivity(
+        widget.isInflowProjection
+            ? PageName.cashInflowProjection
+            : PageName.cashOutflowProjection,
+        action: 'Opened');
     initializeDateResolver();
     _tabController = TabController(
-        length: 60,
-        vsync: this,
-        initialIndex: noOfmonths - (12 - _currentMonth + 1));
+        length: noOfmonths, vsync: this, initialIndex: _currentMonth - 1);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+        ActivityTracker().pageTransactionActivity(
+            widget.isInflowProjection
+                ? PageName.cashInflowProjection
+                : PageName.cashOutflowProjection,
+            action: 'Paused');
+        break;
+      case AppLifecycleState.inactive:
+        ActivityTracker().pageTransactionActivity(
+            widget.isInflowProjection
+                ? PageName.cashInflowProjection
+                : PageName.cashOutflowProjection,
+            action: 'Inactive');
+        break;
+      case AppLifecycleState.resumed:
+        ActivityTracker().pageTransactionActivity(
+            widget.isInflowProjection
+                ? PageName.cashInflowProjection
+                : PageName.cashOutflowProjection,
+            action: 'Resumed');
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    ActivityTracker().pageTransactionActivity(
+        widget.isInflowProjection
+            ? PageName.cashInflowProjection
+            : PageName.cashOutflowProjection,
+        action: 'Closed');
+    _tabController.dispose();
+    super.dispose();
   }
 
   initializeDateResolver() {
     // int _year = _currentYear;
     // int _firstMonth;
     // bool _incrementer;
-    int initYear = _currentYear - 4;
+    int initYear = _currentYear;
     int indexYear = initYear;
     for (int i = 1; i <= noOfmonths; i++) {
       _dateResolver.add(NepaliDateTime(indexYear, (i % 12 == 0) ? 12 : i % 12));
@@ -53,12 +111,6 @@ class _BudgetPageState extends State<BudgetPage>
         indexYear++;
       }
     }
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   @override
@@ -71,35 +123,29 @@ class _BudgetPageState extends State<BudgetPage>
       backgroundColor: Configuration().appColor,
       drawer: MyDrawer(),
       appBar: AppBar(
-        title: AdaptiveText('Cash Outflow Projection'),
+        title: AdaptiveText(
+          'Cash ' + (isInflow ? 'Inflow' : 'Outflow') + ' Projection',
+          style: TextStyle(fontSize: 17),
+        ),
         bottom: TabBar(
           controller: _tabController,
-          indicator: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Configuration().incomeColor,
-          ),
           isScrollable: true,
           tabs: [
             for (int index = 0; index < noOfmonths; index++)
-              //   for (int month = 1; month <= 12; month++)
-              language == Lang.EN
-                  ? Tab(
-                      child: Text(NepaliDateFormat("MMMM ''yy").format(
-                        NepaliDateTime(
-                          _dateResolver[index].year,
-                          _dateResolver[index].month,
-                        ),
-                      )),
-                    )
-                  : Tab(
-                      child: Text(
-                        NepaliDateFormat("MMMM ''yy", Language.nepali).format(
-                          NepaliDateTime(_dateResolver[index].year,
-                              _dateResolver[index].month),
-                        ),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
+              Tab(
+                child: Text(
+                  NepaliDateFormat(
+                          "MMMM ''yy",
+                          language == Lang.EN
+                              ? Language.english
+                              : Language.nepali)
+                      .format(
+                    NepaliDateTime(
+                        _dateResolver[index].year, _dateResolver[index].month),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
           ],
         ),
       ),
@@ -120,15 +166,10 @@ class _BudgetPageState extends State<BudgetPage>
     return Padding(
       padding: const EdgeInsets.only(top: 23.0),
       child: Container(
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(50.0),
-              topRight: Radius.circular(50.0),
-            )),
+        decoration: pageBorderDecoration,
         padding: const EdgeInsets.only(top: 30),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 35),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -138,7 +179,7 @@ class _BudgetPageState extends State<BudgetPage>
                 child: AdaptiveText(
                   selectedSubSector,
                   style: TextStyle(
-                    fontFamily: 'Poppins',
+                  
                     fontSize: 16,
                     color: const Color(0xff1e1e1e),
                     fontWeight: FontWeight.w700,
@@ -147,8 +188,8 @@ class _BudgetPageState extends State<BudgetPage>
               ),
               Expanded(
                 child: FutureBuilder<List<Category>>(
-                  future: CategoryService()
-                      .getCategories(selectedSubSector, CategoryType.EXPENSE),
+                  future: CategoryService().getCategories(selectedSubSector,
+                      isInflow ? CategoryType.INCOME : CategoryType.EXPENSE),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ListView.separated(
@@ -199,12 +240,7 @@ class _BudgetPageState extends State<BudgetPage>
                     _setBudgetDialog(snapshot.data, category, year, month,
                         action: snapshot.data.spent == null ? 'set' : 'update');
                   } else {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return _clearBudgetDialog(snapshot.data, category);
-                      },
-                    );
+                    _clearBudgetDialog(snapshot.data, category);
                   }
                 },
                 itemBuilder: (context) => [
@@ -233,11 +269,28 @@ class _BudgetPageState extends State<BudgetPage>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Icon(
-                        VectorIcons.fromName(category.iconName,
-                            provider: IconProvider.FontAwesome5),
-                        size: 20.0,
-                        color: Configuration().incomeColor,
+                      FutureBuilder<CategoryHeading>(
+                        future: CategoryHeadingService().getCategoryHeadingById(
+                            widget.isInflowProjection
+                                ? CategoryType.INCOME
+                                : CategoryType.EXPENSE,
+                            category.categoryHeadingId == null
+                                ? (widget.isInflowProjection ? 100 : 1)
+                                : category.categoryHeadingId),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<CategoryHeading> snapshot1) {
+                          return (!snapshot1.hasData)
+                              ? Icon(
+                                  VectorIcons.fromName(
+                                    'hornbill',
+                                    provider: IconProvider.FontAwesome5,
+                                  ),
+                                  color: Configuration().incomeColor,
+                                  size: 20.0,
+                                )
+                              : SvgPicture.asset(
+                                  'assets/images/${snapshot1.data.iconName}');
+                        },
                       ),
                       SizedBox(width: 15.0),
                       Expanded(
@@ -249,7 +302,7 @@ class _BudgetPageState extends State<BudgetPage>
                               '',
                               category: category,
                               style: TextStyle(
-                                  fontSize: 16.0, color: Colors.black),
+                                  fontSize: 15.0, color: Colors.black),
                             ),
                             SizedBox(height: 2.0),
                             AdaptiveText(
@@ -259,7 +312,7 @@ class _BudgetPageState extends State<BudgetPage>
                               style: TextStyle(
                                   fontSize: 11.0,
                                   color: Colors.grey,
-                                  fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -269,29 +322,19 @@ class _BudgetPageState extends State<BudgetPage>
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
                           Text(
-                            NepaliNumberFormat(
-                                        decimalDigits: 0,
-                                        language: (language == Lang.EN)
-                                            ? Language.english
-                                            : Language.nepali)
-                                    .format(snapshot.data.spent ?? 0) +
+                            nepaliNumberFormatter(snapshot.data.spent ?? 0) +
                                 '/',
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                        
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Configuration().incomeColor,
                             ),
                           ),
                           Text(
-                            NepaliNumberFormat(
-                                    decimalDigits: 0,
-                                    language: (language == Lang.EN)
-                                        ? Language.english
-                                        : Language.nepali)
-                                .format(snapshot.data.total ?? 0),
+                            nepaliNumberFormatter(snapshot.data.total ?? 0),
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                        
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Configuration().incomeColor,
@@ -323,78 +366,34 @@ class _BudgetPageState extends State<BudgetPage>
     return 0.0;
   }
 
-  Widget _clearBudgetDialog(Budget budget, Category category) {
-    return Theme(
-      data: Theme.of(context).copyWith(canvasColor: Colors.white),
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0))),
-        backgroundColor: Colors.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            SizedBox(
-              height: 10.0,
+  void _clearBudgetDialog(Budget budget, Category category) {
+    showDeleteDialog(context,
+            description: language == Lang.EN
+                ? 'Are you sure to clear the budget for ${category.en}?'
+                : 'के तपाई ${category.np}को लागि बजेट खाली गर्न निश्चित हुनुहुन्छ?',
+            title: 'Clear Budget', onDeletePress: () async {
+      if (await TransactionService().isBudgetEditable(
+          selectedSubSector, budget.categoryId, budget.month, budget.year)) {
+        await BudgetService().clearBudget(selectedSubSector, budget, false);
+        Navigator.of(context, rootNavigator: true).pop(true);
+      } else {
+        Navigator.of(context, rootNavigator: true).pop(false);
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: AdaptiveText(
+              'Budget cannot be cleared as it is in use.',
+              style: TextStyle(color: Colors.white),
             ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-              child: Text(
-                language == Lang.EN
-                    ? 'Are you sure to clear the budget for ${category.en}?'
-                    : 'के तपाई ${category.np}को लागि बजेट खाली गर्न निश्चित हुनुहुन्छ?',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 16.0,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: InkWell(
-                onTap: () async {
-                  if (await TransactionService().isBudgetEditable(
-                      selectedSubSector,
-                      budget.categoryId,
-                      budget.month,
-                      budget.year)) {
-                    await BudgetService()
-                        .clearBudget(selectedSubSector, budget);
-                  } else {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.red,
-                        content: AdaptiveText(
-                            'Budget cannot be cleared as it is in use.'),
-                      ),
-                    );
-                  }
-                  setState(() {});
-                  Navigator.of(context, rootNavigator: true).pop();
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(21.0),
-                    color: const Color(0xfffc717f),
-                  ),
-                  child: AdaptiveText(
-                    'Clear Budget',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
+      }
+    }, deleteButtonText: 'Clear  ')
+        .then((value) {
+      if (value ?? false) {
+        setState(() {});
+      }
+    });
   }
 
   var _formKey = GlobalKey<FormState>();
@@ -402,116 +401,59 @@ class _BudgetPageState extends State<BudgetPage>
   void _setBudgetDialog(
       Budget oldBudgetData, Category category, int year, int month,
       {String action = 'set'}) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Theme(
-          data: Theme.of(context).copyWith(canvasColor: Colors.white),
-          child: Dialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(32.0))),
-            backgroundColor: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Icon(
-                    VectorIcons.fromName(category.iconName,
-                        provider: IconProvider.FontAwesome5),
-                    size: 30.0,
-                    color: Configuration().incomeColor,
-                  ),
-                  SizedBox(height: 15.0),
-                  AdaptiveText(
-                    '',
-                    category: category,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w300,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.withOpacity(0.7)),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: TextFormField(
-                          validator: (value) => value.length == 0
-                              ? language == Lang.EN
-                                  ? 'Cannot be empty'
-                                  : 'खाली  हुनसक्दैन '
-                              : null,
-                          controller: _budgetAmountController,
-                          autofocus: true,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly
-                          ],
-                          style: TextStyle(color: Colors.grey, fontSize: 20.0),
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.only(
-                              left: 10.0,
-                            ),
-                            border: InputBorder.none,
-                            hintText: language == Lang.EN
-                                ? 'Enter budget amount'
-                                : 'बजेट रकम लेख्नुहोस',
-                            hintStyle:
-                                TextStyle(color: Colors.grey, fontSize: 20.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Configuration().incomeColor,
-                        borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _setBudget(
-                              oldBudgetData, category.id, year, month,
-                              action: action),
-                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: AdaptiveText(
-                              action == 'set' ? 'SET BUDGET' : 'UPDATE BUDGET',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 15.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    showFormDialog(
+      context,
+      buttonText: (action == 'set' ? 'Set' : 'Update') + ' Budget',
+      onButtonPressed: () {
+        if (_formKey.currentState.validate()) {
+          _setBudget(oldBudgetData, category.id, year, month, action: action)
+              .then((value) {
+            _budgetAmountController.clear();
+            Navigator.of(context, rootNavigator: true).pop(value);
+          });
+        }
+      },
+      title: language == Lang.EN ? category.en : category.np,
+      bodyWidget: Form(
+        key: _formKey,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.withOpacity(0.7)),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: TextFormField(
+            validator: (value) => value.length == 0
+                ? language == Lang.EN
+                    ? 'Amount Cannot be empty'
+                    : 'रकम खाली हुनसक्दैन '
+                : null,
+            controller: _budgetAmountController,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: TextStyle(color: Colors.grey[800], fontSize: 16.0),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              labelText: language == Lang.EN ? 'Budget amount' : 'बजेट रकम',
+              labelStyle:
+                  TextStyle(color: Colors.grey.withOpacity(0.8), fontSize: 15),
+              contentPadding: const EdgeInsets.all(8.0),
             ),
           ),
-        );
-      },
-    );
+        ),
+      ),
+    ).then((value) {
+      if (value ?? false) {
+        setState(() {});
+      }
+    });
   }
 
-  Future _setBudget(Budget oldBudgetData, int categoryId, int year, int month,
+  Future<bool> _setBudget(
+      Budget oldBudgetData, int categoryId, int year, int month,
       {String action = 'set'}) async {
-    if (_formKey.currentState.validate()) {
-      if (action == 'set') {
-        await BudgetService().updateBudget(
+    if (action == 'set') {
+      await BudgetService().updateBudget(
           selectedSubSector,
           Budget(
             categoryId: oldBudgetData.categoryId ?? categoryId,
@@ -520,40 +462,44 @@ class _BudgetPageState extends State<BudgetPage>
             year: oldBudgetData.year ?? year,
             total: _budgetAmountController.text,
           ),
-        );
-      } else {
-        int amount = int.tryParse(_budgetAmountController.text) ?? 0;
-        String spentString = (await BudgetService().getBudget(
-                selectedSubSector,
-                categoryId,
-                oldBudgetData.month ?? month,
-                oldBudgetData.year ?? year))
+          false);
+      return true;
+    } else {
+      int amount = int.tryParse(_budgetAmountController.text) ?? 0;
+      String spentString = (await BudgetService().getBudget(
+              selectedSubSector,
+              categoryId,
+              oldBudgetData.month ?? month,
+              oldBudgetData.year ?? year))
 
-            ///--------------change yearrrrr
-            .spent;
-        int spent = int.tryParse(spentString ?? '0') ?? 0;
-        if (amount > spent) {
-          await BudgetService().updateBudget(
-            selectedSubSector,
-            Budget(
-              categoryId: oldBudgetData.categoryId ?? categoryId,
-              month: oldBudgetData.month ?? month,
-              year: oldBudgetData.year ?? year,
-              spent: spentString,
-              total: _budgetAmountController.text,
-            ),
-          );
-        } else {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: AdaptiveText('Budget amount is not enough.'),
-            ),
-          );
-        }
-      }
-      Navigator.of(context, rootNavigator: true).pop();
-      _budgetAmountController.clear();
-      setState(() {});
+          ///--------------change yearrrrr
+          .spent;
+      // int spent = int.tryParse(spentString ?? '0') ?? 0;
+      // if (amount > spent) {
+      await BudgetService().updateBudget(
+          selectedSubSector,
+          Budget(
+            categoryId: oldBudgetData.categoryId ?? categoryId,
+            month: oldBudgetData.month ?? month,
+            year: oldBudgetData.year ?? year,
+            spent: spentString,
+            total: _budgetAmountController.text,
+          ),
+          false);
+
+      return true;
+      // } else {
+      //   _scaffoldKey.currentState.showSnackBar(
+      //     SnackBar(
+      //       backgroundColor: Colors.red,
+      //       content: AdaptiveText(
+      //         'Budget amount is not enough.',
+      //         style: TextStyle(color: Colors.white),
+      //       ),
+      //     ),
+      //   );
+      //   return false;
+      // }
     }
   }
 }

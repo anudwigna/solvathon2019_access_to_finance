@@ -6,6 +6,9 @@ import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:MunshiG/models/transaction/transaction.dart' as t;
 
+import '../services/activity_tracking.dart';
+import '../models/app_page_naming.dart';
+
 class AccountService {
   AccountService._();
 
@@ -30,12 +33,16 @@ class AccountService {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future addAccount(Account account) async {
+  ///if this function is invoked without user consent
+  Future addAccount(Account account, bool isAutomated) async {
     var dbStore = await getDatabaseAndStore();
     await dbStore.store.add(dbStore.database, account.toJson());
+    if (!(isAutomated ?? true))
+      ActivityTracker().otherActivityOnPage(
+          PageName.account, 'Add Account', 'Save', 'FlatButton');
   }
 
-  Future deleteAccount(Account account) async {
+  Future deleteAccount(Account account, bool isAutomated) async {
     var dbStore = await getDatabaseAndStore();
     Finder finder = Finder(
       filter: Filter.and([
@@ -47,10 +54,13 @@ class AccountService {
       dbStore.database,
       finder: finder,
     );
+    if (!(isAutomated ?? true))
+      ActivityTracker().otherActivityOnPage(
+          PageName.account, 'Delete Account', 'Delete', 'FlatButton');
   }
 
   /// Name and Type should match in order to update
-  Future updateAccount(Account account) async {
+  Future updateAccount(Account account, bool isAutomated) async {
     var dbStore = await getDatabaseAndStore();
     Finder finder = Finder(
       filter: Filter.and([
@@ -63,6 +73,9 @@ class AccountService {
       account.toJson(),
       finder: finder,
     );
+    if (!(isAutomated ?? true))
+      ActivityTracker().otherActivityOnPage(
+          PageName.account, 'Update Account', 'Update', 'FlatButton');
   }
 
   Future<Account> getAccountForTransaction(t.Transaction transaction) async {
@@ -90,5 +103,9 @@ class AccountService {
     ]);
     int zz = await dbStore.store.count(dbStore.database, filter: filter);
     return zz > 0;
+  }
+  Future<void>closeDatabase(String subsector) async {
+    final db = await getDatabaseAndStore();
+    await db.database.close();
   }
 }
