@@ -1,36 +1,42 @@
-import 'package:MunshiG/services/preference_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:nepali_utils/nepali_utils.dart';
-import 'package:provider/provider.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
-import 'package:MunshiG/components/screen_size_config.dart';
 import 'package:MunshiG/components/drawer.dart';
-import 'package:MunshiG/globals.dart';
+import 'package:MunshiG/components/extra_componenets.dart';
+import 'package:MunshiG/components/screen_size_config.dart';
+import 'package:MunshiG/config/globals.dart';
+import 'package:MunshiG/config/routes.dart';
 import 'package:MunshiG/icons/vector_icons.dart';
+import 'package:MunshiG/models/app_page_naming.dart';
+import 'package:MunshiG/models/category/category.dart';
 import 'package:MunshiG/models/transaction/transaction.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/screens/transaction_page.dart';
 import 'package:MunshiG/services/category_service.dart';
 import 'package:MunshiG/services/transaction_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nepali_utils/nepali_utils.dart';
+import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
-import '../configuration.dart';
-import '../globals.dart';
+import '../config/configuration.dart';
+import '../config/globals.dart';
+import '../services/activity_tracking.dart';
+import '../services/app_page.dart';
+import '../services/versionChanges.dart';
 
 class HomePage extends StatefulWidget {
   @override
   HomePageState createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  Lang language;
-  String selectedSubSector;
-  TabController _tabController;
+class HomePageState extends State<HomePage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  Lang? language;
+  String? selectedSubSector;
+  TabController? _tabController;
   int _currentYear = NepaliDateTime.now().year;
   int _currentMonth = NepaliDateTime.now().month;
-  final int noOfmonths = 60;
+  final int noOfmonths = 132;
   // List<GlobalKey<AnimatedCircularChartState>> _chartKey =
   //     new List<GlobalKey<AnimatedCircularChartState>>();
   var _dateResolver = <NepaliDateTime>[];
@@ -39,20 +45,46 @@ class HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     initializeDateResolver();
+    VersionChanges().v102Changes().then((value) {
+      AppPage().initializeAppPages()
+        ..then((value) {
+          ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Opened');
+        }).catchError((onError) {
+          print('error');
+        });
+    });
 
+    // loadv102appPages();
     _tabController = TabController(
       length: noOfmonths,
       vsync: this,
-      initialIndex: noOfmonths - (12 - _currentMonth + 1),
+      initialIndex: _currentMonth - 1,
     );
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+        ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Paused');
+        break;
+      case AppLifecycleState.inactive:
+        ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Inactive');
+        break;
+      case AppLifecycleState.resumed:
+        ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Resumed');
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
   initializeDateResolver() {
-    // int _year = _currentYear;
-    // int _firstMonth;
-    // bool _incrementer;
-    int initYear = _currentYear - 4;
+    int initYear = _currentYear;
     int indexYear = initYear;
     for (int i = 1; i <= noOfmonths; i++) {
       _dateResolver.add(NepaliDateTime(indexYear, (i % 12 == 0) ? 12 : i % 12));
@@ -60,23 +92,13 @@ class HomePageState extends State<HomePage>
         indexYear++;
       }
     }
-    // _firstMonth = _currentMonth - 9;
-    // if (_firstMonth <= 0) {
-    //   _year = _currentYear - 1;
-    // }
-    // for (int i = 0; i < 12; i++) {
-    //   int _thisMonth = (_firstMonth + i) % 12;
-    //   if (_incrementer = _thisMonth == 0) {
-    //     _thisMonth = 12;
-    //   }
-    //   _dateResolver.add(NepaliDateTime(_year, _thisMonth));
-    //   if (_incrementer) _year++;
-    // }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    ActivityTracker().pageTransactionActivity(PageName.dashboard, action: 'Closed');
+    WidgetsBinding.instance.removeObserver(this);
+    _tabController!.dispose();
     _dateResolver.clear();
     super.dispose();
   }
@@ -84,277 +106,279 @@ class HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     language = Provider.of<PreferenceProvider>(context).language;
-    selectedSubSector =
-        Provider.of<SubSectorProvider>(context).selectedSubSector;
-    return Container(
-      decoration: Configuration().gradientDecoration,
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: const Color(0xff2b2f8e),
-        appBar: AppBar(
-          title: Text(
-            ((language == Lang.EN) ? 'MunshiG (' : 'मुंशीजी (') +
-                (selectedSubSector) +
-                ')',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 20,
-              color: const Color(0xffffffff),
-              fontWeight: FontWeight.w600,
+    selectedSubSector = Provider.of<SubSectorProvider>(context).selectedSubSector;
+    return WillPopScope(
+      onWillPop: () async {
+        exitApplication();
+        return false;
+      },
+      child: Container(
+        decoration: Configuration().gradientDecoration,
+        child: Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: Configuration().appColor,
+          appBar: AppBar(
+            title: Row(
+              children: [
+                Text(
+                  ((language == Lang.EN) ? 'MunshiG (' : 'मुंशीजी ('),
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 17,
+                    color: const Color(0xffffffff),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                AdaptiveText(
+                  selectedSubSector!,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 17,
+                    color: const Color(0xffffffff),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  ')',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 17,
+                    color: const Color(0xffffffff),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
-          ),
-          bottom: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            indicator: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Configuration().incomeColor,
-            ),
-            tabs: [
-              for (int index = 0; index < noOfmonths; index++)
-                language == Lang.EN
-                    ? Tab(
-                        child: Text(
-                          NepaliDateFormat("MMMM ''yy").format(
-                            NepaliDateTime(
-                              _dateResolver[index].year,
-                              _dateResolver[index].month,
+            actions: [
+              IconButton(
+                onPressed: () {
+                  exitApplication();
+                },
+                icon: Icon(Icons.exit_to_app),
+              )
+            ],
+            bottom: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabs: [
+                for (int index = 0; index < noOfmonths; index++)
+                  language == Lang.EN
+                      ? Tab(
+                          child: Text(
+                            NepaliDateFormat("MMMM ''yy", language == Lang.EN ? Language.english : Language.nepali).format(
+                              NepaliDateTime(
+                                _dateResolver[index].year,
+                                _dateResolver[index].month,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                    : Tab(
-                        child: Text(
-                          NepaliDateFormat("MMMM ''yy", Language.nepali).format(
-                            NepaliDateTime(_dateResolver[index].year,
-                                _dateResolver[index].month),
+                        )
+                      : Tab(
+                          child: Text(
+                            NepaliDateFormat("MMMM ''yy", language == Lang.EN ? Language.english : Language.nepali).format(
+                              NepaliDateTime(_dateResolver[index].year, _dateResolver[index].month),
+                            ),
+                            style: TextStyle(color: Colors.white),
                           ),
-                          style: TextStyle(color: Colors.white),
                         ),
-                      ),
+              ],
+            ),
+          ),
+          drawer: MyDrawer(homePageState: this),
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              for (int index = 0; index < noOfmonths; index++) _buildBody(_dateResolver[index]),
             ],
           ),
-        ),
-        drawer: MyDrawer(homePageState: this),
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            for (int index = 0; index < noOfmonths; index++)
-              _buildBody(_dateResolver[index]),
-          ],
         ),
       ),
     );
   }
 
+  exitApplication() {
+    showDeleteDialog(context, title: 'Confirm Exit', deleteButtonText: 'Exit  ', description: 'Do you want to exit this application?', onDeletePress: () {
+      ActivityTracker().otherActivityOnPage(PageName.dashboard, 'Exit App from In-App Dialog', 'Exit', 'FlatButton');
+      SystemNavigator.pop(animated: true);
+    });
+  }
+
   Widget _buildBody(NepaliDateTime date) {
     return Padding(
       padding: const EdgeInsets.only(top: 15.0),
-      child: Material(
-        elevation: 5.0,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0)),
-        ),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: ScreenSizeConfig.blockSizeHorizontal * 10,
-                  vertical: ScreenSizeConfig.blockSizeHorizontal * 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  FutureBuilder<List<double>>(
-                    future: TransactionService().getTotalIncomeExpense(
-                        selectedSubSector, date.year, date.month),
-                    builder: (context, snapshot) {
-                      final income = snapshot.data?.first ?? 0.0;
-                      final expense = snapshot.data?.last ?? 0.0;
-                      final bool isExpenseGreater = (expense - income) > 0;
-                      final percentSaved = income == 0.0
-                          ? 0.0
-                          : (income - expense) / (income) * 100;
-                      return Center(
-                        child: SleekCircularSlider(
-                          innerWidget: (percentage) => Padding(
-                            padding: EdgeInsets.only(
-                                top: ScreenSizeConfig.blockSizeVertical * 4.5),
-                            child:
-                                Center(child: _centerWidget(income, expense)),
-                          ),
-                          initialValue: isExpenseGreater ? 100 : (percentSaved),
-                          appearance: CircularSliderAppearance(
-                            angleRange: 360,
-                            startAngle: 270,
-                            customWidths: CustomSliderWidths(
-                              trackWidth: 10.0,
-                              progressBarWidth: 10.0,
+      child: Container(
+        decoration: pageBorderDecoration,
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: ScreenSizeConfig.blockSizeHorizontal * 10, vertical: ScreenSizeConfig.blockSizeHorizontal * 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    FutureBuilder<List<double>>(
+                      future: TransactionService().getTotalIncomeExpense(selectedSubSector!, date.year, date.month),
+                      builder: (context, snapshot) {
+                        final income = snapshot.data?.first ?? 0.0;
+                        final expense = snapshot.data?.last ?? 0.0;
+                        final bool isExpenseGreater = (expense - income) > 0;
+                        final percentSaved = income == 0.0 ? 0.0 : (income - expense) / (income) * 100;
+                        return Center(
+                          child: SleekCircularSlider(
+                            innerWidget: (percentage) => Padding(
+                              padding: EdgeInsets.only(top: ScreenSizeConfig.blockSizeVertical * 4.5),
+                              child: Center(child: _centerWidget(income, expense)),
                             ),
-                            customColors: CustomSliderColors(
-                              trackColor: Configuration().expenseColor,
-                              progressBarColors: (isExpenseGreater)
-                                  ? [Colors.red, Colors.red]
-                                  : [Color(0xff7635C7), Color(0xff7635C7)],
-                              hideShadow: true,
-                            ),
-                            infoProperties: InfoProperties(
-                              topLabelStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
+                            initialValue: isExpenseGreater ? 100 : (percentSaved),
+                            appearance: CircularSliderAppearance(
+                              angleRange: 360,
+                              startAngle: 270,
+                              customWidths: CustomSliderWidths(
+                                trackWidth: 10.0,
+                                progressBarWidth: 10.0,
                               ),
-                              bottomLabelStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
+                              customColors: CustomSliderColors(
+                                trackColor: Configuration().expenseColor,
+                                progressBarColors: (isExpenseGreater) ? [Colors.red, Colors.red] : [Color(0xff7635C7), Color(0xff7635C7)],
+                                hideShadow: true,
                               ),
-                              mainLabelStyle: TextStyle(
-                                  fontSize: 17.0, color: Colors.black),
+                              infoProperties: InfoProperties(
+                                topLabelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                ),
+                                bottomLabelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                ),
+                                mainLabelStyle: TextStyle(fontSize: 17.0, color: Colors.black),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Column(
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TransactionPage(
-                                  0,
-                                  selectedSubSector: selectedSubSector,
-                                ),
-                              ),
-                            ).then((onValue) {
-                              if (onValue ?? false) {
-                                updateChartData();
-                              }
-                            }),
-                            child: Column(
-                              children: <Widget>[
-                                circularComponent(true),
-                                AdaptiveText(
-                                  'Cash In',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 14,
-                                    color: const Color(0xff1e1e1e),
-                                    height: 2.0833333333333335,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TransactionPage(
-                                  1,
-                                  selectedSubSector: selectedSubSector,
-                                ),
-                              ),
-                            ).then((onValue) {
-                              if (onValue ?? false) {
-                                updateChartData();
-                              }
-                            }),
-                            child: Column(
-                              children: <Widget>[
-                                circularComponent(false),
-                                AdaptiveText(
-                                  'Cash out',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 14,
-                                    color: const Color(0xff1e1e1e),
-                                    height: 2.0833333333333335,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  ),
-                  SizedBox(width: 20.0),
-                ],
-              ),
-            ),
-            Text(
-              language == Lang.EN
-                  ? 'Overview for the month of  ${NepaliDateFormat("MMMM").format(date)}'
-                  : '${NepaliDateFormat("MMMM", Language.nepali).format(date)} महिनाको विस्तृत सर्वेक्षण',
-              style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  color: const Color(0xffb2b2b2),
-                  height: 1.4285714285714286,
-                  fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Divider(
-              color: Colors.grey.withOpacity(0.5),
-              thickness: 2,
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Expanded(
-                child: FutureBuilder<List<Transaction>>(
-                    future: TransactionService().getTransactions(
-                        selectedSubSector, date.year, date.month),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data.length == 0) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                    Column(
+                      children: <Widget>[
+                        InkWell(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TransactionPage(
+                                0,
+                                selectedSubSector: selectedSubSector,
+                              ),
+                            ),
+                          ).then((onValue) {
+                            if (onValue ?? false) {
+                              updateChartData();
+                            }
+                          }),
+                          child: Column(
                             children: <Widget>[
-                              SvgPicture.string(
-                                noTransaction,
-                                allowDrawingOutsideViewBox: true,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
+                              circularComponent(true),
                               AdaptiveText(
-                                'No Transactions',
+                                'Cash In',
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
                                   fontSize: 14,
-                                  color: const Color(0xff272b37),
-                                  height: 1.4285714285714286,
+                                  color: const Color(0xff1e1e1e),
+                                  height: 2.0833333333333335,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
-                          );
-                        } else {
-                          return TransactionList(
-                              transactionData: snapshot.data,
-                              date: date,
-                              language: language);
-                        }
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        InkWell(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TransactionPage(
+                                1,
+                                selectedSubSector: selectedSubSector,
+                              ),
+                            ),
+                          ).then((onValue) {
+                            if (onValue ?? false) {
+                              updateChartData();
+                            }
+                          }),
+                          child: Column(
+                            children: <Widget>[
+                              circularComponent(false),
+                              AdaptiveText(
+                                'Cash out',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                  color: const Color(0xff1e1e1e),
+                                  height: 2.0833333333333335,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 20.0),
+                  ],
+                ),
+              ),
+              Text(
+                language == Lang.EN ? 'Overview for the month of ${NepaliDateFormat("MMMM").format(date)}' : '${NepaliDateFormat("MMMM", Language.nepali).format(date)} महिनाको विस्तृत सर्वेक्षण',
+                style: TextStyle(fontFamily: 'Poppins', fontSize: 16, color: Colors.black, height: 1.4285714285714286, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
+              Divider(
+                color: Colors.grey.withOpacity(0.5),
+                thickness: 1,
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              FutureBuilder<List<Transaction>>(
+                  future: TransactionService().getTransactions(selectedSubSector!, date.year, date.month),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.length == 0) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            AspectRatio(
+                              aspectRatio: 4,
+                              child: SvgPicture.string(
+                                noTransactionIcon,
+                                allowDrawingOutsideViewBox: true,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            AdaptiveText(
+                              'No Transactions',
+                              style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Colors.grey, height: 1.4285714285714286, fontWeight: FontWeight.w500),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         );
+                      } else {
+                        return TransactionList(transactionData: snapshot.data, date: date, language: language);
                       }
-                    })),
-          ],
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  }),
+            ],
+          ),
         ),
       ),
     );
@@ -371,14 +395,8 @@ class HomePageState extends State<HomePage>
           ),
         ),
         Text(
-          NepaliNumberFormat(
-                  decimalDigits: 0,
-                  language: (language == Lang.EN)
-                      ? Language.english
-                      : Language.nepali)
-              .format(income ?? 0),
-          style: TextStyle(
-              color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold),
+          nepaliNumberFormatter(income),
+          style: TextStyle(color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 10.0),
         AdaptiveText(
@@ -388,12 +406,7 @@ class HomePageState extends State<HomePage>
           ),
         ),
         Text(
-          NepaliNumberFormat(
-                  decimalDigits: 0,
-                  language: (language == Lang.EN)
-                      ? Language.english
-                      : Language.nepali)
-              .format(expense ?? 0),
+          nepaliNumberFormatter(expense),
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -411,17 +424,9 @@ class HomePageState extends State<HomePage>
   circularComponent(bool cashIn) {
     return Container(
       decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: cashIn
-              ? Configuration().incomeColor
-              : Configuration().expenseColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black,
-              offset: Offset(0, 0),
-              blurRadius: 3,
-            )
-          ]),
+        shape: BoxShape.circle,
+        color: cashIn ? Configuration().incomeColor : Configuration().expenseColor,
+      ),
       height: 38,
       width: 38,
       child: Center(
@@ -435,9 +440,9 @@ class HomePageState extends State<HomePage>
 }
 
 class TransactionList extends StatefulWidget {
-  final List<Transaction> transactionData;
-  final NepaliDateTime date;
-  final Lang language;
+  final List<Transaction>? transactionData;
+  final NepaliDateTime? date;
+  final Lang? language;
 
   TransactionList({this.date, this.language, this.transactionData});
 
@@ -447,8 +452,8 @@ class TransactionList extends StatefulWidget {
 
 class _TransactionListState extends State<TransactionList> {
   var _transactionMap = <String, List<Transaction>>{};
-  List<bool> _expansionRecords;
-  List<double> income, expense;
+  List<bool>? _expansionRecords;
+  List<double> income = [], expense = [];
   @override
   void initState() {
     super.initState();
@@ -456,7 +461,7 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   initData() {
-    _transactionMap = _buildTransactionMap(widget.transactionData);
+    _transactionMap = _buildTransactionMap(widget.transactionData!);
     income = List.filled(_transactionMap.length, 0.0);
     expense = List.filled(_transactionMap.length, 0.0);
     int z = 0;
@@ -472,58 +477,51 @@ class _TransactionListState extends State<TransactionList> {
   @override
   void didUpdateWidget(TransactionList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.transactionData.length != oldWidget.transactionData.length) {
+    if (widget.transactionData!.length != oldWidget.transactionData!.length) {
       initData();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Theme(
-        data: Theme.of(context).copyWith(
-            cardColor: Colors.white,
-            cursorColor: Colors.red,
-            buttonColor: Colors.amber,
-            primaryColor: Colors.red),
-        child: ExpansionPanelList(
-            expansionCallback: (index, isExpanded) {
-              setState(() {
-                _expansionRecords[index] = !isExpanded;
-              });
-            },
-            children: [
-              for (int i = 0; i < _transactionMap.length; i++)
-                ExpansionPanel(
-                  isExpanded: _expansionRecords[i],
-                  canTapOnHeader: true,
-                  headerBuilder: (context, isExpanded) => ListTile(
-                    leading: Chip(
-                      label: Text(
-                          getDateTimeFormat(_transactionMap.keys.toList()[i])),
-                      backgroundColor: Configuration().incomeColor,
-                    ),
-                    title: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          _aggregate(
-                            0,
-                            income[i],
-                          ),
-                          _aggregate(
-                            1,
-                            expense[i],
-                          ),
-                        ],
-                      ),
+    return Theme(
+      data: Theme.of(context).copyWith(cardColor: Colors.white, primaryColor: Colors.red),
+      child: ExpansionPanelList(
+          // elevation: 0,
+          expansionCallback: (index, isExpanded) {
+            setState(() {
+              _expansionRecords![index] = !isExpanded;
+            });
+          },
+          children: [
+            for (int i = 0; i < _transactionMap.length; i++)
+              ExpansionPanel(
+                isExpanded: _expansionRecords![i],
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) => ListTile(
+                  leading: Chip(
+                    label: Text(getDateTimeFormat(_transactionMap.keys.toList()[i])),
+                    backgroundColor: Configuration().incomeColor,
+                  ),
+                  title: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _aggregate(
+                          0,
+                          income[i],
+                        ),
+                        _aggregate(
+                          1,
+                          expense[i],
+                        ),
+                      ],
                     ),
                   ),
-                  body: _dailyTransactionWidget(
-                      _transactionMap[_transactionMap.keys.toList()[i]]),
                 ),
-            ]),
-      ),
+                body: _dailyTransactionWidget(_transactionMap[_transactionMap.keys.toList()[i]]!),
+              ),
+          ]),
     );
   }
 
@@ -532,9 +530,9 @@ class _TransactionListState extends State<TransactionList> {
     double exValue = 0.0;
     data.forEach((element) {
       if (element.transactionType == 0) {
-        inValue = inValue + double.parse(element.amount);
+        inValue = inValue + double.parse(element.amount!);
       } else
-        exValue = exValue + double.parse(element.amount);
+        exValue = exValue + double.parse(element.amount!);
     });
     return [inValue, exValue];
   }
@@ -545,9 +543,7 @@ class _TransactionListState extends State<TransactionList> {
       child: Row(
         children: [
           Material(
-            color: (transactionType == 0)
-                ? Configuration().incomeColor
-                : Configuration().expenseColor,
+            color: (transactionType == 0) ? Configuration().incomeColor : Configuration().expenseColor,
             shape: CircleBorder(),
             child: SizedBox(
               width: 10.0,
@@ -556,11 +552,7 @@ class _TransactionListState extends State<TransactionList> {
           ),
           SizedBox(width: 5.0),
           Text(
-            NepaliNumberFormat(
-                    decimalDigits: 0,
-                    language:
-                        (language == 'en') ? Language.english : Language.nepali)
-                .format<double>(amount),
+            nepaliNumberFormatter(amount),
             style: TextStyle(
               fontSize: 15.0,
               color: Colors.black,
@@ -572,9 +564,7 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   getDateTimeFormat(String date) {
-    return NepaliDateFormat("dd/MM/EE",
-            widget.language == Lang.EN ? Language.english : Language.nepali)
-        .format(NepaliDateTime.parse(NepaliDateTime(
+    return NepaliDateFormat("dd/MM/EE", widget.language == Lang.EN ? Language.english : Language.nepali).format(NepaliDateTime.parse(NepaliDateTime(
       int.parse(date.split('-').first),
       int.parse(date.split('-')[1]),
       int.parse(date.split('-').last),
@@ -602,26 +592,21 @@ class _TransactionListState extends State<TransactionList> {
                   itemCount: dailyTransactions.length,
                   reverse: true,
                   itemBuilder: (context, index) {
-                    return FutureBuilder(
+                    return FutureBuilder<Category>(
                       future: CategoryService().getCategoryById(
-                        selectedSubSector,
+                        selectedSubSector!,
                         dailyTransactions[index].categoryId,
                         dailyTransactions[index].transactionType,
                       ),
                       builder: (context, snapshot) {
-                        if (!snapshot.hasData)
-                          return Container(
-                            height: 1,
-                            width: 1,
-                          );
+                        if (!snapshot.hasData) return SizedBox.shrink();
                         return ListTile(
                           onTap: () async {
-                            await _showTransactionDetail(
-                                dailyTransactions[index]);
+                            await _showTransactionDetail(dailyTransactions[index]);
                           },
                           leading: Icon(
                             VectorIcons.fromName(
-                              snapshot.data.iconName,
+                              snapshot.data!.iconName,
                               provider: IconProvider.FontAwesome5,
                             ),
                             color: Configuration().incomeColor,
@@ -633,11 +618,7 @@ class _TransactionListState extends State<TransactionList> {
                             style: TextStyle(color: Colors.black),
                           ),
                           trailing: Text(
-                            NepaliNumberFormat(
-                                    language: (language == 'en')
-                                        ? Language.english
-                                        : Language.nepali)
-                                .format(dailyTransactions[index].amount),
+                            nepaliNumberFormatter(double.tryParse(dailyTransactions[index].amount!)),
                             style: getTextStyle(dailyTransactions[index]),
                           ),
                         );
@@ -655,144 +636,52 @@ class _TransactionListState extends State<TransactionList> {
   }
 
   Future _showTransactionDetail(Transaction transaction) async {
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-          backgroundColor: Colors.white,
-          contentPadding: EdgeInsets.all(0.0),
-          title: AdaptiveText(
-            'Transaction Detail',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 20,
-              color: const Color(0xff1e1e1e),
-              fontWeight: FontWeight.w700,
+    await detailDialog(context,
+        title: 'Transaction Detail',
+        detailWidget: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+          _detailsRow(
+            'Date: ',
+            NepaliDateFormat("MMMM dd, y (EEE)", widget.language == Lang.EN ? Language.english : Language.nepali).format(
+              NepaliDateTime.parse(transaction.timestamp!),
             ),
-            textAlign: TextAlign.center,
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 10.0),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: _detailsRow(
-                  'Date: ',
-                  NepaliDateFormat(
-                          "MMMM dd, y (EEE)",
-                          widget.language == Lang.EN
-                              ? Language.english
-                              : Language.nepali)
-                      .format(
-                    NepaliDateTime.parse(transaction.timestamp),
-                  ),
-                ),
-              ),
-              SizedBox(height: 5.0),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: _detailsRow('Detail: ', '${transaction.memo ?? ''}'),
-              ),
-              SizedBox(height: 5.0),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: _detailsRow(
-                  'Amount: ',
-                  NepaliNumberFormat(
-                          language: (language == Lang.EN)
-                              ? Language.english
-                              : Language.nepali)
-                      .format(transaction.amount ?? 0),
-                ),
-              ),
-              SizedBox(height: 10.0),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    InkWell(
-                      onTap: () {
-                        _deleteTransaction(transaction).then((value) {
-                          Navigator.pop(context, value);
-                        });
-                      },
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(21.0),
-                          color: const Color(0xfffc717f),
-                        ),
-                        child: AdaptiveText(
-                          'DELETE',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TransactionPage(
-                              transaction.transactionType,
-                              transaction: transaction,
-                              selectedSubSector: selectedSubSector,
-                            ),
-                          ),
-                        ).then((value) {
-                          if (value ?? false) {
-                            Navigator.pop(context, true);
-                          }
-                        });
-                      },
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(21.0),
-                          color: const Color(0xffb380f6),
-                        ),
-                        child: AdaptiveText(
-                          'Update',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () => Navigator.pop(context, false),
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(21.0),
-                          color: const Color(0xffb9bbc5),
-                        ),
-                        child: AdaptiveText(
-                          'Cancel',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          // SizedBox(height: 5.0),
+          _detailsRow('Detail: ', '${transaction.memo ?? ''}'),
+          // SizedBox(height: 5.0),
+          _detailsRow(
+            'Amount: ',
+            nepaliNumberFormatter(transaction.amount ?? 0),
           ),
-        );
-      },
-    ).then((value) {
+        ]), onDelete: () {
+      _deleteTransaction(transaction).then((value) {
+        Navigator.of(context, rootNavigator: true).pop(value);
+      });
+    }, onUpdate: () {
+      Navigator.of(context, rootNavigator: true).pop();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TransactionPage(
+            transaction.transactionType,
+            transaction: transaction,
+            selectedSubSector: selectedSubSector,
+          ),
+        ),
+      ).then((value) {
+        if (value ?? false) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            home,
+            ModalRoute.withName(home),
+          );
+        }
+      });
+    }, onDialogClosed: (value) {
       if (value ?? false) {
         Navigator.pushNamedAndRemoveUntil(
           context,
-          '/home',
-          ModalRoute.withName('/home'),
+          home,
+          ModalRoute.withName(home),
         );
       }
     });
@@ -831,123 +720,23 @@ class _TransactionListState extends State<TransactionList> {
     );
   }
 
-  TextStyle getTextStyle(Transaction transaction) => TextStyle(
-      color: transaction.transactionType == 0
-          ? Configuration().incomeColor
-          : Configuration().expenseColor,
-      fontWeight: FontWeight.bold);
+  TextStyle getTextStyle(Transaction transaction) => TextStyle(color: transaction.transactionType == 0 ? Configuration().incomeColor : Configuration().expenseColor, fontWeight: FontWeight.bold);
 
-  Map<String, List<Transaction>> _buildTransactionMap(
-      List<Transaction> transactions) {
-    transactions.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  Map<String, List<Transaction>> _buildTransactionMap(List<Transaction> transactions) {
+    transactions.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
     final zz = transactions.reversed.toList();
-    final map = zz.groupBy((e) => e.timestamp.split('T').first);
+    final Map<String, List<Transaction>> map = zz.groupBy((e) => e.timestamp!.split('T').first);
     return map;
   }
 
   Future<bool> _deleteTransaction(Transaction transaction) async {
-    return await showDialog(
-      context: context,
-      builder: (context) {
-        return Theme(
-          data: Theme.of(context).copyWith(canvasColor: Colors.white),
-          child: Dialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(32.0))),
-            backgroundColor: Colors.white,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                SizedBox(
-                  height: 10.0,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-                  child: Column(
-                    children: <Widget>[
-                      Icon(
-                        Icons.warning,
-                        color: Colors.black,
-                        size: 35,
-                      ),
-                      Text(
-                        'Warning!!',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 20,
-                          color: const Color(0xff1e1e1e),
-                          fontWeight: FontWeight.w700,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      AdaptiveText(
-                        'Are you sure you want to delete this category? Deleting the category will also clear all the records related to it.',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          color: const Color(0xff43425d),
-                          height: 1.5625,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.0),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      InkWell(
-                        onTap: () async {
-                          await TransactionService().deleteTransaction(
-                              selectedSubSector, transaction);
-                          Navigator.pop(context, true);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.0, vertical: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(21.0),
-                            color: const Color(0xfffc717f),
-                          ),
-                          child: AdaptiveText(
-                            'DELETE',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () => Navigator.pop(context, false),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.0, vertical: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(21.0),
-                            color: const Color(0xffb9bbc5),
-                          ),
-                          child: AdaptiveText(
-                            'Cancel',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    ).then((value) {
-      return value;
+    final d = await showDeleteDialog(context, topIcon: Icons.error_outline, description: 'Are you sure you want to delete this transaction?', title: 'Delete Transaction', onDeletePress: () async {
+      await TransactionService().deleteTransaction(selectedSubSector!, transaction, false);
+      Navigator.of(context, rootNavigator: true).pop(true);
+    }, onCancelPress: () {
+      Navigator.of(context, rootNavigator: true).pop(false);
     });
+
+    return d;
   }
 }

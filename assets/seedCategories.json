@@ -2,95 +2,124 @@
   "expense": [
     {
       "id": 100,
-      "en": "Foundation Seed",
+      "en": "Foundation Seed", 
       "np": "मूल बिउ",
-      "iconName": "utensils"
+      "iconName": "utensils",
+      "categoryHeadingId": 1 
     },
     {
       "id": 101,
       "en": "Fertilizers",
       "np": "मल",
-      "iconName": "file-invoice-dollar"
+      "iconName": "file-invoice-dollar",
+      "categoryHeadingId": 1
     },
     {
       "id": 102,
       "en": "Insecticide",
       "np": "बिषादी",
-      "iconName": "bus"
+      "iconName": "bus",
+      "categoryHeadingId":1
     },
     {
       "id": 103,
       "en": "Tools",
       "np": "औजार / मेसिन",
-      "iconName": "home"
+      "iconName": "home",
+      "categoryHeadingId":2
     },
     {
       "id": 104,
       "en": "Transportation",
       "np": "यातायात",
-      "iconName": "car"
+      "iconName": "car",
+      "categoryHeadingId":1
     },
     {
       "id": 105,
       "en": "Water",
       "np": "पानी",
-      "iconName": "gamepad"
+      "iconName": "gamepad",
+      "categoryHeadingId":1
     },
     {
       "id": 106,
       "en": "Electricity / Fuel",
       "np": "बिजुली / इन्धन",
-      "iconName": "shopping-bag"
+      "iconName": "shopping-bag",
+      "categoryHeadingId":1
     },
     {
       "id": 107,
       "en": "Labour Wage",
       "np": "श्रमिक ज्याला",
-      "iconName": "tshirt"
+      "iconName": "tshirt",
+      "categoryHeadingId":1
     },
     {
       "id": 108,
       "en": "Rent",
       "np": "भाडा",
-      "iconName": "user-shield"
+      "iconName": "user-shield",
+      "categoryHeadingId":1
     },
     {
       "id": 109,
       "en": "Transportation Fare",
       "np": "ढुवानी",
-      "iconName": "file-invoice"
+      "iconName": "file-invoice",
+      "categoryHeadingId":1
     },
     {
       "id": 110,
       "en": "Food",
       "np": "खाजा खाना",
-      "iconName": "heartbeat"
+      "iconName": "heartbeat",
+      "categoryHeadingId":1
     },
     {
       "id": 111,
-      "en": "Miscellaneous",
+      "en": "Miscellaneous", 
       "np": "मसलन्द",
-      "iconName": "table-tennis"
+      "iconName": "table-tennis",
+      "categoryHeadingId":1
     },
     {
       "id": 112,
-      "en": "Insurance Expense",
+      "en": "Insurance Expense", 
       "np": "बिमा खर्च",
-      "iconName": "table-tennis"
+      "iconName": "table-tennis",
+      "categoryHeadingId":1
     }
   ],
   "income": [
     {
       "id": 1,
-      "en": "Sales",
+      "en": "Sales", 
       "np": "बिक्री",
-      "iconName": "hand-holding-usd"
+      "iconName": "hand-holding-usd",
+      "categoryHeadingId":100
     },
     {
       "id": 112,
-      "en": "Insurance Income",
+      "en": "Insurance Income", 
       "np": "बिमा आय",
-      "iconName": "table-tennis"
+      "iconName": "table-tennis",
+      "categoryHeadingId":100
+    },
+     {
+      "id": 113,
+      "en": "Capital Investment",
+      "np": "पुंजी लगानी",
+      "iconName": "hornbill",
+      "categoryHeadingId":101
+    },
+     {
+      "id": 114,
+      "en": "Loan",
+      "np": "ऋण",
+      "iconName": "hornbill",
+      "categoryHeadingId":102
     }
   ]
 }

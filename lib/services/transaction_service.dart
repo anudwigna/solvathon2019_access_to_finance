@@ -9,6 +9,8 @@ import 'package:MunshiG/services/budget_service.dart';
 import 'package:MunshiG/services/preference_service.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
+import '../services/activity_tracking.dart';
+import '../models/app_page_naming.dart';
 
 class TransactionService {
   TransactionService._();
@@ -18,8 +20,7 @@ class TransactionService {
   Future<DatabaseAndStore> getDatabaseAndStore(String subSector) async {
     DatabaseFactory dbFactory = databaseFactoryIo;
     return DatabaseAndStore(
-      database: await dbFactory.openDatabase(
-          await _getDbPath('${subSector.toLowerCase()}Transaction.db')),
+      database: await dbFactory.openDatabase(await _getDbPath('${subSector.toLowerCase()}Transaction.db')),
       store: intMapStoreFactory.store('transaction'),
     );
   }
@@ -29,8 +30,7 @@ class TransactionService {
     return join(appDocumentDir.path, dbName);
   }
 
-  Future<List<double>> getTotalIncomeExpense(
-      String subSector, int year, int month) async {
+  Future<List<double>> getTotalIncomeExpense(String subSector, int year, int month) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
@@ -38,48 +38,38 @@ class TransactionService {
         Filter.equals('month', month),
       ]),
     );
-    var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
     if (snapshot.isEmpty) {
       return [0, 0];
     }
-    List<t.Transaction> transactions =
-        snapshot.map((record) => t.Transaction.fromJson(record.value)).toList();
+    List<t.Transaction> transactions = snapshot.map((record) => t.Transaction.fromJson(record.value)).toList();
     int income = 0;
     int expense = 0;
     transactions.forEach(
       (transaction) {
         if (transaction.transactionType == 0) {
-          income += int.parse(transaction.amount);
+          income += int.parse(transaction.amount!);
         } else {
-          expense += int.parse(transaction.amount);
+          expense += int.parse(transaction.amount!);
         }
       },
     );
-    return [
-      (income == 0) ? 0.0 : income * 1.0,
-      expense == 0 ? 0.0 : expense * 1.0
-    ];
+    return [(income == 0) ? 0.0 : income * 1.0, expense == 0 ? 0.0 : expense * 1.0];
   }
 
-  Future<bool> isBudgetEditable(
-      String subSector, int categoryId, int month, int year) async {
+  Future<bool> isBudgetEditable(String subSector, int? categoryId, int? month, int? year) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
-      filter: Filter.and([
-        Filter.equals('year', year),
-        Filter.equals('month', month),
-        Filter.equals('categoryId', categoryId)
-      ]),
+      filter: Filter.and([Filter.equals('year', year), Filter.equals('month', month), Filter.equals('categoryId', categoryId)]),
     );
-    var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
-    if ((snapshot?.length ?? 0) > 0) {
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
+    if ((snapshot.length) > 0) {
       return false;
     }
     return true;
   }
 
-  Future<List<t.Transaction>> getTransactions(
-      String subSector, int year, int month) async {
+  Future<List<t.Transaction>> getTransactions(String subSector, int year, int month) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.and([
@@ -88,36 +78,31 @@ class TransactionService {
       ]),
     );
 
-    var snapshot = await dbStore.store.find(dbStore.database, finder: finder);
-    return snapshot
-        .map((record) => t.Transaction.fromJson(record.value))
-        .toList();
+    List<RecordSnapshot<int?, Map<String, dynamic>>> snapshot = await dbStore.store!.find(dbStore.database, finder: finder);
+    return snapshot.map((record) => t.Transaction.fromJson(record.value)).toList();
   }
 
   /// Updates the transaction
   ///
   /// Adds new transaction record if record doesn't exist. Returns TransactionId.
-  Future<int> updateTransaction(
-      String subSector, t.Transaction transaction) async {
-    int transactionId;
+  Future<int?> updateTransaction(String subSector, t.Transaction transaction, bool isAutomated) async {
+    int? transactionId;
     var dbStore = await getDatabaseAndStore(subSector);
     Filter checkRecord = Filter.equals(
       'id',
       transaction.id,
     );
-    bool recordFound =
-        (await dbStore.store.count(dbStore.database, filter: checkRecord)) != 0;
+    bool recordFound = (await dbStore.store!.count(dbStore.database, filter: checkRecord)) != 0;
     if (recordFound) {
-      await dbStore.store.update(dbStore.database, transaction.toJson(),
+      await dbStore.store!.update(dbStore.database, transaction.toJson(),
           finder: Finder(
             filter: checkRecord,
           ));
       transactionId = transaction.id;
     } else {
-      int currentIndex =
-          await PreferenceService.instance.getCurrentTransactionIndex();
+      int currentIndex = await PreferenceService.instance.getCurrentTransactionIndex();
       transactionId = currentIndex;
-      await dbStore.store.add(
+      await dbStore.store!.add(
         dbStore.database,
         {
           'id': currentIndex,
@@ -131,13 +116,18 @@ class TransactionService {
           'timestamp': transaction.timestamp,
         },
       );
-      await PreferenceService.instance
-          .setCurrentTransactionIndex(currentIndex + 1);
+      await PreferenceService.instance.setCurrentTransactionIndex(currentIndex + 1);
     }
+    if (!(isAutomated))
+      ActivityTracker().otherActivityOnPage(
+          (transaction.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut),
+          (recordFound ? 'Update' : 'Add') + (transaction.transactionType == 0 ? 'Income' : 'Expense') + ' Transaction $subSector, ${transaction.name}, ${transaction.timestamp}',
+          'Submit',
+          'FlatButton');
     return transactionId;
   }
 
-  Future deleteTransaction(String subSector, t.Transaction transaction) async {
+  Future deleteTransaction(String subSector, t.Transaction transaction, bool isAutomated) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.equals(
@@ -146,52 +136,50 @@ class TransactionService {
       ),
     );
 
-    Account _associatedAccount =
-        await AccountService().getAccountForTransaction(transaction);
-    _associatedAccount.transactionIds.remove(transaction.id);
+    Account _associatedAccount = await (AccountService().getAccountForTransaction(transaction) as Future<Account>);
+    _associatedAccount.transactionIds!.remove(transaction.id);
     if (transaction.transactionType == 0) {
-      int newBalance =
-          int.parse(_associatedAccount.balance) - int.parse(transaction.amount);
+      int newBalance = int.parse(_associatedAccount.balance!) - int.parse(transaction.amount!);
       await AccountService().updateAccount(
-        Account(
-          name: _associatedAccount.name,
-          type: _associatedAccount.type,
-          transactionIds: _associatedAccount.transactionIds,
-          balance: '$newBalance',
-        ),
-      );
+          Account(
+            name: _associatedAccount.name,
+            type: _associatedAccount.type,
+            transactionIds: _associatedAccount.transactionIds,
+            balance: '$newBalance',
+          ),
+          true);
     } else {
-      int newBalance =
-          int.parse(_associatedAccount.balance) + int.parse(transaction.amount);
+      int newBalance = int.parse(_associatedAccount.balance!) + int.parse(transaction.amount!);
       await AccountService().updateAccount(
-        Account(
-          name: _associatedAccount.name,
-          type: _associatedAccount.type,
-          transactionIds: _associatedAccount.transactionIds,
-          balance: '$newBalance',
-        ),
-      );
+          Account(
+            name: _associatedAccount.name,
+            type: _associatedAccount.type,
+            transactionIds: _associatedAccount.transactionIds,
+            balance: '$newBalance',
+          ),
+          true);
     }
     if (transaction.transactionType == 1) {
-      Budget budget = await BudgetService().getBudget(subSector,
-          transaction.categoryId, transaction.month, transaction.year);
-      int newSpent = int.parse(budget.spent) - int.parse(transaction.amount);
+      Budget budget = await BudgetService().getBudget(subSector, transaction.categoryId, transaction.month, transaction.year);
+      int newSpent = int.parse(budget.spent!) - int.parse(transaction.amount!);
       await BudgetService().updateBudget(
-        subSector,
-        Budget(
-          categoryId: budget.categoryId,
-          month: budget.month,
-          spent: '$newSpent',
-          total: budget.total,
-          year: budget.year,
-        ),
-      );
+          subSector,
+          Budget(
+            categoryId: budget.categoryId,
+            month: budget.month,
+            spent: '$newSpent',
+            total: budget.total,
+            year: budget.year,
+          ),
+          true);
     }
-    await dbStore.store.delete(dbStore.database, finder: finder);
+    await dbStore.store!.delete(dbStore.database, finder: finder);
+    if (!(isAutomated))
+      ActivityTracker().otherActivityOnPage((transaction.transactionType == 0 ? PageName.addCashIn : PageName.addCashOut),
+          'Delete' + (transaction.transactionType == 0 ? 'Income' : 'Expense') + ' Transaction $subSector, ${transaction.name}, ${transaction.timestamp}', 'Delete', 'FlatButton');
   }
 
-  Future deleteAllTransactionsForCategory(
-      String subSector, int categoryId) async {
+  Future deleteAllTransactionsForCategory(String subSector, int? categoryId) async {
     var dbStore = await getDatabaseAndStore(subSector);
     Finder finder = Finder(
       filter: Filter.equals(
@@ -199,6 +187,11 @@ class TransactionService {
         categoryId,
       ),
     );
-    await dbStore.store.delete(dbStore.database, finder: finder);
+    await dbStore.store!.delete(dbStore.database, finder: finder);
+  }
+
+  Future<void> closeDatabase(String subsector) async {
+    final db = await getDatabaseAndStore(subsector);
+    await db.database.close();
   }
 }

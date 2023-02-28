@@ -1,10 +1,11 @@
+import 'package:MunshiG/config/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:MunshiG/providers/preference_provider.dart';
 import 'package:MunshiG/services/preference_service.dart';
 import 'package:MunshiG/components/adaptive_text.dart';
 
-import '../configuration.dart';
+import '../config/configuration.dart';
 
 class LanguageSelectionPage extends StatelessWidget {
   @override
@@ -125,5 +126,5 @@ class LanguageSelectionPage extends StatelessWidget {
   }
 
   _navigateToHome(BuildContext context) =>
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, home);
 }

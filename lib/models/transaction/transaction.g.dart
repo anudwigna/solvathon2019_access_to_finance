@@ -8,15 +8,15 @@ part of 'transaction.dart';
 
 Transaction _$TransactionFromJson(Map<String, dynamic> json) {
   return Transaction(
-      id: json['id'] as int,
-      transactionType: json['transactionType'] as int,
-      categoryId: json['categoryId'] as int,
-      name: json['name'] as String,
-      memo: json['memo'] as String,
-      amount: json['amount'] as String,
-      year: json['year'] as int,
-      month: json['month'] as int,
-      timestamp: json['timestamp'] as String);
+      id: json['id'] as int?,
+      transactionType: json['transactionType'] as int?,
+      categoryId: json['categoryId'] as int?,
+      name: json['name'] as String?,
+      memo: json['memo'] as String?,
+      amount: json['amount'] as String?,
+      year: json['year'] as int?,
+      month: json['month'] as int?,
+      timestamp: json['timestamp'] as String?);
 }
 
 Map<String, dynamic> _$TransactionToJson(Transaction instance) =>

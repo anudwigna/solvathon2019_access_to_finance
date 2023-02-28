@@ -4,12 +4,12 @@ part 'account.g.dart';
 
 @JsonSerializable()
 class Account extends Object {
-  String name;
-  String balance;
+  String? name;
+  String? balance;
 
   ///0=Person 1=Bank 2=Cash 3=Other
-  int type;
-  List<int> transactionIds;
+  int? type;
+  List<int?>? transactionIds;
 
   Account({
     this.name,

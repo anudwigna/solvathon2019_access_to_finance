@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "name": "Dashboard Page"
+  },
+  {
+    "id": 2,
+    "name": "Profile Page"
+  },
+  {
+    "id": 3,
+    "name": "Categories Page"
+  },
+  {
+    "id": 4,
+    "name": "Cash Inflow Projection Page"
+  },
+  {
+    "id": 5,
+    "name": "Cash Outflow Projection Page"
+  },
+  {
+    "id": 6,
+    "name": "Account Page"
+  },
+  {
+    "id": 7,
+    "name": "Report Page"
+  },
+  {
+    "id": 8,
+    "name": "Setting Page"
+  },
+  {
+    "id": 9,
+    "name": "Add Cash In Transaction Page"
+  },
+  {
+    "id": 10,
+    "name": "Add Cash Out Transaction Page"
+  },
+  {
+    "id": 11,
+    "name": "Create Profile Page"
+  }
+  ,
+  {
+    "id": 12,
+    "name": "Backup Page"
+  }
+]

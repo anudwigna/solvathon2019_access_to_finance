@@ -4,11 +4,11 @@ part 'budget.g.dart';
 
 @JsonSerializable()
 class Budget extends Object {
-  final int month;
-  final String total;
-  final String spent;
-  final int categoryId;
-  final int year;
+  final int? month;
+  final String? total;
+  final String? spent;
+  final int? categoryId;
+  final int? year;
 
   Budget({this.month, this.total, this.spent, this.categoryId, this.year});
 
